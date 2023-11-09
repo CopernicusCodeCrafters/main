@@ -23,6 +23,7 @@ async function connectToMongo() {
 connectToMongo();
 
 var indexRouter = require("./routes/webpage");
+var impressumRouter = require("./routes/impressum")
 
 
 var app = express();
@@ -81,6 +82,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
+app.use("/impressum", impressumRouter)
 
 
 

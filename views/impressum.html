@@ -26,11 +26,55 @@
             </div>
         </nav>
     </header>
-
+    <div class="container">
+        <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
+            <div class="col-lg-6">
+                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                    <h2 class="card-title">Hauptsitz:</h2>
+                    <div class="karte">
+                        <!-- Add any content for the map here -->
+                    </div>
+                    <div id="map2"></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                    <h2 class="card-title">Impressum:</h2>
+                    <p>
+                        Anbieter:<br>
+                        Copernicus Code Crafters<br>
+                        GEO1, Heisenbergstraße 2<br>
+                        48149 Münster
+                    </p>
+                    <p>&nbsp;</p>
+                    <p>&nbsp;</p>
+                    <p>
+                        Kontakt:<br>
+                        Telefon: 0157/1234567-8<br>
+                        Telefax: 0800/1234567-9<br>
+                        E-Mail: ccc@info.de<br>
+                        Website: <a href="https://github.com/CopernicusCodeCrafters">https://github.com/CopernicusCodeCrafters</a>
+                    </p>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript for creating the map -->
+    <script>
+        // Create Map
+        var map = L.map('map2').setView([51.969364, 7.595765], 19);
+        L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: 'Google Maps'
+        }).addTo(map);
+    </script>
     <div class="container">
         <footer>
             <div class="d-flex flex-wrap justify-content-between align-items-center py-1 my-3 border-top">
-                <p class="col-md-4 mb-0 text-body-secondary">&copy; 2023 LEEZGO, Inc</p><a class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" href="/"><svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg></a>
+                <p class="col-md-4 mb-0 text-body-secondary">&copy; 2023 Copernicus Code Crafters, Inc</p><a class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none" href="/"><svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg></a>
                 <ul class="nav col-md-4 justify-content-end">
                     <li class="nav-item"><a class="nav-link px-2 text-body-secondary active" area-current="page" href="/impressum">Impressum</a></li>
                 </ul>
@@ -38,7 +82,7 @@
         </footer>
     </div>
     
-   
+
     <footer>
         <div class="navbar navbar-expand-md bg-secondary rounded justify-content-center"><span class="text-grey">Geosoftware 2</span></div>
     </footer>
