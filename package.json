@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/CopernicusCodeCrafters/main/issues"
   },
-  "homepage": "https://github.com/CopernicusCodeCrafters/main#readme"
+  "homepage": "https://github.com/CopernicusCodeCrafters/main#readme",
+  "dependencies": {
+    "node": "^21.1.0"
+  }
 }
