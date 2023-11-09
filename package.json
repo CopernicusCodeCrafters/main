@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/CopernicusCodeCrafters/main#readme",
   "dependencies": {
-    "node": "^21.1.0"
+    "express": "^4.18.2",
+    "node": "^21.1.0",
+    "nodemon": "^3.0.1"
   }
 }
