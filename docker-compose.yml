@@ -3,8 +3,19 @@ version: "3.7"
 services:
 
     frontend:
+        build: ./views
+        ports:
+            - 3000:3000
+
+
 
     backend:
+        build: ./bin
+        ports: 
+            - 3001:3001
+        environment:
+            
+
 
 
 volumes:
