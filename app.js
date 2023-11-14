@@ -24,7 +24,7 @@ connectToMongo();
 
 var indexRouter = require("./routes/webpage");
 var impressumRouter = require("./routes/impressum")
-var trainingsdaten  =require("./routes/trainingsdaten")
+var trainingsdatenRouter  =require("./routes/trainingsdaten")
 
 
 var app = express();
@@ -85,6 +85,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/webpage", indexRouter);
 app.use("/impressum", impressumRouter)
+app.use("/trainingsdaten",trainingsdatenRouter)
 
 
 
