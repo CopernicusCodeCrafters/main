@@ -2,23 +2,21 @@ version: "3.7"
 
 services:
 
-    frontend:
-        build: ./views
-        ports:
-            - 3000:3000
-
-
-
     backend:
+        conatiner_name: express_server
         build: ./bin
         ports: 
-            - 3000:3001
+            - 3000:3000
         environment:
+            DB_URL: mongodb://127.0.0.1:27017"        
 
     db:
+        container_name: mongodb
+        image: mongo:4.0-xenial
+        volumes:
+            - ./data:/data/db
+        ports:
+            - 27017:27017
+
+
     
-            
-
-
-
-volumes:
