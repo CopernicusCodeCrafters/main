@@ -12,8 +12,11 @@ services:
     backend:
         build: ./bin
         ports: 
-            - 3001:3001
+            - 3000:3001
         environment:
+
+    db:
+    
             
 
 
