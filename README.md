@@ -21,8 +21,12 @@ Co-authored-by: Kjell Wundram           @kwundram2602
 
 ( oder in Github Desktop)
 
-### OpenEOcubes
+## OpenEOcubes
 
+#### Processes 
+                https://processes.openeo.org/#add_dimension
+
+#### Container
 
 1.  docker pull brianpondi/openeocubes ( in cmd )
 2. 
@@ -30,5 +34,10 @@ Co-authored-by: Kjell Wundram           @kwundram2602
     __For light tasks and processes you can host the service on pc and therefore you don't need AWS IPv4 Address__
     b) docker run -p 8000:8000  brianpondi/openeocubes
 
-#### Processes 
-                https://processes.openeo.org/#add_dimension
+
+#### Paths
+http://localhost:8000/collections/
+http://localhost:8000/processes
+http://localhost:8000/credentials/basic
+http://localhost:8000/file_formats
+http://localhost:8000/result

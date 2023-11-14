@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--  teste open eo js client-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--Bootstrap:-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Lealfet:-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!--Leaflet Draw:-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+    <!--OPenEO JS Client:-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/oidc-client@1/dist/oidc-client.min.js"></script> <!-- Only required if you'd like to enable authentication via OpenID Connect -->
+    <script src="https://cdn.jsdelivr.net/npm/multihashes@3/src/index.min.js"></script> <!-- Only required if you have checksums in the STAC metadata -->
+    <script src="https://cdn.jsdelivr.net/npm/@openeo/js-client@2/openeo.min.js"></script>
+
+    <!--Own stylesheet:-->
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <title>Copernicus Code Crafters- test von openeo js client</title>
+</head>
+
+<body>
+    <header class="mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-secondary"><a class="navbar-brand active"
+                area-current="page" href="/">CCC Clasifier</a><button class="navbar-toggler" type="button"
+                data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a class="nav-link active" area-current="page"
+                            href="/trainingsdaten">Trainingsdatenverwalten
+                    <li class="nav-item active"></li></a></li>
+                    <li class="nav-item"><a class="nav-link active" area-current="page" href="/impressum">Impressum </a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0"><label class="switch"><input id="dark_mode_button"
+                            type="checkbox" checked=""><span class="slider round"></span></label></form>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <footer>
+            <div class="d-flex flex-wrap justify-content-between align-items-center py-1 my-3 border-top">
+                <p class="col-md-4 mb-0 text-body-secondary">&copy; 2023 LEEZGO, Inc</p><a
+                    class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
+                    href="/"><svg class="bi me-2" width="40" height="32">
+                        <use xlink:href="#bootstrap"></use>
+                    </svg></a>
+                <ul class="nav col-md-4 justify-content-end">
+                    <li class="nav-item"><a class="nav-link px-2 text-body-secondary active" area-current="page"
+                            href="/impressum">Impressum</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+
+    <footer>
+        <div class="navbar navbar-expand-md bg-secondary rounded justify-content-center"><span
+                class="text-grey">Geosoftware 2</span></div>
+    </footer>
+</body>

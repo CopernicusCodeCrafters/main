@@ -6,4 +6,9 @@ router.get("/", function (req, res, next) {
   res.render("impressum", { title: "Express" });
 });
 
+
+router.get("/trainingsdaten", function (req, res, next) {
+  res.render("impressum", { title: "Express" });
+});
+
 module.exports = router;
