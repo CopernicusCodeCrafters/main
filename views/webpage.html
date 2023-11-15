@@ -34,23 +34,41 @@
                     <li class="nav-item"><a class="nav-link active" area-current="page" href="/impressum">Impressum </a>
                     </li>
                 </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <label class="switch">
-                        <input id="dark_mode_button" type="checkbox" checked="">
-                         <span class="slider round"></span>
-                    </label>
-                </form>
             </div>
         </nav>
     </header>
-    <div id="map" style="height: 400px;width: 600px"></div>
-    <script>
-        var map = L.map('map').setView([51.305915044598834,10.21774343122064], 6);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-    </script>
+
+    <div class="container">
+        <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
+            <div class="col-lg-6">
+                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                    <h2 class="card-title">Viewer</h2>
+                    <div id="map"></div>
+                    <script>
+                        var map = L.map('map').setView([51.305915044598834,10.21774343122064], 6);
+                        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        }).addTo(map);
+                    </script>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                    <h2 class="card-title">Options</h2>
+                    <p>
+                        Option1<br>
+                        Option 2<br>
+                        Option 3<br>
+                        Option 4
+                    </p>
+                    <p>&nbsp;</p>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <footer>
@@ -59,7 +77,7 @@
                     class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
                     href="/"><svg class="bi me-2" width="40" height="32">
                         <use xlink:href="#bootstrap"></use>
-                    </svg></a>
+                    </svg></a>                  
                 <ul class="nav col-md-4 justify-content-end">
                     <li class="nav-item"><a class="nav-link px-2 text-body-secondary active" area-current="page"
                             href="/impressum">Impressum</a></li>
@@ -67,7 +85,6 @@
             </div>
         </footer>
     </div>
-
 
     <footer>
         <div class="navbar navbar-expand-md bg-secondary bg-gradient rounded justify-content-center"><span
