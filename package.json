@@ -28,7 +28,7 @@
     "http-errors": "~1.6.3",
     "install": "^0.13.0",
     "mapbox-gl": "^2.15.0",
-    "mongodb": "^6.0.0",
+    "mongodb": "^6.2.0",
     "morgan": "~1.9.1",
     "swig": "^1.4.2"
   },
