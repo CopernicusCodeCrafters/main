@@ -7,6 +7,14 @@
     <!-- Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Bootstrap JS and Popper.js (required for Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Bootstrap-datepicker CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap-datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <!--Leaflet-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -15,7 +23,9 @@
     <!--Leaflet Draw-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+    <!--Own stylesheets-->
     <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/webpageStyles.css">
 
     <title>Copernicus Code Crafters</title>
 </head>
@@ -38,9 +48,9 @@
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container-fluid">
         <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
-            <div class="col-lg-6">
+            <div class="col-lg-9">
                 <div class="card shadow p-3 h-100 bg-secondary rounded">
                     <h2 class="card-title">Viewer</h2>
                     <div id="map"></div>
@@ -53,15 +63,35 @@
                     </script>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-3">
                 <div class="card shadow p-3 h-100 bg-secondary rounded">
-                    <h2 class="card-title">Options</h2>
-                    <p>
-                        Option1<br>
-                        Option 2<br>
-                        Option 3<br>
-                        Option 4
-                    </p>
+                    <h2 class="card-title">Options</h2><br>
+                    <div>
+                        <h5 class="card-title">Choose Cloud Cover (%)</h5>
+                        <input type="range" class="custom-slider" value="50" min="10" max="100" step="10" oninput="this.nextElementSibling.value = this.value">
+                        <output>50</output>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Choose Time Period</h5>
+                        <label for="datepicker">Select a start date</label>
+                        <input type="text" class="form-contorl" id="datepicker1">
+                        <script>
+                            $(document).ready(function(){
+                              $('#datepicker1').datepicker();
+                            });
+                          </script> 
+                    </div>
+                    <div>
+                        <label for="datepicker">Select an end date</label>
+                        <input type="text" class="form-contorl" id="datepicker2"> 
+                        <script>
+                            $(document).ready(function(){
+                              $('#datepicker2').datepicker();
+                            });
+                          </script>                         
+                    </div>
+                
+                    
                     <p>&nbsp;</p>
 
 
@@ -70,7 +100,7 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
         <footer>
             <div class="d-flex flex-wrap justify-content-between align-items-center py-1 my-3 border-top">
                 <p class="col-md-4 mb-0 text-body-secondary">&copy; CopernicusCodeCrafters</p><a
