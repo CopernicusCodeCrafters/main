@@ -51,8 +51,10 @@
                     <br>
                         <label for="avatar">Choose Trainingsdata:</label>
 
-                        <input type="file" id="fileInput" accept=".gpkg, .geojson">
-                        <button onclick="handleFile()">Load File</button>
+                        <form id="uploadForm" action="/trainingsdaten/upload" method="post" enctype="multipart/form-data">
+                            <input type="file" name="file" accept=".gpkg, .geojson">
+                            <button type="submit">Upload File</button>
+                          </form>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -120,7 +122,22 @@
           console.error('Error opening GeoPackage:', err);
         } else {
           console.log('GeoPackage opened successfully:', result);
-          // Perform operations on the GeoPackage here
+          try {
+            L.geoPackageFeatureLayer([], {
+                geoPackageUrl: 'https://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
+                layerName: 'rivers',
+                style: function(feature) {
+                return {
+                    color: '#F00',
+                    weight: 2,
+                    opacity: 1,
+                };
+                }
+            }).addTo(map);
+        } catch (e) {
+            console.error(e);
+}
+
         }
       });
     }
