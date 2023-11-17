@@ -22,6 +22,7 @@ async function connectToMongo() {
 
 connectToMongo();
 
+//Routes
 var indexRouter = require("./routes/webpage");
 var impressumRouter = require("./routes/impressum")
 var trainingsdatenRouter  =require("./routes/trainingsdaten")
