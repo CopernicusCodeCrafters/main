@@ -7,10 +7,10 @@ var mongodb = require("mongodb");
 const bodyParser = require('body-parser');
 var engines = require('consolidate')
 
-
-let url = "mongodb://127.0.0.1:27017";
+//const url = "mongodb://127.0.0.1:27017"
+let url = "mongodb://mongo:27017";
 let dbName = "mydatabase";
-let client = new mongodb.MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true});
+let client = new mongodb.MongoClient(url);
 async function connectToMongo() {
   try {
     await client.connect();
