@@ -18,7 +18,12 @@
   "homepage": "https://github.com/CopernicusCodeCrafters/main#readme",
   "dependencies": {
     "@ngageoint/geopackage": "^4.2.4",
+<<<<<<< Updated upstream
     "@ngageoint/geopackage-geojson-js": "^4.1.3",
+=======
+    "@ngageoint/leaflet-geopackage": "^4.1.3",
+    "@openeo/js-client": "^2.5.1",
+>>>>>>> Stashed changes
     "consolidate": "^1.0.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
