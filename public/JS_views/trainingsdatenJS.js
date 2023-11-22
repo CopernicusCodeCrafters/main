@@ -1,5 +1,5 @@
 
-console.log("File")
+// Input File is processed and shown in the Leaflet Map
 function handleFile(event) {
     event.preventDefault();
   
@@ -10,7 +10,6 @@ function handleFile(event) {
     if (file) {
       const fileName = file.name.toLowerCase();
   
-      // Check if it's a GeoJSON file
       if (fileName.endsWith('.geojson')) {
         const reader = new FileReader();
         reader.onload = function () {
@@ -20,9 +19,8 @@ function handleFile(event) {
         };
         reader.readAsText(file);
       }
-      // Check if it's a GeoPackage file
       else if (fileName.endsWith('.gpkg')) {
-        // Assuming Leaflet is used
+   
         const gpkgLayer = L.geoPackageTileLayer({
           geoPackageUrl: URL.createObjectURL(file),
           layerName: 'features'
@@ -38,6 +36,9 @@ function handleFile(event) {
     }
   }
  
+
+
+// Leaflet Draw is intialized
   const container = L.DomUtil.create(
     "div",
     "leaflet-control "
@@ -81,35 +82,7 @@ map.on(L.Draw.Event.CREATED, function (event) {
   drawnItems.addLayer(layer);
 });
 
-// --------------------------------------------------
-// save geojson to file
-
-const download = document.getElementById("save-Button1");
-
-download.addEventListener("click", () => {
-    // Extract GeoJSON from featureGroup
-    const data = drawnItems.toGeoJSON();
-
-    if (data.features.length === 0) {
-        alert("No features in GeoJSON data");
-        return;
-    }
-
-    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = "trainingsdaten.geojson";
-
-    downloadLink.click();
-
-    // Cleanup
-    //URL.revokeObjectURL(downloadLink.href);
-});
-
-
-
-
+// A Geojson is displayed in the map
 const geojsonFromLocalStorage = JSON.parse(localStorage.getItem("geojson"));
 
 function setGeojsonToMap(geojson) {
@@ -131,7 +104,7 @@ function setGeojsonToMap(geojson) {
 
 
 
-// Event listener for saving GeoJSON
+// Event listener for saving GeoJSON in Local Storage
 const saveGeoJSON = document.querySelector("#save-Button");
 saveGeoJSON.addEventListener("click", (e) => {
     e.preventDefault();
@@ -143,7 +116,6 @@ saveGeoJSON.addEventListener("click", (e) => {
         return;
     }
 
-    // Prompt the user to enter the name for the GeoJSON file
     const geojsonName = prompt("Enter the name for the GeoJSON file:");
 
     if (geojsonName === null || geojsonName.trim() === "") {
@@ -152,37 +124,52 @@ saveGeoJSON.addEventListener("click", (e) => {
     }
 
 
-    // Create a button to load the saved GeoJSON
     const savedDataButton = document.createElement("button");
     savedDataButton.textContent = "Load " + geojsonName;
     savedDataButton.classList.add("savedJSONButton");
     savedDataButton.dataset.geojsonName = geojsonName;
 
-    // Add click event listener to the created button
+
     savedDataButton.addEventListener("click", () => {
         const savedJSON = localStorage.getItem("geojson");
 
         if (savedJSON) {
             const data = JSON.parse(savedJSON);
 
-            // Clear previously added layers
             drawnItems.clearLayers();
-
-            // Add the saved GeoJSON data as a layer to the map
-           setGeojsonToMap(data);
-
-            // Fit map bounds to the new layer
+            setGeojsonToMap(data);
             map.fitBounds(feature.getBounds());
         } else {
             console.error("Saved GeoJSON not found");
         }
     });
 
-    // Append the created button to the document
     document.body.appendChild(savedDataButton);
-
-    // Save the GeoJSON data to local storage
     localStorage.setItem("geojson", JSON.stringify(data));
+});
+
+// Geojson is transformed into a Download Link using a Blob object
+
+const download = document.getElementById("save-Button1");
+
+download.addEventListener("click", () => {
+    // Extract GeoJSON from featureGroup
+    const data = drawnItems.toGeoJSON();
+
+    if (data.features.length === 0) {
+        alert("No features in GeoJSON data");
+        return;
+    }
+
+    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = "trainingsdaten.geojson";
+
+    downloadLink.click();
+
+    //URL.revokeObjectURL(downloadLink.href);
 });
 
 
