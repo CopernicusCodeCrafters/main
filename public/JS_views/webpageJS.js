@@ -29,4 +29,13 @@ console.log("webpageJS")
  document.getElementById('drawButton').addEventListener('click', function() {
      // Add Leaflet Draw controls to the map
      map.addControl(drawControl);
+      //Handle rectangle creation
+      map.on('draw:created', function (e) {
+        var type = e.layerType,
+            layer = e.layer;
+
+        if (type === 'rectangle') {
+            drawnItems.addLayer(layer);
+        }
+        });
  });
