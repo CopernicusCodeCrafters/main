@@ -4,7 +4,6 @@
         height: 100vh;
         width: 50%;
 
-
         border: 5px;
         margin: 0;
         padding: 50px;
@@ -49,7 +48,7 @@
 
     #map {
         border: 3px solid #ffffff;
-        height: 50vh;
+        height: 100vh;
     }
 
     #col-lg-6 {
@@ -67,24 +66,5 @@
         width: 50%;
     }
 
-}
-
-
-.dark_mode {
-    background-color: black;
-    color: white;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
 }
 
