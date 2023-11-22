@@ -7,27 +7,28 @@ services:
         build: ./
         ports: 
             - 3000:3000
+        
         depends_on:
             - mongodb    
         environment:
             WAIT_HOSTS: mongodb://127.0.0.1:27017/
             MONGODB_URI: mongodb://127.0.0.1:27017/
             
-        networks:
-            - webappnetwork
+      
 
     mongodb:
         image: mongo
         restart: always
-        container_name: mongodb
+        container_name: mongo
         ports:
-            - 27017:27017
+            - "27017:27017"
         volumes:
-            - ./data-node:/data/db
+             - ./mongo-init/:/docker-entrypoint-initdb.d/:ro
+             - ./mongo-volume:/data/db
+
         command: mongod --noauth 
         
-        networks:
-            - webappnetwork
+        
     
     mong-express:
         image: mongo-express
@@ -37,9 +38,3 @@ services:
             - mongodb
         ports: 
             - '8081:8081'
-        networks:
-            - webappnetwork
-networks:
-    webappnetwork:
-        driver: bridge
-    
