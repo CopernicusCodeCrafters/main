@@ -26,7 +26,11 @@
     <!--Own stylesheets-->
     <link rel="stylesheet" href="stylesheets/style.css">
     <link rel="stylesheet" href="stylesheets/webpageStyles.css">
+    <!--Turf.js for bounding box-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/0.0.124/turf.min.js"></script>
     <script defer src="JS_views/webpageJS.js"></script>
+
+
 
     <title>Copernicus Code Crafters</title>
 </head>
@@ -94,6 +98,7 @@
                         <button id="drawButton" class="black-btn">Activate Draw</button>
                         <h7>Or</h7>
                         <button id="uploadRectangle" class="black-btn">Upload</button>
+                        <input type="file" id="fileInput" accept=".geojson"/>
                     </div> <br>
                     <!--Training model selection-->
                     <div>

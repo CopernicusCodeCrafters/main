@@ -1,5 +1,6 @@
 "use strict"
 
+
 console.log("webpageJS")
  //Add Leaflet Map 
  var map = L.map('map').setView([51.305915044598834,10.21774343122064], 6);
@@ -39,3 +40,24 @@ console.log("webpageJS")
         }
         });
  });
+
+// Add event listener for the upload button click
+document.getElementById('uploadRectangle').addEventListener('click', function(){
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (file) {
+        // Read GeoJSON file
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const geojsonData = JSON.parse(e.target.result);
+            var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]]);
+            var bbox = turf.bbox(line);
+            var bboxPolygon = turf.bboxPolygon(bbox);
+            L.geoJSON(geojsonData).addTo(map);
+            L.geoJSON(bboxPolygon).addTo(map);
+        };
+
+        reader.readAsText(file);
+    }
+});
