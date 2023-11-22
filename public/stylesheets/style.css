@@ -160,9 +160,7 @@ background: #fff;
 padding: 5px;
 }
 
-.geojson {
-display: none;
-}
+
 
 input[type="file"] {
 font-size: 0;
@@ -171,10 +169,7 @@ font-size: 0;
 font-size: initial;
 }
 
-.icon-geojson {
-width: 25px;
-height: 25px;
-}
+
 
 
 #map2 {
