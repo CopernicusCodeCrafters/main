@@ -29,7 +29,7 @@ function handleFile(event) {
           map.fitBounds(gpkgLayer.getBounds());
         });
       } else {
-        console.log('Invalid file format. Supported formats: GeoJSON (.geojson) or GeoPackage (.gpkg)');
+        console.log('Invalid file format. Supported formats: GeoJSON (.geojson) and GeoPackage (.gpkg)');
       }
     } else {
       console.log('No file selected');
@@ -99,7 +99,7 @@ function setGeojsonToMap(geojson) {
     },
   }).addTo(map);
 
-  map.getBounds(feature.getBounds());
+  map.fitBounds(feature.getBounds());
 }
 
 
@@ -118,35 +118,39 @@ saveGeoJSON.addEventListener("click", (e) => {
 
     const geojsonName = prompt("Enter the name for the GeoJSON file:");
 
-    if (geojsonName === null || geojsonName.trim() === "") {
+    if (geojsonName == null || geojsonName == "") {
         alert("Please enter a valid name for the GeoJSON file.");
         return;
     }
 
+    const savedData = localStorage.getItem("geojson") ? JSON.parse(localStorage.getItem("geojson")) : {};
+
+    savedData[geojsonName] = data;
+
+    localStorage.setItem("geojson", JSON.stringify(savedData));
 
     const savedDataButton = document.createElement("button");
     savedDataButton.textContent = "Load " + geojsonName;
     savedDataButton.classList.add("savedJSONButton");
     savedDataButton.dataset.geojsonName = geojsonName;
 
-
     savedDataButton.addEventListener("click", () => {
         const savedJSON = localStorage.getItem("geojson");
+        const savedData = savedJSON ? JSON.parse(savedJSON) : {};
 
-        if (savedJSON) {
-            const data = JSON.parse(savedJSON);
+        if (savedData[geojsonName]) {
+            const data = savedData[geojsonName];
 
             drawnItems.clearLayers();
-            setGeojsonToMap(data);
-            map.fitBounds(feature.getBounds());
+            setGeojsonToMap(data); 
         } else {
             console.error("Saved GeoJSON not found");
         }
     });
 
     document.body.appendChild(savedDataButton);
-    localStorage.setItem("geojson", JSON.stringify(data));
 });
+
 
 // Geojson is transformed into a Download Link using a Blob object
 
