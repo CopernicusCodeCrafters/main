@@ -20,7 +20,7 @@ async function connectToMongo() {
   }
 }
 
-connectToMongo();
+//connectToMongo();
 
 //Routes
 var indexRouter = require("./routes/webpage");
