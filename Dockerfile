@@ -1,4 +1,4 @@
-FROM node:17
+FROM node:latest
 
 WORKDIR /app
 
@@ -11,5 +11,6 @@ RUN npm install
 COPY . ./
 
 EXPOSE 3000
+EXPOSE 27017
 
 CMD ["npm" , "start"]

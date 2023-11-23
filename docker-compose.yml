@@ -3,20 +3,38 @@ version: "3.7"
 services:
 
     backend:
-        conatiner_name: express_server
-        build: ./bin
+       
+        build: ./
         ports: 
             - 3000:3000
+        
+        depends_on:
+            - mongodb    
         environment:
-            DB_URL: mongodb://127.0.0.1:27017"        
+            WAIT_HOSTS: mongodb://127.0.0.1:27017/
+            MONGODB_URI: mongodb://127.0.0.1:27017/
+            
+      
 
-    db:
-        container_name: mongodb
-        image: mongo:4.0-xenial
-        volumes:
-            - ./data:/data/db
+    mongodb:
+        image: mongo
+        restart: always
+        container_name: mongo
         ports:
-            - 27017:27017
+            - "27017:27017"
+        volumes:
+             - ./mongo-init/:/docker-entrypoint-initdb.d/:ro
+             - ./mongo-volume:/data/db
 
-
+        command: mongod --noauth 
+        
+        
     
+    mong-express:
+        image: mongo-express
+        restart: always
+        
+        depends_on:
+            - mongodb
+        ports: 
+            - '8081:8081'
