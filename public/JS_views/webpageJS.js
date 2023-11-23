@@ -41,10 +41,15 @@ console.log("webpageJS")
         });
  });
 
-// Add event listener for the upload button click
-document.getElementById('uploadRectangle').addEventListener('click', function(){
+
+ //Option to choose a geojson in any format and adds it to the map
+ document.getElementById('uploadRectangle').addEventListener('click', function () {
     const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
+    fileInput.click();
+});
+
+document.getElementById('fileInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
 
     if (file) {
         // Read GeoJSON file
@@ -52,6 +57,7 @@ document.getElementById('uploadRectangle').addEventListener('click', function(){
         reader.onload = function (e) {
             try {
                 const geojsonData = JSON.parse(e.target.result);
+                //Using Turf.js to create bounding box for OpenEO Request
                 var bbox = turf.bbox(geojsonData);
                 var bboxPolygon = turf.bboxPolygon(bbox);
                 L.geoJSON(geojsonData).addTo(map);
