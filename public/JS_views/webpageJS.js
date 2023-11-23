@@ -50,14 +50,16 @@ document.getElementById('uploadRectangle').addEventListener('click', function(){
         // Read GeoJSON file
         const reader = new FileReader();
         reader.onload = function (e) {
-            const geojsonData = JSON.parse(e.target.result);
-            var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]]);
-            var bbox = turf.bbox(line);
-            var bboxPolygon = turf.bboxPolygon(bbox);
-            L.geoJSON(geojsonData).addTo(map);
-            L.geoJSON(bboxPolygon).addTo(map);
+            try {
+                const geojsonData = JSON.parse(e.target.result);
+                var bbox = turf.bbox(geojsonData);
+                var bboxPolygon = turf.bboxPolygon(bbox);
+                L.geoJSON(geojsonData).addTo(map);
+                L.geoJSON(bboxPolygon).addTo(map);
+            } catch (error) {
+                console.error("Error parsing or processing GeoJSON:", error);
+            }
         };
-
         reader.readAsText(file);
     }
 });
