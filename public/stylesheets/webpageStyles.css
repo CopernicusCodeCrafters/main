@@ -1,0 +1,24 @@
+ /* Slider for cloud range */
+.custom-slider {
+    position: relative;
+    width: 80%;
+    height: 30%;
+}
+ /* Button for area of interest */
+.black-btn {
+    /* TODO: maybe change sizes to percent*/
+      display: inline-block;
+      padding: 10px 10px;
+      text-decoration: none;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      color: #fff;
+      background-color: #000;
+    }
+ /* Hover effect */
+ .black-btn:hover {
+   background-color: #555;
+ }
