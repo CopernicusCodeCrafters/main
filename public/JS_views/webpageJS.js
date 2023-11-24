@@ -54,24 +54,42 @@ console.log("webpageJS")
      featureGroup: drawnItems
      }
  });
- // Event listener for the button
+ // Event listener for the button "Activate Draw"
  document.getElementById('drawButton').addEventListener('click', function() {
      // Add Leaflet Draw controls to the map
      map.addControl(drawControl);
+    //variable for drawControl
+     var drawingEnabled = true; 
       //Handle rectangle creation
       map.on('draw:created', function (e) {
         var type = e.layerType,
             layer = e.layer;
 
-        if (type === 'rectangle') {
+        if (drawingEnabled) {
             drawnItems.addLayer(layer);
+
+            //limit to one draw
+            drawingEnabled = false; 
         }
         });
  });
+//function to deactivate one of the aoi buttons
+function toggleButtonState(buttonNumber) {
+    var drawButton = document.getElementById('drawButton');
+    var uploadButton = document.getElementById('uploadButton');
 
+    if (buttonNumber === 1) {
+      drawButton.disabled = drawButton.disabled;
+      uploadButton.disabled = !uploadButton.disabled;
+    } else if (buttonNumber === 2) {
+      drawButton.disabled = !drawButton.disabled;
+      uploadButton.disabled = uploadButton.disabled;
+      map.removeControl(drawControl);
+    }
+  }
 
  //Option to choose a geojson in any format and adds it to the map
- document.getElementById('uploadRectangle').addEventListener('click', function () {
+ document.getElementById('uploadButton').addEventListener('click', function () {
     const fileInput = document.getElementById('fileInput');
     fileInput.click();
 });

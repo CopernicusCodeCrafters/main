@@ -85,9 +85,9 @@
                     <div>
                         <h5 class="card-title">Select Area of Interest</h5>
                         <!-- Button to activate Leaflet Draw -->
-                        <button id="drawButton" class="black-btn">Activate Draw</button>
+                        <button id="drawButton" class="black-btn" onclick="toggleButtonState(1)">Activate Draw</button>
                         <h7>Or</h7>
-                        <button id="uploadRectangle" class="black-btn">Upload</button>
+                        <button id="uploadButton" class="black-btn" onclick="toggleButtonState(2)">Upload</button>
                         <input type="file" id="fileInput" accept=".geojson" style="display: none"/>
                     </div> <br>
                     <!--Training model selection-->

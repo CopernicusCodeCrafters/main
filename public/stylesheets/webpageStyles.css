@@ -23,3 +23,13 @@
    background-color: #555;
  }
 
+#drawButton:disabled{
+  background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+}
+#uploadButton:disabled{
+  background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+}
