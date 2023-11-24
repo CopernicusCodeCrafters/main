@@ -38,3 +38,10 @@ services:
             - mongodb
         ports: 
             - '8081:8081'
+
+    openEO_Own:
+        image: kwundram/own_openeo:1.0
+        ports:
+            - 8000:8000
+    
+    
