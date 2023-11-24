@@ -70,26 +70,16 @@
                         <input type="range" class="custom-slider" value="50" min="10" max="100" step="1" oninput="this.nextElementSibling.value = this.value">
                         <output>50</output>
                     </div>
-                    <!--Datepicker div-->
+                    <!--Datepicker Start date-->
                     <div>
                         <h5 class="card-title">Choose Time Period</h5>
-                        <label for="datepicker">Select a start date:</label>
-                        <input type="text" class="form-contorl" id="datepicker1">
-                        <script>
-                            $(document).ready(function(){
-                              $('#datepicker1').datepicker();
-                            });
-                          </script> 
+                        <label for="startDate">Select a start date:</label>
+                        <input type="text" class="form-contorl" id="startDate" autocomplete="off">
                     </div>
-                    <!--Datepicker div-->
+                    <!--Datepicker end date-->
                     <div>
-                        <label for="datepicker">Select an end date:</label>
-                        <input type="text" class="form-contorl" id="datepicker2"> 
-                        <script>
-                            $(document).ready(function(){
-                              $('#datepicker2').datepicker();
-                            });
-                          </script>                         
+                        <label for="endDate">Select an end date:</label>
+                        <input type="text" class="form-contorl" id="endDate" autocomplete="off">                         
                     </div> <br>
                     <!--Area of Interest-->
                     <div>

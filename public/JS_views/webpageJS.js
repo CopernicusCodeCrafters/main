@@ -9,6 +9,34 @@ console.log("webpageJS")
  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
  }).addTo(map);
 
+ /**
+  * function to implement datepicker and limit date selection
+  */
+ $(document).ready(function () {
+        // Initialize the first datepicker
+        $('#startDate').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+ });
+        // Initialize the second datepicker with the startDate option
+        $('#endDate').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+          });
+
+         // Update the startDate of the second datepicker when the first datepicker changes
+        $('#startDate').on('changeDate', function (e) {
+            // Calculate one day later
+            var startDate = new Date(e.date);
+            startDate.setDate(startDate.getDate() + 1);
+  
+        // Set the new startDate for the second datepicker
+            $('#endDate').datepicker('setStartDate', startDate);
+        });
+    });
+
  // Add Leaflet Draw controls
  var drawnItems = new L.FeatureGroup();
  map.addLayer(drawnItems);
@@ -26,7 +54,7 @@ console.log("webpageJS")
      featureGroup: drawnItems
      }
  });
- // Event listener for the button click
+ // Event listener for the button
  document.getElementById('drawButton').addEventListener('click', function() {
      // Add Leaflet Draw controls to the map
      map.addControl(drawControl);
