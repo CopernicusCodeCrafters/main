@@ -11,7 +11,7 @@
     }
 
     #map2 {
-        border: 2px solid #ffffff;
+        border: 2px solid #000000;
         height: 41vh;
     }
 
@@ -35,7 +35,7 @@
     }
 
     #map2 {
-        border: 2px solid #ffffff;
+        border: 2px solid #000000;
         height: 41vh;
     }
 
@@ -47,8 +47,8 @@
 @media only screen and (min-width: 992px) {
 
     #map {
-        border: 3px solid #ffffff;
-        height: 100vh;
+        border: 3px solid #000000;
+        height: 80vh;
     }
 
     #col-lg-6 {
@@ -58,7 +58,7 @@
 
 
     #map2 {
-        border: 2px solid #ffffff;
+        border: 3px solid #000000;
         height: 41vh;
     }
 
@@ -71,8 +71,8 @@
 
 
 #map {
-    border: 3px solid #ffffff;
-    height: 50vh;
+    border: 3px solid #000000;
+    height: 80vh;
 }
 
 #col-lg-6 {

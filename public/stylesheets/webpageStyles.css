@@ -23,13 +23,22 @@
    background-color: #555;
  }
 
-#drawButton:disabled{
-  background-color: #ccc;
-      color: #666;
-      cursor: not-allowed;
-}
-#uploadButton:disabled{
-  background-color: #ccc;
-      color: #666;
-      cursor: not-allowed;
+  /* Button for area of interest */
+.green-btn {
+  /* TODO: maybe change sizes to percent*/
+    display: inline-block;
+    padding: 10px 10px;
+    width:100%;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    color: #fff;
+    background-color: rgb(21, 156, 0);
+  }
+/* Hover effect */
+.green-btn:hover {
+ background-color: rgb(12, 81, 1);
 }
