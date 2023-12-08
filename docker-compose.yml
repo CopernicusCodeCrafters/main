@@ -4,8 +4,8 @@ services:
 
     backend:
        
-        # build: ./
-        image: kwundram/backend:1.0
+        build: ./
+            #image: kwundram/backend:1.0
         ports: 
             - 3000:3000
         
