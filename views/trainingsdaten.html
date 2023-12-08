@@ -27,6 +27,7 @@
 
     <!--Own stylesheet:-->
     <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/webpageStyles.css">
     <title>Copernicus Code Crafters</title>
 </head>
 
@@ -67,10 +68,10 @@
                     <h2 class="card-title">Upload</h2><br>
                     <form id="uploadForm" onsubmit="handleFile(event)" enctype="multipart/form-data">
                         <input type="file" name="file" accept=".gpkg, .geojson">
-                        <button type="submit">Upload File</button>
-                    </form>
-                    <button id="save-Button">Save GeoJSON to Local Storage</button>
-                    <button id="save-Button1">Save GeoJSON as File</button>
+                        <button class="black-btn" type="submit">Upload File</button>
+                    </form> <br>
+                    <button id="save-Button" class="black-btn">Save GeoJSON to Local Storage</button> <br>
+                    <button id="save-Button1" class="black-btn">Save GeoJSON as File</button>
                     <div id="savedDataButton"></div>
 
 
