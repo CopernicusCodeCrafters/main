@@ -68,4 +68,41 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
         };
         reader.readAsText(file);
     }
-});
+
+async function createDatacube(){
+    console.log("Creating");
+    try {
+        var con = await OpenEO.connect("http://34.209.215.214:8000/");
+        await con.authenticateBasic("username", "password");
+        let datacube = compute_result({
+            "process_graph": {
+              "load1": {
+                "process_id": "load_collection",
+                "arguments": {
+                  "bands": [
+                    "B01",
+                    "B02",
+                    "B03"
+                  ],
+                  "id": "landsat-8-l1-c1",
+                  "crs": 3262,
+                  "spatial_extent": {
+                    "west": 7.249267614418553,
+                    "east": 7.982744173837268,
+                    "south": 51.8492779296632,
+                    "north": 52.04432055815272
+                  },
+                  "temporal_extent": [
+                    "2023-11-09T00:00:00Z",
+                    "2023-12-06T00:00:00Z"
+                  ]
+                },
+                "result": true
+              }
+            },
+            "parameters": []
+          })
+      } catch (error) {
+        console.log("Error connecting);", error);
+      }
+}
