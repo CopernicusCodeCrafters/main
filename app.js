@@ -6,10 +6,10 @@ var logger = require("morgan");
 var mongodb = require("mongodb");
 const bodyParser = require('body-parser');
 var engines = require('consolidate')
+var cors = require('cors')
 
-//const url = "mongodb://127.0.0.1:27017"
-const url = "mongodb://mongo:27017";
 const url = "mongodb://127.0.0.1:27017"
+//const url = "mongodb://mongo:27017";
 //const url = "mongodb://mongo:27017";
 let dbName = "mydatabase";
 let client = new mongodb.MongoClient(url);
@@ -127,4 +127,19 @@ app.get('/getGeoJSON', async (req, res) => {
   }
 });
 
+//Setup to fix Cors Issue
+app.use(cors())
+
+var corsOptions = {
+  origin: 'http://34.209.215.214:8000/',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.get('/products/:id', cors(corsOptions), function (req, res, next) {
+  res.json({msg: 'This is CORS-enabled for only example.com.'})
+})
+
+app.listen(3001, function () {
+  console.log('CORS-enabled web server listening on port 80')
+})
 module.exports = app;

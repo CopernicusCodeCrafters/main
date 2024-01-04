@@ -68,40 +68,51 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
         };
         reader.readAsText(file);
     }
+});
 
 async function createDatacube(){
-    console.log("Creating");
+    console.log("Creating1");
     try {
-        var con = await OpenEO.connect("http://34.209.215.214:8000/");
-        await con.authenticateBasic("username", "password");
-        let datacube = compute_result({
-            "process_graph": {
-              "load1": {
-                "process_id": "load_collection",
-                "arguments": {
-                  "bands": [
-                    "B01",
-                    "B02",
-                    "B03"
-                  ],
-                  "id": "landsat-8-l1-c1",
-                  "crs": 3262,
-                  "spatial_extent": {
-                    "west": 7.249267614418553,
-                    "east": 7.982744173837268,
-                    "south": 51.8492779296632,
-                    "north": 52.04432055815272
-                  },
-                  "temporal_extent": [
-                    "2023-11-09T00:00:00Z",
-                    "2023-12-06T00:00:00Z"
-                  ]
-                },
-                "result": true
-              }
-            },
-            "parameters": []
-          })
+      const con = await OpenEO.connect("http://34.209.215.214:8000")
+        await con.authenticateBasic("user", "password");
+        var response = await con.listCollections();
+        response.collections.forEach(collection => {
+          console.log(`${collection.id}: ${collection.summary}`);
+        });
+
+        var builder = await con.buildProcess();
+
+        var datacube = builder.load_collection(
+          "COPERNICUS/S1_GRD",
+          {west: 16.06, south: 48.06, east: 16.65, north: 48.35},
+          ["2017-03-01", "2017-04-01"],
+          ["VV", "VH"]
+        );
+
+        var min = function(data) { return this.min(data); };
+        //datacube = builder.reduce_dimension(datacube, min, "t");
+        
+        datacube = builder.save_result(datacube, "PNG", {
+          red: "R",
+          green: "G",
+          blue: "B"
+        });
+      
+        // Now send the processing instructions to the back-end for (synchronous) execution and save the file as result.png
+        await con.downloadResult(datacube, "result.png");
+      
+
+        /*var result = builder.save_result(datacube, "GTiff");
+        console.log(result)
+
+        var layer = new GeoRasterLayer({
+          result 
+        });
+        layer.addTo(map);
+
+        map.fitBounds(layer.getBounds());
+        */
+        
       } catch (error) {
         console.log("Error connecting);", error);
       }
