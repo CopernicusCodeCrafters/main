@@ -4,13 +4,12 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mongodb = require("mongodb");
-const bodyParser = require('body-parser');
 var engines = require('consolidate')
 
 
 const url = "mongodb://127.0.0.1:27017"
 //const url = "mongodb://mongo:27017";
-let dbName = "mydatabase";
+let dbName = "geosoft2";
 let client = new mongodb.MongoClient(url);
 async function connectToMongo() {
   try {
@@ -23,59 +22,15 @@ async function connectToMongo() {
 
 connectToMongo();
 
-
 //Routes
 var indexRouter = require("./routes/webpage");
 var impressumRouter = require("./routes/impressum")
 var trainingsdatenRouter  =require("./routes/trainingsdaten")
 
-
 var app = express();
 app.use(express.json())
-app.post('/uploadRoute', async (req, res) => {
-  try {
-    // Connect to MongoDB
-    await client.connect();
-    console.log('Connected to MongoDB');
-    
-    // Get the geojson and folderName from the request body
-    const { geojson, folderName } = req.body;
-    
-    // Parse the geojson and connect to the specified database
-    const db = client.db(dbName);
-    const collection = db.collection(folderName);
 
-    // Insert the GeoJSON data into the specified collection
-    const result = await collection.insertOne(JSON.parse(geojson));
-
-    console.log('GeoJSON data uploaded successfully:', result.insertedId);
-    res.status(201).json({ message: 'GeoJSON data uploaded successfully', insertedId: result.insertedId });
-  } catch (error) {
-    console.error('Error uploading GeoJSON data to MongoDB:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    // Close the MongoDB connection
-    client.close();
-  }
-});
-
-app.get('/getStation', async (req, res) => {
-  try {
-    await client.connect();
-    let db = client.db(dbName);
-    let collection = db.collection('newpois');
-    let geojsonArray = await collection.find().toArray(); // Find all documents and convert to an array
-    client.close();
-
-    res.json(geojsonArray); // Send the array of GeoJSON documents as a JSON response
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Fehler beim Abrufen der Daten');
-  }
-});
-
-
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 // view engine setup
 app.engine('html', engines.swig)
@@ -93,6 +48,20 @@ app.use("/webpage", indexRouter);
 app.use("/impressum", impressumRouter)
 app.use("/trainingsdaten",trainingsdatenRouter)
 
+//Fügt eine GeoJSON zu der Dtanbank hinzu
+app.post('/insert-geojson', async (req, res) => {
+  const { geojson } = req.body;
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
+    const result = await collection.insertOne(geojson);
+    console.log('GeoJSON data inserted successfully:', result.insertedId);
+    res.send('GeoJSON data inserted successfully');
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).send('An error occurred');
+  }
+});
 
 
 
@@ -110,24 +79,6 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render("error");
-});
-
-
-app.get('/getGeoJSON', async (req, res) => {
-  try {
-      await client.connect();
-      let db = client.db(dbName);
-      let collection = db.collection('Stationen');
-
-      let geojson = await collection.findOne(); 
-      
-      client.close();
-
-      res.json(geojson); 
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Fehler beim Abrufen der Daten');
-  }
 });
 
 module.exports = app;

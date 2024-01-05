@@ -177,19 +177,58 @@ download.addEventListener("click", () => {
 });
 
 
-const geojson = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"type":"polygon"},"geometry":{"type":"Polygon","coordinates":[[[5.878365,50.044761],[5.878365,50.044761],[5.600893,49.758341],[5.600893,49.758341],[6.455287,49.58247],[6.455287,49.58247],[6.738253,49.809739],[6.491001,50.048286],[6.491001,50.048286],[6.491001,50.048286],[6.182896,50.048304],[6.182896,50.048304],[5.878365,50.044761]]]}}]};
-const folderName = "Trainingspolygone";
+const geojson = {
+  "type": "Feature",
+  "properties": {
+    "type": "rectangle"},
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          2.551218,
+          50.781539
+        ],
+        [
+          2.551218,
+          52.592531
+        ],
+        [
+          12.304037,
+          52.592531
+        ],
+        [
+          12.304037,
+          50.781539
+        ],
+        [
+          2.551218,
+          50.781539
+        ]
+      ]
+    ]
+  }
+}
 
-fetch('/uploadRoute', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    geojson,
-    folderName,
-  }),
-})
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error('Error:', error));
+const fetchButton = document.getElementById('insertTrainingsdata_button');
+
+function addGeoJSONtoDB() {
+  fetchButton.addEventListener("click", async () => {
+    console.log("Funktion startet")
+    try {
+      const response = await fetch('/insert-geojson', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ geojson }), // Remove the outer JSON.stringify
+      });
+      const result = await response.text();
+      console.log(result);
+    } catch (error) {
+      console.error('An error occurred:', error);
+    }
+  });
+}
+
+addGeoJSONtoDB(); // Call the function to set up the event listener on page load
