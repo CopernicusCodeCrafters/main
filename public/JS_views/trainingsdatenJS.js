@@ -1,4 +1,55 @@
 
+//Funktion, welche onload alle Trainingypolygone hinzufügt
+async function startingPolygonmanager() {
+  try {
+    const response = await fetch("/getAllPolygons");
+    const stationData = await response.json();
+    
+    // Iterate over the array of GeoJSON objects and add them to the map
+    stationData.forEach((geojson) => {
+      const classification = geojson.properties.classification;
+
+      // Define a color based on the classification
+      let color;
+      switch (classification) {
+        case 'field':
+          color = 'green';
+          break;
+        case 'water':
+          color = 'blue';
+          break;
+        case 'street':
+          color = 'black';
+          break;
+        default:
+          color = 'gray';
+      }
+      L.geoJSON(geojson, {
+        style: {
+          fillColor: color,
+          color: color,
+          weight: 2,
+        },
+        onEachFeature: function (feature, layer) {
+          const popupContent =`
+          <strong>Name:</strong> ${feature.properties.name}<br>
+          <strong>Object ID:</strong> ${feature.properties.object_id}<br> 
+          <strong>Classification:</strong> ${feature.properties.classification}
+        `;
+          layer.bindPopup(popupContent);
+        }
+      }).addTo(map);
+    });
+
+    console.log("Fetched stationdata:", stationData);
+  } catch (error) {
+    console.error("Error fetching GeoJSON data:", error);
+  }
+}
+
+startingPolygonmanager();
+
+
 // Input File is processed and shown in the Leaflet Map
 function handleFile(event) {
     event.preventDefault();
@@ -65,10 +116,24 @@ map.addControl(
   })
 );
 
-map.on(L.Draw.Event.CREATED, function (event) {
+map.on(L.Draw.Event.CREATED, async function (event) {
   let layer = event.layer;
   let feature = (layer.feature = layer.feature || {});
   let type = event.layerType;
+
+  const object_id = prompt("Enter object_id:");
+  const name = prompt("Enter name:");
+  const classification = prompt("Enter classification:");
+
+  let geojson = {
+    type: "Feature",
+    properties: {
+      object_id,
+      name,
+      classification,
+    },
+    geometry: layer.toGeoJSON().geometry,
+  };
 
   feature.type = feature.type || "Feature";
   let props = (feature.properties = feature.properties || {});
@@ -80,6 +145,8 @@ map.on(L.Draw.Event.CREATED, function (event) {
   }
 
   drawnItems.addLayer(layer);
+
+  await addGeoJSONtoDB(geojson);
 });
 
 // A Geojson is displayed in the map
@@ -176,59 +243,20 @@ download.addEventListener("click", () => {
     //URL.revokeObjectURL(downloadLink.href);
 });
 
-
-const geojson = {
-  "type": "Feature",
-  "properties": {
-    "type": "rectangle"},
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          2.551218,
-          50.781539
-        ],
-        [
-          2.551218,
-          52.592531
-        ],
-        [
-          12.304037,
-          52.592531
-        ],
-        [
-          12.304037,
-          50.781539
-        ],
-        [
-          2.551218,
-          50.781539
-        ]
-      ]
-    ]
-  }
-}
-
+//Funktion, welche eine GeoJSON der Trainingsgebiete in der MongoDB speichert
 const fetchButton = document.getElementById('insertTrainingsdata_button');
-
-function addGeoJSONtoDB() {
-  fetchButton.addEventListener("click", async () => {
-    console.log("Funktion startet")
-    try {
-      const response = await fetch('/insert-geojson', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ geojson }), // Remove the outer JSON.stringify
-      });
-      const result = await response.text();
-      console.log(result);
-    } catch (error) {
-      console.error('An error occurred:', error);
-    }
-  });
-}
-
-addGeoJSONtoDB(); // Call the function to set up the event listener on page load
+const addGeoJSONtoDB = async (geojson) => {
+  try {
+    const response = await fetch('/insert-geojson', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ geojson }),
+    });
+    const result = await response.text();
+    console.log(result);
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+};

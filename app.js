@@ -48,7 +48,7 @@ app.use("/webpage", indexRouter);
 app.use("/impressum", impressumRouter)
 app.use("/trainingsdaten",trainingsdatenRouter)
 
-//Fügt eine GeoJSON zu der Dtanbank hinzu
+//Fügt eine GeoJSON zu der Datenbank hinzu
 app.post('/insert-geojson', async (req, res) => {
   const { geojson } = req.body;
   try {
@@ -63,7 +63,19 @@ app.post('/insert-geojson', async (req, res) => {
   }
 });
 
+//get-Befehl(Stationen),der alle Datenbank-Objekte als Array zurückgibt
+app.get('/getAllPolygons', async (req, res) => {
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
 
+    const geojsonArray = await collection.find().toArray();
+    res.json(geojsonArray);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Fehler beim Abrufen der Daten');
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
