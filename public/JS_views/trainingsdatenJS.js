@@ -177,3 +177,19 @@ download.addEventListener("click", () => {
 });
 
 
+const geojson = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"type":"polygon"},"geometry":{"type":"Polygon","coordinates":[[[5.878365,50.044761],[5.878365,50.044761],[5.600893,49.758341],[5.600893,49.758341],[6.455287,49.58247],[6.455287,49.58247],[6.738253,49.809739],[6.491001,50.048286],[6.491001,50.048286],[6.491001,50.048286],[6.182896,50.048304],[6.182896,50.048304],[5.878365,50.044761]]]}}]};
+const folderName = "Trainingspolygone";
+
+fetch('/uploadRoute', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    geojson,
+    folderName,
+  }),
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));

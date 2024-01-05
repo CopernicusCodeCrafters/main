@@ -21,7 +21,8 @@ async function connectToMongo() {
   }
 }
 
-//connectToMongo();
+connectToMongo();
+
 
 //Routes
 var indexRouter = require("./routes/webpage");
@@ -33,24 +34,27 @@ var app = express();
 app.use(express.json())
 app.post('/uploadRoute', async (req, res) => {
   try {
-
-    // Verbindung zur MongoDB herstellen
+    // Connect to MongoDB
     await client.connect();
-    console.log('Mit MongoDB verbunden');
-    let { geojson } = req.body;
+    console.log('Connected to MongoDB');
+    
+    // Get the geojson and folderName from the request body
+    const { geojson, folderName } = req.body;
+    
+    // Parse the geojson and connect to the specified database
     const db = client.db(dbName);
-    const collection = db.collection('routen');
-    let geojsonParsed = JSON.parse(geojson);
-    // GeoJSON-Daten aus dem Request-Body extrahieren und in die Sammlung einfügen
-    const result = await collection.insertOne(geojsonParsed);
+    const collection = db.collection(folderName);
 
-    console.log('GeoJSON-Daten erfolgreich hochgeladen:', result.insertedId);
-    res.status(201).json({ message: 'GeoJSON-Daten erfolgreich hochgeladen', insertedId: result.insertedId });
+    // Insert the GeoJSON data into the specified collection
+    const result = await collection.insertOne(JSON.parse(geojson));
+
+    console.log('GeoJSON data uploaded successfully:', result.insertedId);
+    res.status(201).json({ message: 'GeoJSON data uploaded successfully', insertedId: result.insertedId });
   } catch (error) {
-    console.error('Fehler beim Hochladen der GeoJSON-Daten in MongoDB:', error);
-    res.status(500).json({ error: 'Interner Serverfehler' });
+    console.error('Error uploading GeoJSON data to MongoDB:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   } finally {
-    // Verbindung schließen, wenn Sie fertig sind
+    // Close the MongoDB connection
     client.close();
   }
 });
