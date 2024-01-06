@@ -19,10 +19,11 @@ const OpenEO_JSON = {
 
 console.log("webpageJS")
  //Add Leaflet Map 
- var map = L.map('map').setView([51.305915044598834,10.21774343122064], 6);
- L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
- maxZoom: 19,
- attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+ var map = L.map('map').setView([51.96269732749698,7.625025563711631], 13);
+ L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+ maxZoom: 20,
+ minZoom:2,
+ subdomains:['mt0','mt1','mt2','mt3']
  }).addTo(map);
 
  // Add Leaflet Draw controls

@@ -8,8 +8,6 @@ async function startingPolygonmanager() {
     // Iterate over the array of GeoJSON objects and add them to the map
     stationData.forEach((geojson) => {
       const classification = geojson.properties.classification;
-
-      // Define a color based on the classification
       let color;
       switch (classification) {
         case 'field':
@@ -117,37 +115,48 @@ map.addControl(
 );
 
 map.on(L.Draw.Event.CREATED, async function (event) {
-  let layer = event.layer;
-  let feature = (layer.feature = layer.feature || {});
-  let type = event.layerType;
+    let layer = event.layer;
+    let feature = (layer.feature = layer.feature || {});
+    let type = event.layerType;
 
-  const object_id = prompt("Enter object_id:");
-  const name = prompt("Enter name:");
-  const classification = prompt("Enter classification:");
+    let object_id, name, classification;
 
-  let geojson = {
-    type: "Feature",
-    properties: {
-      object_id,
-      name,
-      classification,
-    },
-    geometry: layer.toGeoJSON().geometry,
-  };
+    do {
+      object_id = prompt("Enter object_id:");
+    } while (!object_id.trim()); // Repeat the prompt until a non-empty string is entered
 
-  feature.type = feature.type || "Feature";
-  let props = (feature.properties = feature.properties || {});
+    do {
+      name = prompt("Enter name:");
+    } while (!name.trim());
 
-  props.type = type;
+    do {
+      classification = prompt("Enter classification:");
+    } while (!classification.trim());
 
-  if (type === "circle") {
-    props.radius = layer.getRadius();
-  }
+    let geojson = {
+      type: "Feature",
+      properties: {
+        object_id,
+        name,
+        classification,
+      },
+      geometry: layer.toGeoJSON().geometry,
+    };
 
-  drawnItems.addLayer(layer);
+    feature.type = feature.type || "Feature";
+    let props = (feature.properties = feature.properties || {});
 
-  await addGeoJSONtoDB(geojson);
+    props.type = type;
+
+    if (type === "circle") {
+      props.radius = layer.getRadius();
+    }
+
+    drawnItems.addLayer(layer);
+
+    await addGeoJSONtoDB(geojson);
 });
+
 
 // A Geojson is displayed in the map
 const geojsonFromLocalStorage = JSON.parse(localStorage.getItem("geojson"));
