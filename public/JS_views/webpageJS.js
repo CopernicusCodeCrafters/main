@@ -87,6 +87,9 @@ async function createDatacube(){
           {west: 16.06, south: 48.06, east: 16.65, north: 48.35},
           ["2017-03-01", "2017-04-01"],
           ["VV", "VH"]
+          "sentinel-s2-l2a-cogs",
+          {west: 563080.6, south: 4483092.4, east: 609472, north: 4530135},
+          ["2021-06-01", "2021-06-30"],
         );
 
         var min = function(data) { return this.min(data); };
