@@ -110,6 +110,22 @@ async function createDatacube(){
 
         var layer = new GeoRasterLayer({
           result 
+async function createDatacube() {
+  console.log("Creating1");
+  try {
+    const response = await fetch('/satelliteImage');
+    const blob = await response.blob();
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const arrayBuffer = reader.result;
+
+      try {
+        const georaster = await parseGeoraster(arrayBuffer);
+        let layer = new GeoRasterLayer({
+          georaster: georaster,
+          opacity: 1,
+          resolution: 512
         });
         layer.addTo(map);
 
@@ -118,5 +134,12 @@ async function createDatacube(){
         
       } catch (error) {
         console.log("Error connecting);", error);
+        console.log(error);
       }
+    };
+
+    reader.readAsArrayBuffer(blob);
+  } catch (error) {
+    console.log(error);
+  }
 }

@@ -61,6 +61,9 @@ router.get('/satelliteImage', async function (req, res, next) {
     // Connect to the OpenEO server
     //const connection = await OpenEO.connect('http://34.209.215.214:8000');
     const connection = await OpenEO.connect('http://localhost:8000/');
+    // Connect to the OpenEOcubes server
+    const connection = await OpenEO.connect('http://34.209.215.214:8000');
+    //const connection = await OpenEO.connect('http://localhost:8000/');
     await connection.authenticateBasic('user', 'password');
 
     var builder = await connection.buildProcess();
@@ -77,10 +80,12 @@ router.get('/satelliteImage', async function (req, res, next) {
     var mean = function(data) {
       return this.mean(data);
     };
+    
     //datacube = builder.reduce_dimension(datacube, mean, dimension = "t");  
     let result = builder.save_result(datacube_filtered, "GTiff");
     //let response = await connection.computeResult(result, "result.tif");
     
+    let response = await connection.computeResult(result);
     
     //console.log(tif)
     /*var job = await connection.createJob(result, "Example Title")
@@ -89,6 +94,9 @@ router.get('/satelliteImage', async function (req, res, next) {
 
 
     console.log("Done");
+    // Sending the result data back to the frontend
+    res.status(200).set('Content-Type', response.type); 
+    response.data.pipe(res); // Send the GeoTIFF as a response
     
     // Sending the result data back to the client
     //res.status(200).set('Content-Type', 'json'); 
