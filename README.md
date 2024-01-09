@@ -9,6 +9,10 @@ Jan Becker
 Emil Erlenkötter
 Joaquin Valdez
 
+### for starting openeocubes on VM in folder :
+folder : ubuntu@ip-172-31-29-252:~/test2/openeocubes
+sudo apt install r-base-core
+
 ###  For Co-Authoring:
 Commit message
 
@@ -23,8 +27,7 @@ Co-authored-by: Kjell Wundram           @kwundram2602
 
 ## OpenEOcubes
 
-#### Processes 
-                https://processes.openeo.org/#add_dimension
+
 
 #### Container
 
