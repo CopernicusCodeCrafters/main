@@ -6,8 +6,8 @@ var logger = require("morgan");
 var mongodb = require("mongodb");
 var engines = require('consolidate')
 
-//const url = "mongodb://127.0.0.1:27017"
-const url = "mongodb://mongo:27017";
+const url = "mongodb://127.0.0.1:27017"
+//const url = "mongodb://mongo:27017";
 let dbName = "geosoft2";
 let client = new mongodb.MongoClient(url);
 async function connectToMongo() {
