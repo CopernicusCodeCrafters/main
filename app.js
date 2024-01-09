@@ -4,14 +4,16 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mongodb = require("mongodb");
-const bodyParser = require('body-parser');
 var engines = require('consolidate')
-var cors = require('cors')
+
+
+
+
 
 const url = "mongodb://127.0.0.1:27017"
 //const url = "mongodb://mongo:27017";
+let dbName = "geosoft2";
 
-let dbName = "mydatabase";
 let client = new mongodb.MongoClient(url);
 async function connectToMongo() {
   try {
@@ -22,57 +24,17 @@ async function connectToMongo() {
   }
 }
 
-//connectToMongo();
+connectToMongo();
 
 //Routes
 var indexRouter = require("./routes/webpage");
 var impressumRouter = require("./routes/impressum")
 var trainingsdatenRouter  =require("./routes/trainingsdaten")
 
-
 var app = express();
 app.use(express.json())
-app.post('/uploadRoute', async (req, res) => {
-  try {
 
-    // Verbindung zur MongoDB herstellen
-    await client.connect();
-    console.log('Mit MongoDB verbunden');
-    let { geojson } = req.body;
-    const db = client.db(dbName);
-    const collection = db.collection('routen');
-    let geojsonParsed = JSON.parse(geojson);
-    // GeoJSON-Daten aus dem Request-Body extrahieren und in die Sammlung einfügen
-    const result = await collection.insertOne(geojsonParsed);
-
-    console.log('GeoJSON-Daten erfolgreich hochgeladen:', result.insertedId);
-    res.status(201).json({ message: 'GeoJSON-Daten erfolgreich hochgeladen', insertedId: result.insertedId });
-  } catch (error) {
-    console.error('Fehler beim Hochladen der GeoJSON-Daten in MongoDB:', error);
-    res.status(500).json({ error: 'Interner Serverfehler' });
-  } finally {
-    // Verbindung schließen, wenn Sie fertig sind
-    client.close();
-  }
-});
-
-app.get('/getStation', async (req, res) => {
-  try {
-    await client.connect();
-    let db = client.db(dbName);
-    let collection = db.collection('newpois');
-    let geojsonArray = await collection.find().toArray(); // Find all documents and convert to an array
-    client.close();
-
-    res.json(geojsonArray); // Send the array of GeoJSON documents as a JSON response
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Fehler beim Abrufen der Daten');
-  }
-});
-
-
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 // view engine setup
 app.engine('html', engines.swig)
@@ -90,8 +52,34 @@ app.use("/webpage", indexRouter);
 app.use("/impressum", impressumRouter)
 app.use("/trainingsdaten",trainingsdatenRouter)
 
+//Fügt eine GeoJSON zu der Datenbank hinzu
+app.post('/insert-geojson', async (req, res) => {
+  const { geojson } = req.body;
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
+    const result = await collection.insertOne(geojson);
+    console.log('GeoJSON data inserted successfully:', result.insertedId);
+    res.send('GeoJSON data inserted successfully');
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).send('An error occurred');
+  }
+});
 
+//get-Befehl(Stationen),der alle Datenbank-Objekte als Array zurückgibt
+app.get('/getAllPolygons', async (req, res) => {
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
 
+    const geojsonArray = await collection.find().toArray();
+    res.json(geojsonArray);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Fehler beim Abrufen der Daten');
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -108,6 +96,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+
 
 
 app.get('/getGeoJSON', async (req, res) => {
@@ -127,19 +116,4 @@ app.get('/getGeoJSON', async (req, res) => {
   }
 });
 
-//Setup to fix Cors Issue
-app.use(cors())
-
-var corsOptions = {
-  origin: 'http://34.209.215.214:8000/',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
-
-app.get('/products/:id', cors(corsOptions), function (req, res, next) {
-  res.json({msg: 'This is CORS-enabled for only example.com.'})
-})
-
-app.listen(3001, function () {
-  console.log('CORS-enabled web server listening on port 80')
-})
 module.exports = app;
