@@ -4,6 +4,7 @@
     width: 80%;
     height: 30%;
 }
+
  /* Button for area of interest */
 .black-btn {
     /* TODO: maybe change sizes to percent*/
@@ -22,6 +23,7 @@
  .black-btn:hover {
    background-color: #555;
  }
+
 
   /* Button for area of interest */
 .green-btn {

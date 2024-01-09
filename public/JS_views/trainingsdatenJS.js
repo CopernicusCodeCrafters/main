@@ -1,45 +1,55 @@
 
+
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
   try {
     const response = await fetch("/getAllPolygons");
     const stationData = await response.json();
-    
-    // Iterate over the array of GeoJSON objects and add them to the map
-    stationData.forEach((geojson) => {
-      const classification = geojson.properties.classification;
-      let color;
-      switch (classification) {
-        case 'field':
-          color = 'green';
-          break;
-        case 'water':
-          color = 'blue';
-          break;
-        case 'street':
-          color = 'black';
-          break;
-        default:
-          color = 'gray';
-      }
-      L.geoJSON(geojson, {
-        style: {
-          fillColor: color,
-          color: color,
-          weight: 2,
-        },
-        onEachFeature: function (feature, layer) {
-          const popupContent =`
-          <strong>Name:</strong> ${feature.properties.name}<br>
-          <strong>Object ID:</strong> ${feature.properties.object_id}<br> 
-          <strong>Classification:</strong> ${feature.properties.classification}
-        `;
-          layer.bindPopup(popupContent);
-        }
-      }).addTo(map);
-    });
 
-    console.log("Fetched stationdata:", stationData);
+    if (Array.isArray(stationData)) {
+      // Check if stationData is an array
+      stationData.forEach((geojson) => {
+        const classification = geojson && geojson.properties && geojson.properties.classification;
+        let color;
+
+        switch (classification) {
+          case 'field':
+            color = 'green';
+            break;
+          case 'water':
+            color = 'blue';
+            break;
+          case 'street':
+            color = 'black';
+            break;
+          case 'settlement':
+            color = 'red';
+            break;
+          default:
+            color = 'gray';
+        }
+
+        L.geoJSON(geojson, {
+          style: {
+            fillColor: color,
+            color: color,
+            weight: 2,
+          },
+          onEachFeature: function (feature, layer) {
+            const popupContent =`
+            <strong>Name:</strong> ${feature.properties.name || 'N/A'}<br>
+            <strong>Object ID:</strong> ${feature.properties.object_id || 'N/A'}<br> 
+            <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}
+          `;
+            layer.bindPopup(popupContent);
+          }
+        }).addTo(map);
+      });
+
+      console.log("Fetched stationdata:", stationData);
+    } else {
+      console.error("Error: Invalid stationData format");
+    }
   } catch (error) {
     console.error("Error fetching GeoJSON data:", error);
   }
@@ -49,25 +59,48 @@ startingPolygonmanager();
 
 
 // Input File is processed and shown in the Leaflet Map
-function handleFile(event) {
-    event.preventDefault();
-  
-    const formData = new FormData(document.getElementById('uploadForm'));
-    const file = formData.get('file');
-    console.log(file)
-  
-    if (file) {
-      const fileName = file.name.toLowerCase();
-  
-      if (fileName.endsWith('.geojson')) {
-        const reader = new FileReader();
-        reader.onload = function () {
-          const result = reader.result;
-          const geojson = JSON.parse(result);
+async function handleFile(event) {
+  event.preventDefault();
+
+  const formData = new FormData(document.getElementById('uploadForm'));
+  const file = formData.get('file');
+
+  if (file) {
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith('.geojson')) {
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const result = reader.result;
+        const geojson = JSON.parse(result);
+
+        for (const feature of geojson.features) {
+          let object_id, name, classification;
+
+          do {
+            object_id = prompt("Enter object_id:");
+          } while (!object_id.trim());
+
+          do {
+            name = prompt("Enter name:");
+          } while (!name.trim());
+
+          do {
+            classification = prompt("Enter classification:");
+          } while (!classification.trim());
+
+          feature.properties = {
+            object_id,
+            name,
+            classification,
+          };
+
           setGeojsonToMap(geojson);
-        };
-        reader.readAsText(file);
-      }
+          await addGeoJSONtoDB(feature);
+        }
+      };
+      reader.readAsText(file);
+    }
       else if (fileName.endsWith('.gpkg')) {
    
         const gpkgLayer = L.geoPackageTileLayer({
@@ -83,8 +116,7 @@ function handleFile(event) {
     } else {
       console.log('No file selected');
     }
-  }
- 
+  } 
 
 
 // Leaflet Draw is intialized
@@ -159,73 +191,40 @@ map.on(L.Draw.Event.CREATED, async function (event) {
 
 
 // A Geojson is displayed in the map
-const geojsonFromLocalStorage = JSON.parse(localStorage.getItem("geojson"));
-
 function setGeojsonToMap(geojson) {
-  drawnItems.clearLayers()
-  const feature = L.geoJSON(geojson, {
-    onEachFeature: function (feature, layer) {
-      drawnItems.addLayer(layer);
-      const coordinates = feature.geometry.coordinates.toString();
-      const result = coordinates.match(/[^,]+,[^,]+/g);
+  drawnItems.clearLayers();
 
-      layer.bindPopup(
-        "<span>Coordinates:<br>" + result.join("<br>") + "</span>"
-      );
-    },
-  }).addTo(map);
+  if (geojson.type === "FeatureCollection" && geojson.features) {
+    // GeoJSON is a Feature Collection
+    geojson.features.forEach((feature) => {
+      displayFeature(feature);
+    });
+  } else if (geojson.type === "Feature") {
+    // GeoJSON is a single Feature
+    displayFeature(geojson);
+  }
 
-  map.fitBounds(feature.getBounds());
+  function displayFeature(feature) {
+    const properties = feature.properties;
+    const popupContent = `
+      <strong>Name:</strong> ${properties.name || 'N/A'}<br>
+      <strong>Object ID:</strong> ${properties.object_id || 'N/A'}<br> 
+      <strong>Classification:</strong> ${properties.classification || 'N/A'}
+    `;
+    const layer = L.geoJSON(feature, {
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(popupContent);
+      },
+    });
+    drawnItems.addLayer(layer);
+  }
+
+  map.fitBounds(drawnItems.getBounds());
 }
 
 
 
-// Event listener for saving GeoJSON in Local Storage
-const saveGeoJSON = document.querySelector("#save-Button");
-saveGeoJSON.addEventListener("click", (e) => {
-    e.preventDefault();
 
-    const data = drawnItems.toGeoJSON();
-
-    if (data.features.length === 0) {
-        alert("You must have some data to save it");
-        return;
-    }
-
-    const geojsonName = prompt("Enter the name for the GeoJSON file:");
-
-    if (geojsonName == null || geojsonName == "") {
-        alert("Please enter a valid name for the GeoJSON file.");
-        return;
-    }
-
-    const savedData = localStorage.getItem("geojson") ? JSON.parse(localStorage.getItem("geojson")) : {};
-
-    savedData[geojsonName] = data;
-
-    localStorage.setItem("geojson", JSON.stringify(savedData));
-
-    const savedDataButton = document.createElement("button");
-    savedDataButton.textContent = "Load " + geojsonName;
-    savedDataButton.classList.add("savedJSONButton");
-    savedDataButton.dataset.geojsonName = geojsonName;
-
-    savedDataButton.addEventListener("click", () => {
-        const savedJSON = localStorage.getItem("geojson");
-        const savedData = savedJSON ? JSON.parse(savedJSON) : {};
-
-        if (savedData[geojsonName]) {
-            const data = savedData[geojsonName];
-
-            drawnItems.clearLayers();
-            setGeojsonToMap(data); 
-        } else {
-            console.error("Saved GeoJSON not found");
-        }
-    });
-
-    document.body.appendChild(savedDataButton);
-});
 
 
 // Geojson is transformed into a Download Link using a Blob object
