@@ -1,8 +1,14 @@
 "use strict"
 
+//const cons = require("consolidate");
 
-console.log("webpageJS")
- //Add Leaflet Map 
+//Create GeoJSON FeatureCollection for all Options
+var geoJSONData = {
+    type: "FeatureCollection",
+    features: []
+}; 
+
+//Add Leaflet Map 
  var map = L.map('map').setView([51.305915044598834,10.21774343122064], 6);
  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
  maxZoom: 19,
@@ -17,13 +23,15 @@ console.log("webpageJS")
         $('#startDate').datepicker({
             format: 'yyyy-mm-dd',
             autoclose: true,
-            todayHighlight: true
+            todayHighlight: true,
+            endDate: new Date()
  });
         // Initialize the second datepicker with the startDate option
         $('#endDate').datepicker({
             format: 'yyyy-mm-dd',
             autoclose: true,
             todayHighlight: true,
+            endDate: new Date()
           });
 
          // Update the startDate of the second datepicker when the first datepicker changes
@@ -54,42 +62,53 @@ console.log("webpageJS")
      featureGroup: drawnItems
      }
  });
+
+ // Set maximum allowed area in square meters
+ var maxAllowedArea = 20000;
+
  // Event listener for the button "Activate Draw"
  document.getElementById('drawButton').addEventListener('click', function() {
-     // Add Leaflet Draw controls to the map
+    // Remove the existing drawn shape before adding a new one
+    drawnItems.clearLayers(); 
+    // Add Leaflet Draw controls to the map
      map.addControl(drawControl);
     //variable for drawControl
      var drawingEnabled = true; 
       //Handle rectangle creation
       map.on('draw:created', function (e) {
-        var type = e.layerType,
-            layer = e.layer;
+            var layer = e.layer;
+            var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1000000;
 
         if (drawingEnabled) {
+            //limit leafletDraw to size given in maxAllowedArea
+            if (area > maxAllowedArea) {
+                alert('The drawn area exceeds the maximum allowed area.');
+            } else {
             drawnItems.addLayer(layer);
+            console.log("LayerTest")
+
+            // Convert the drawn layer to GeoJSON and add it to the FeatureCollection
+            var feature = layer.toGeoJSON();
+            geoJSONData.features.push(feature);
+            //Test
+            console.log(geoJSONData); 
+            console.log("Test")
 
             //limit to one draw
             drawingEnabled = false; 
+            }
         }
         });
+        map.on('draw:deleted', function (e) {
+            drawingEnabled = true;
+          });
  });
-//function to deactivate one of the aoi buttons
-function toggleButtonState(buttonNumber) {
-    var drawButton = document.getElementById('drawButton');
-    var uploadButton = document.getElementById('uploadButton');
-
-    if (buttonNumber === 1) {
-      drawButton.disabled = drawButton.disabled;
-      uploadButton.disabled = !uploadButton.disabled;
-    } else if (buttonNumber === 2) {
-      drawButton.disabled = !drawButton.disabled;
-      uploadButton.disabled = uploadButton.disabled;
-      map.removeControl(drawControl);
-    }
-  }
 
  //Option to choose a geojson in any format and adds it to the map
  document.getElementById('uploadButton').addEventListener('click', function () {
+    // Remove the existing drawn shape before adding a new one
+    drawnItems.clearLayers();
+    map.removeControl(drawControl)
     const fileInput = document.getElementById('fileInput');
     fileInput.click();
 });
