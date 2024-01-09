@@ -30,6 +30,19 @@
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
     <script defer src="JS_views/webpageJS.js"></script>
 
+    <!--OpenEo-->
+    <script src="https://cdn.jsdelivr.net/npm/oidc-client@1/lib/oidc-client.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@openeo/js-client@2/openeo.min.js"></script>
+
+    <!--Georasterlayer for Leaflet-->
+    <script src="https://unpkg.com/georaster-layer-for-leaflet/dist/georaster-layer-for-leaflet.min.js"></script>
+
+    <!--Georaster-->
+    <script src="https://unpkg.com/georaster"></script>
+
+    <!--Chroma-->
+    <script src="https://unpkg.com/chroma-js"></script>
 
 
     <title>Copernicus Code Crafters</title>
@@ -113,7 +126,7 @@
 
                      <!--Submit button-->
                      <div>
-                        <button id="hyperParameterSelection" class="green-btn">Submit</button>
+                        <button id="hyperParameterSelection" class="green-btn" onclick="createDatacube()">Submit</button>
                     </div> <br>
                 </div>
             </div>

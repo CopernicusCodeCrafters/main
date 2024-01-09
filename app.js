@@ -7,9 +7,13 @@ var mongodb = require("mongodb");
 var engines = require('consolidate')
 
 
+
+
+
 const url = "mongodb://127.0.0.1:27017"
 //const url = "mongodb://mongo:27017";
 let dbName = "geosoft2";
+
 let client = new mongodb.MongoClient(url);
 async function connectToMongo() {
   try {
@@ -91,6 +95,25 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render("error");
+});
+
+
+
+app.get('/getGeoJSON', async (req, res) => {
+  try {
+      await client.connect();
+      let db = client.db(dbName);
+      let collection = db.collection('Stationen');
+
+      let geojson = await collection.findOne(); 
+      
+      client.close();
+
+      res.json(geojson); 
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Fehler beim Abrufen der Daten');
+  }
 });
 
 module.exports = app;
