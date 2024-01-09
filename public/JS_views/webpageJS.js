@@ -49,15 +49,18 @@ console.log("webpageJS")
             endDate: new Date()
           });
 
-         // Update the startDate of the second datepicker when the first datepicker changes
-        $('#startDate').on('changeDate', function (e) {
-            // Calculate one day later
-            var startDate = new Date(e.date);
-            startDate.setDate(startDate.getDate() + 1);
+            // Update the startDate and endDate options of the datepickers when the first datepicker changes
+    $('#startDate').on('changeDate', function (e) {
+        // Calculate two weeks later
+        var endDate = new Date(e.date);
+        endDate.setDate(endDate.getDate() + 13); // 13 days to allow for a 14-day span
   
         // Set the new startDate for the second datepicker
-            $('#endDate').datepicker('setStartDate', startDate);
-        });
+        $('#endDate').datepicker('setStartDate', e.date);
+        
+        // Set the new endDate for the second datepicker
+        $('#endDate').datepicker('setEndDate', endDate);
+      });
     });
 
  // Add Leaflet Draw controls
