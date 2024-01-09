@@ -72,20 +72,54 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 
 
 async function createDatacube() {
-  console.log("Creating1");
+  console.log("Creating Image");
   try {
+    // fetch the tif image
     const response = await fetch('/satelliteImage');
     const blob = await response.blob();
+    console.log("warum")
 
+    /*const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'satelliteImage.tif';
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);*/
+    
+    // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {
       const arrayBuffer = reader.result;
 
       try {
+        // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
+        const min = georaster.mins[0];
+        const max = georaster.maxs[0];
+        const range = georaster.ranges[0];
+
+            // available color scales can be found by running console.log(chroma.brewer);
+            console.log(chroma.brewer);
+            var scale = chroma.scale(['red', 'green', 'blue']);
+        console.log(georaster)
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
+          pixelValuesToColorFn: function(pixelValues) {
+            var pixelValue = pixelValues[0]; // there's just one band in this raster
+            
+
+            // if there's zero wind, don't return a color
+            if (pixelValue === 0) return null;
+
+            // scale to 0 - 1 used by chroma
+            var scaledPixelValue = (pixelValue - min) / range;
+
+            var color = scale(scaledPixelValue).hex();
+
+            return color;
+          },
           resolution: 512
         });
         layer.addTo(map);
