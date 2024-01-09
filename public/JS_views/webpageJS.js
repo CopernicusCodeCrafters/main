@@ -16,6 +16,36 @@ const OpenEO_JSON = {
 
 };
 
+var selectedDates = [];
+
+//Function for date-picker
+$(document).ready(function () {
+    $('#datepicker1').datepicker();
+    $('#datepicker2').datepicker();
+});
+
+function getSelectedDates() {
+  var startDate = $('#datepicker1').datepicker('getUTCDate');
+  var endDate = $('#datepicker2').datepicker('getUTCDate');
+
+  if (startDate && endDate) {
+      // Format dates as YYYY-MM-DD
+      var formattedStartDate = formatDate(startDate);
+      var formattedEndDate = formatDate(endDate);
+
+      // Store dates in an array
+      var date = [formattedStartDate, formattedEndDate];
+
+      console.log(date); // You can use the 'date' array as needed
+  } else {
+      alert('Please select both start and end dates.');
+  }
+}
+
+// Function to format date using Bootstrap-datepicker's format
+function formatDate(date) {
+  return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+}
 
 console.log("webpageJS")
  //Add Leaflet Map 

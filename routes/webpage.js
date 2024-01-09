@@ -71,11 +71,11 @@ router.get('/satelliteImage', async function (req, res, next) {
 
     var datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
-      {west: 563080.6, south: 4483092.4, east: 609472, north: 4530135},
+      {west: 588080.6, south: 4493092.4, east: 609472, north: 4530135},
       32618,
       ["2021-06-01", "2021-06-30"]
     );
-    
+      //["2021-06-01", "2021-06-30"]
 
     let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
     var mean = function(data) {
