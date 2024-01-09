@@ -36,7 +36,7 @@ function getSelectedDates() {
       // Store dates in an array
       var date = [formattedStartDate, formattedEndDate];
 
-      console.log(date); // You can use the 'date' array as needed
+      console.log(date); 
   } else {
       alert('Please select both start and end dates.');
   }
@@ -138,7 +138,7 @@ async function createDatacube() {
   console.log("Creating Image");
   try {
     // fetch the tif image
-    const response = await fetch('/satelliteImage');
+    const response = await fetch(`/satelliteImage?date=${selectedDates}`);
     const blob = await response.blob();
     console.log("warum")
 

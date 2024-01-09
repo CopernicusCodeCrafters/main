@@ -85,25 +85,21 @@
                     </div>
                     <!--Datepicker div-->
                     <div>
-                        <h5 class="card-title">Choose Time Period</h5>
-                        <label for="datepicker">Select a start date:</label>
-                        <input type="text" class="form-contorl" id="datepicker1">
-<script>
-                            $(document).ready(function(){
-                              $('#datepicker1').datepicker();
-                            });
-                          </script> 
-                    </div>
-                <!--Datepicker div-->
-                    <div>
-                        <label for="datepicker">Select an end date:</label>
-                        <input type="text" class="form-contorl" id="datepicker2">
-<script>
-                            $(document).ready(function(){
-                              $('#datepicker2').datepicker();
-                            });
-                          </script>                         
-                    </div> <br>
+
+                        <div>
+                            <h5 class="card-title">Choose Time Period</h5>
+                            <label for="datepicker1">Select a start date:</label>
+                            <input type="text" class="form-control" id="datepicker1">
+                        </div>
+                    
+                        <div>
+                            <label for="datepicker2">Select an end date:</label>
+                            <input type="text" class="form-control" id="datepicker2">
+                        </div>
+                    
+                        <br>
+                    
+                        <button class="black-btn" onclick="getSelectedDates()">Save Dates</button> <br>
                     <!--Area of Interest-->
                     <div>
                         <h5 class="card-title">Select Area of Interest</h5>
