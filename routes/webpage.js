@@ -60,7 +60,8 @@ router.post("/newstation", function (req, res, next) {
 router.get('/satelliteImage', async function (req, res, next) {
   try {
     console.log('Processing satellite image...'); // Indicate the code is running up to this point
-    console.log(req.query.date)
+    const dateArray = req.query.date.split(',');
+    console.log(dateArray);
     // Connect to the OpenEO server
     const connection = await OpenEO.connect('http://34.209.215.214:8000');
     //const connection = await OpenEO.connect('http://localhost:8000/');  
@@ -73,7 +74,7 @@ router.get('/satelliteImage', async function (req, res, next) {
       "sentinel-s2-l2a-cogs",
       {west: 588080.6, south: 4493092.4, east: 609472, north: 4530135},
       32618,
-      req.query.date
+      dateArray
     );
       //["2021-06-01", "2021-06-30"]
 

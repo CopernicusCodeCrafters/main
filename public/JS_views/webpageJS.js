@@ -34,9 +34,9 @@ function getSelectedDates() {
       var formattedEndDate = formatDate(endDate);
 
       // Store dates in an array
-      var date = [formattedStartDate, formattedEndDate];
+      selectedDates = [formattedStartDate, formattedEndDate];
 
-      console.log(date); 
+      console.log(selectedDates); 
   } else {
       alert('Please select both start and end dates.');
   }
