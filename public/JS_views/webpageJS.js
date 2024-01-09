@@ -16,6 +16,10 @@ const OpenEO_JSON = {
 
 };
 
+var geoJSONData={
+    type:"FeatureCollection",
+    features:[]
+}
 
 console.log("webpageJS")
  //Add Leaflet Map 
@@ -87,8 +91,8 @@ console.log("webpageJS")
      var drawingEnabled = true; 
       //Handle rectangle creation
       map.on('draw:created', function (e) {
-        var type = e.layerType,
-            layer = e.layer;
+            var layer = e.layer;
+            var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0])/100000
 
         if (drawingEnabled) {
             //limit leafletDraw to size given in maxAllowedArea
