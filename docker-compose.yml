@@ -4,12 +4,14 @@ services:
 
     backend:
        
-        build: ./
+        # build: ./
+        image: kwundram/backend:1.0
         ports: 
             - 3000:3000
         
         depends_on:
             - mongodb    
+            
         environment:
             WAIT_HOSTS: mongodb://127.0.0.1:27017/
             MONGODB_URI: mongodb://127.0.0.1:27017/
@@ -40,7 +42,7 @@ services:
             - '8081:8081'
 
     openEO_Own:
-        image: kwundram/own_openeo:1.0
+        image: kwundram/own_openeo:1.2
         ports:
             - 8000:8000
     

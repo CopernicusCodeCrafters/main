@@ -1,13 +1,49 @@
 "use strict"
 
+//const cons = require("consolidate");
 
-console.log("webpageJS")
- //Add Leaflet Map 
+//Create GeoJSON FeatureCollection for all Options
+var geoJSONData = {
+    type: "FeatureCollection",
+    features: []
+}; 
+
+//Add Leaflet Map 
  var map = L.map('map').setView([51.305915044598834,10.21774343122064], 6);
  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
  maxZoom: 19,
  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
  }).addTo(map);
+
+ /**
+  * function to implement datepicker and limit date selection
+  */
+ $(document).ready(function () {
+        // Initialize the first datepicker
+        $('#startDate').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+ });
+        // Initialize the second datepicker with the startDate option
+        $('#endDate').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+          });
+
+         // Update the startDate of the second datepicker when the first datepicker changes
+        $('#startDate').on('changeDate', function (e) {
+            // Calculate one day later
+            var startDate = new Date(e.date);
+            startDate.setDate(startDate.getDate() + 1);
+  
+        // Set the new startDate for the second datepicker
+            $('#endDate').datepicker('setStartDate', startDate);
+        });
+    });
 
  // Add Leaflet Draw controls
  var drawnItems = new L.FeatureGroup();
@@ -26,24 +62,53 @@ console.log("webpageJS")
      featureGroup: drawnItems
      }
  });
- // Event listener for the button click
+
+ // Set maximum allowed area in square meters
+ var maxAllowedArea = 20000;
+
+ // Event listener for the button "Activate Draw"
  document.getElementById('drawButton').addEventListener('click', function() {
-     // Add Leaflet Draw controls to the map
+    // Remove the existing drawn shape before adding a new one
+    drawnItems.clearLayers(); 
+    // Add Leaflet Draw controls to the map
      map.addControl(drawControl);
+    //variable for drawControl
+     var drawingEnabled = true; 
       //Handle rectangle creation
       map.on('draw:created', function (e) {
-        var type = e.layerType,
-            layer = e.layer;
+            var layer = e.layer;
+            var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]) / 1000000;
 
-        if (type === 'rectangle') {
+        if (drawingEnabled) {
+            //limit leafletDraw to size given in maxAllowedArea
+            if (area > maxAllowedArea) {
+                alert('The drawn area exceeds the maximum allowed area.');
+            } else {
             drawnItems.addLayer(layer);
+            console.log("LayerTest")
+
+            // Convert the drawn layer to GeoJSON and add it to the FeatureCollection
+            var feature = layer.toGeoJSON();
+            geoJSONData.features.push(feature);
+            //Test
+            console.log(geoJSONData); 
+            console.log("Test")
+
+            //limit to one draw
+            drawingEnabled = false; 
+            }
         }
         });
+        map.on('draw:deleted', function (e) {
+            drawingEnabled = true;
+          });
  });
 
-
  //Option to choose a geojson in any format and adds it to the map
- document.getElementById('uploadRectangle').addEventListener('click', function () {
+ document.getElementById('uploadButton').addEventListener('click', function () {
+    // Remove the existing drawn shape before adding a new one
+    drawnItems.clearLayers();
+    map.removeControl(drawControl)
     const fileInput = document.getElementById('fileInput');
     fileInput.click();
 });

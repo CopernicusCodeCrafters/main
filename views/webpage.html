@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="public\pictures\favicon.ico" type="image/x-icon">
     <!-- Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -37,7 +38,7 @@
 
 <body>
     <header class="mb-3">
-        <nav class="navbar navbar-expand-lg navbar-light bg-secondary">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt=""></a>
             <a class="navbar-brand active"area-current="page" href="/">Viewer</a>
             <button class="navbar-toggler" type="button"data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
@@ -56,49 +57,34 @@
     <div class="container-fluid">
         <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
             <div class="col-lg-9">
-                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Viewer</h2>
                     <div id="map"></div>
                 </div>
             </div>
             <div class="col-lg-3">
-                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Options</h2><br>
-                    <!--Cloud Cover Slider-->
-                    <div>
-                        <h5 class="card-title">Choose Cloud Cover (%)</h5>
-                        <input type="range" class="custom-slider" value="50" min="10" max="100" step="1" oninput="this.nextElementSibling.value = this.value">
-                        <output>50</output>
-                    </div>
-                    <!--Datepicker div-->
+                    <!--Datepicker Start date-->
                     <div>
                         <h5 class="card-title">Choose Time Period</h5>
-                        <label for="datepicker">Select a start date:</label>
-                        <input type="text" class="form-contorl" id="datepicker1">
-                        <script>
-                            $(document).ready(function(){
-                              $('#datepicker1').datepicker();
-                            });
-                          </script> 
+                        <label for="startDate">Select a start date:</label>
+                        <input type="text" class="form-contorl" id="startDate" autocomplete="off">
                     </div>
-                    <!--Datepicker div-->
+                    <!--Datepicker end date-->
                     <div>
-                        <label for="datepicker">Select an end date:</label>
-                        <input type="text" class="form-contorl" id="datepicker2"> 
-                        <script>
-                            $(document).ready(function(){
-                              $('#datepicker2').datepicker();
-                            });
-                          </script>                         
+                        <label for="endDate">Select an end date:</label>
+                        <input type="text" class="form-contorl" id="endDate" autocomplete="off">                         
                     </div> <br>
                     <!--Area of Interest-->
                     <div>
                         <h5 class="card-title">Select Area of Interest</h5>
                         <!-- Button to activate Leaflet Draw -->
-                        <button id="drawButton" class="black-btn">Activate Draw</button>
+                        <button id="drawButton" class="black-btn" onclick="toggleButtonState(1)">Activate Draw</button>
                         <h7>Or</h7>
-                        <button id="uploadRectangle" class="black-btn">Upload</button>
-                        <input type="file" id="fileInput" accept=".geojson" style="display: none"/>
+                        <!-- Button to activate Upload-->
+                        <button id="uploadButton" class="black-btn" onclick="toggleButtonState(2)">Upload</button>
+                        <input type="file" id="fileInput" accept=".geojson, .gpgk" style="display: none"/>
                     </div> <br>
                     <!--Training model selection-->
                     <div>
@@ -109,7 +95,12 @@
                     <div>
                         <h5 class="card-title">Select Hyperparameters</h5>
                         <button id="hyperParameterSelection" class="black-btn">Choose Hyperparameters</button>
-                    </div>
+                    </div> <br>
+
+                     <!--Submit button-->
+                     <div>
+                        <button id="hyperParameterSelection" class="green-btn">Submit</button>
+                    </div> <br>
                 </div>
             </div>
         </div>

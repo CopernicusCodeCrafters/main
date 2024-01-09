@@ -27,12 +27,13 @@
 
     <!--Own stylesheet:-->
     <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/webpageStyles.css">
     <title>Copernicus Code Crafters</title>
 </head>
 
 <body>
     <header class="mb-3">
-        <nav class="navbar navbar-expand-lg navbar-light bg-secondary">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt=""></a>
             <a class="navbar-brand active"area-current="page" href="/">Viewer</a>
             <button class="navbar-toggler" type="button"data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
@@ -50,7 +51,7 @@
     <div class="container-fluid">
         <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
             <div class="col-lg-9">
-                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Viewer</h2>
                     <div id="map"></div>
                     <script>
@@ -63,14 +64,14 @@
                 </div>
             </div>
             <div class="col-lg-3">
-                <div class="card shadow p-3 h-100 bg-secondary rounded">
+                <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Upload</h2><br>
                     <form id="uploadForm" onsubmit="handleFile(event)" enctype="multipart/form-data">
                         <input type="file" name="file" accept=".gpkg, .geojson">
-                        <button type="submit">Upload File</button>
-                    </form>
-                    <button id="save-Button">Save GeoJSON to Local Storage</button>
-                    <button id="save-Button1">Save GeoJSON as File</button>
+                        <button class="black-btn" type="submit">Upload File</button>
+                    </form> <br>
+                    <button id="save-Button" class="black-btn">Save GeoJSON to Local Storage</button> <br>
+                    <button id="save-Button1" class="black-btn">Save GeoJSON as File</button>
                     <div id="savedDataButton"></div>
 
 
