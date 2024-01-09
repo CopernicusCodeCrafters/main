@@ -1,5 +1,4 @@
 
-
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
   try {
@@ -268,3 +267,4 @@ const addGeoJSONtoDB = async (geojson) => {
     console.error('An error occurred:', error);
   }
 };
+
