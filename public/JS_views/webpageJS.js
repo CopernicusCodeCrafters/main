@@ -12,8 +12,6 @@ const OpenEO_JSON = {
         "date_start":"YYYY-MM-DD",
         "date_end": "YYYY-MM-DD"
     }   
-
-
 };
 
 var geoJSONData={
@@ -21,14 +19,30 @@ var geoJSONData={
     features:[]
 }
 
-console.log("webpageJS")
  //Add Leaflet Map 
  var map = L.map('map').setView([51.96269732749698,7.625025563711631], 13);
- L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
- maxZoom: 20,
- minZoom:2,
- subdomains:['mt0','mt1','mt2','mt3']
- }).addTo(map);
+ // Define base layers
+var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'OpenStreetMap'
+ });
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    attribution: 'Google Satellite',
+    maxZoom: 20,
+    minZoom:2,
+    subdomains:['mt0','mt1','mt2','mt3']
+ }); 
+// Add base layers to the map
+osmLayer.addTo(map);  // Default base layer
+
+// Create an object to store base layers with custom names
+var baseLayers = {
+    'OpenStreetMap': osmLayer,
+    'Google Satellite': googleSatLayer
+};
+
+// Add layer control to the map
+L.control.layers(baseLayers).addTo(map);
+
 
  /**
   * function to implement datepicker and limit date selection

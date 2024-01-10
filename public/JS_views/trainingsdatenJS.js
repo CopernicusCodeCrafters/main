@@ -1,4 +1,27 @@
 
+ //Add Leaflet Map 
+ var map = L.map('map').setView([51.96269732749698,7.625025563711631], 13);
+ // Define base layers
+var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'OpenStreetMap'
+ });
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    attribution: 'Google Satellite',
+    maxZoom: 20,
+    minZoom:2,
+    subdomains:['mt0','mt1','mt2','mt3']
+ }); 
+// Add base layers to the map
+googleSatLayer.addTo(map);  // Default base layer
+
+// Create an object to store base layers with custom names
+var baseLayers = {
+    'OpenStreetMap': osmLayer,
+    'Google Satellite': googleSatLayer
+};
+
+// Add layer control to the map
+L.control.layers(baseLayers).addTo(map);
 
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
