@@ -72,7 +72,7 @@ app.post('/insert-geojson', async (req, res) => {
   const { geojson } = req.body;
   try {
     const db = client.db(dbName);
-    const collection = db.collection('training polygons');
+    const collection = db.collection('Trainingspolygone');
     const result = await collection.insertOne(geojson);
     console.log('GeoJSON data inserted successfully:', result.insertedId);
     res.send('GeoJSON data inserted successfully');
