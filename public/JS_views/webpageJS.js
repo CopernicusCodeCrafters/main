@@ -37,6 +37,20 @@ function getSelectedDates() {
       selectedDates = [formattedStartDate, formattedEndDate];
 
       console.log(selectedDates); 
+
+      var saveDateBtn = document.getElementById("saveDateBtn");
+
+      // Remove the current class
+      saveDateBtn.classList.remove("black-btn");
+
+      // Add the new class
+      saveDateBtn.classList.add("accepted-btn");
+
+      //Change button text
+      saveDateBtn.innerHTML="Date saved";
+      document.getElementById("datepicker1").disabled = true;
+      document.getElementById("datepicker2").disabled = true;
+      saveDateBtn.disabled=true;
   } else {
       alert('Please select both start and end dates.');
   }

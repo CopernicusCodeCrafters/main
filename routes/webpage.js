@@ -62,6 +62,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     console.log('Processing satellite image...'); // Indicate the code is running up to this point
     const dateArray = req.query.date.split(',');
     console.log(dateArray);
+    
     // Connect to the OpenEO server
     const connection = await OpenEO.connect('http://34.209.215.214:8000');
     //const connection = await OpenEO.connect('http://localhost:8000/');  

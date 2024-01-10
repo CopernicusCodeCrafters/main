@@ -77,12 +77,6 @@
             <div class="col-lg-3">
                 <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Options</h2><br>
-                    <!--Cloud Cover Slider-->
-                    <div>
-                        <h5 class="card-title">Choose Cloud Cover (%)</h5>
-                        <input type="range" class="custom-slider" value="50" min="10" max="100" step="1" oninput="this.nextElementSibling.value = this.value">
-                        <output>50</output>
-                    </div>
                     <!--Datepicker div-->
                     <div>
 
@@ -95,11 +89,9 @@
                         <div>
                             <label for="datepicker2">Select an end date:</label>
                             <input type="text" class="form-control" id="datepicker2">
-                        </div>
+                        </div><br>
                     
-                        <br>
-                    
-                        <button class="black-btn" onclick="getSelectedDates()">Save Dates</button> <br>
+                        <button id="saveDateBtn" class="black-btn" onclick="getSelectedDates()">Save Dates</button> <br><br>
                     <!--Area of Interest-->
                     <div>
                         <h5 class="card-title">Select Area of Interest</h5>
