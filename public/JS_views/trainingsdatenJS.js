@@ -24,6 +24,9 @@ async function startingPolygonmanager() {
           case 'settlement':
             color = 'red';
             break;
+          case 'forest':
+            color='darkgreen';
+            break;
           default:
             color = 'gray';
         }
