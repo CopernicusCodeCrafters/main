@@ -87,6 +87,11 @@ console.log("webpageJS")
      featureGroup: drawnItems
      }
  });
+
+ var convertedEast=0;
+ var convertedNorth=0;
+ var convertedSouth=0;
+ var convertedWest=0;
  // Event listener for the button click
  document.getElementById('drawButton').addEventListener('click', function() {
      // Add Leaflet Draw controls to the map
@@ -95,15 +100,30 @@ console.log("webpageJS")
       map.on('draw:created', function (e) {
         var type = e.layerType,
             layer = e.layer;
+            console.log(type)
+            console.log(layer)
             const bounds = layer.getBounds();
             // Extract coordinates from the bounds object
             const southWest = bounds.getSouthWest(); // returns LatLng object
             const northEast = bounds.getNorthEast(); // returns LatLng object
-            OpenEO_JSON.coordinates.swLat = southWest.lat; 
-            OpenEO_JSON.coordinates.swLng = southWest.lng;
-            OpenEO_JSON.coordinates.neLat = northEast.lat;
-            OpenEO_JSON.coordinates.neLng = northEast.lng;
-            console.log(OpenEO_JSON);
+            // Define the source and destination coordinate systems
+            const sourceCRS = 'EPSG:4326';
+            const destCRS = 'EPSG:3857';
+            // Define the projection transformations
+            proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+            proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+
+            // Perform the coordinate transformation
+            const convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
+            const convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
+
+            convertedSouth = convertedSouthWest[1];
+            convertedWest = convertedSouthWest[0];
+            convertedNorth = convertedNorthEast[1];
+            convertedEast = convertedNorthEast[0];
+            // The converted coordinates in EPSG:3857
+            console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+            console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
 
         if (type === 'rectangle') {
@@ -152,11 +172,12 @@ async function createDatacube() {
   console.log("Creating Image");
   startRotation();
   try {
-    // fetch the tif image
-    const response = await fetch(`/satelliteImage?date=${selectedDates}`);
+    // Include converted bounds in the satelliteImage request
+    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}`);
     const blob = await response.blob();
     console.log("warum")
 
+    
     /*const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'satelliteImage.tif';
