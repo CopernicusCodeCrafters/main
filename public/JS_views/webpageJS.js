@@ -150,6 +150,7 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 
 async function createDatacube() {
   console.log("Creating Image");
+  startRotation();
   try {
     // fetch the tif image
     const response = await fetch(`/satelliteImage?date=${selectedDates}`);
@@ -202,7 +203,7 @@ async function createDatacube() {
         layer.addTo(map);
 
         map.fitBounds(layer.getBounds());
-        
+        stopRotation();
         
       } catch (error) {
         console.log("Error connecting);", error);
@@ -214,4 +215,14 @@ async function createDatacube() {
   } catch (error) {
     console.log(error);
   }
+}
+
+function startRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.add('rotate');
+}
+
+function stopRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.remove('rotate');
 }

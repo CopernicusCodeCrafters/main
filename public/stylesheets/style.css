@@ -184,8 +184,7 @@ transform: translateX(26px);
   }
 
   .rotate {
-    animation: rotate 2s linear infinite; /* 2s for 2 seconds, adjust as needed */
+    animation: rotate 1s linear infinite; 
   }
-
 
 
