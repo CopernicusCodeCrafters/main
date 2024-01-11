@@ -22,8 +22,10 @@
     "@turf/turf": "^6.5.0",
     "consolidate": "^1.0.3",
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "^4.18.2",
+    "gdal": "^0.11.1",
     "geopackage": "^1.0.2",
     "html": "^1.0.0",
     "http-errors": "~1.6.3",
@@ -31,6 +33,7 @@
     "mapbox-gl": "^2.15.0",
     "mongodb": "^6.0.0",
     "morgan": "~1.9.1",
+    "oidc-client": "^1.11.5",
     "swig": "^1.4.2",
     "turf": "^3.0.14"
   },

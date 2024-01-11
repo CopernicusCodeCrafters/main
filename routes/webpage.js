@@ -2,13 +2,17 @@ var express = require("express");
 var router = express.Router();
 var mongodb = require("mongodb");
 const { MongoClient } = require("mongodb");
+const { OpenEO } = require('@openeo/js-client'); 
 
-//const url = "mongodb://127.0.0.1:27017"; 
-const url = "mongodb://mongo:27017"; // connection URL
+
+const url = "mongodb://127.0.0.1:27017"; 
+//const url = "mongodb://mongo:27017"; // connection URL
+
 const client = new MongoClient(url); // mongodb client
 const dbName = "mydatabase"; // database name
 const collectionName = "newpois"; // collection name
 console.log("test");
+
 
 /* GET home page. */
 router.get("/", async (req, res, next) => {
@@ -51,5 +55,49 @@ router.post("/newstation", function (req, res, next) {
 //   // pass the data added as input for the notification page
 //   res.render("add_notification", { title: "Addition Completed", newpoi: poi });
 // }
+
+
+router.get('/satelliteImage', async function (req, res, next) {
+  try {
+    console.log('Processing satellite image...'); // Indicate the code is running up to this point
+
+    // Connect to the OpenEO server
+    const connection = await OpenEO.connect('http://34.209.215.214:8000');
+    //const connection = await OpenEO.connect('http://localhost:8000/');  
+  
+    await connection.authenticateBasic('user', 'password');
+
+    var builder = await connection.buildProcess();
+
+    var datacube = builder.load_collection(
+      "sentinel-s2-l2a-cogs",
+      {west: 563080.6, south: 4483092.4, east: 609472, north: 4530135},
+      32618,
+      ["2021-06-01", "2021-06-30"]
+    );
+    
+
+    let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
+    var mean = function(data) {
+      return this.mean(data);
+    };
+    
+    //datacube = builder.reduce_dimension(datacube, mean, dimension = "t");  
+    let result = builder.save_result(datacube_filtered, "GTiff");    
+    let response = await connection.computeResult(result);
+
+
+    console.log("Done");
+
+    // Sending the result data back to the frontend
+    res.status(200).set('Content-Type', response.type); 
+    response.data.pipe(res); // Send the Tiff as response
+    console.log("Send Done");
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+  }
+});
 module.exports = router;
 

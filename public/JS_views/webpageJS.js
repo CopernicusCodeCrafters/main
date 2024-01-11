@@ -1,12 +1,29 @@
 "use strict"
 
+const OpenEO_JSON = {
+    "name":"",
+    "coordinates":{
+        "swLat":0.0,
+        "swLng":0.0,
+        "neLat":0.0,
+        "neLng":0.0      
+    },
+    "date":{
+        "date_start":"YYYY-MM-DD",
+        "date_end": "YYYY-MM-DD"
+    }   
+
+
+};
+
 
 console.log("webpageJS")
  //Add Leaflet Map 
- var map = L.map('map').setView([51.305915044598834,10.21774343122064], 6);
- L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
- maxZoom: 19,
- attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+ var map = L.map('map').setView([51.96269732749698,7.625025563711631], 13);
+ L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+ maxZoom: 20,
+ minZoom:2,
+ subdomains:['mt0','mt1','mt2','mt3']
  }).addTo(map);
 
  // Add Leaflet Draw controls
@@ -34,6 +51,16 @@ console.log("webpageJS")
       map.on('draw:created', function (e) {
         var type = e.layerType,
             layer = e.layer;
+            const bounds = layer.getBounds();
+            // Extract coordinates from the bounds object
+            const southWest = bounds.getSouthWest(); // returns LatLng object
+            const northEast = bounds.getNorthEast(); // returns LatLng object
+            OpenEO_JSON.coordinates.swLat = southWest.lat; 
+            OpenEO_JSON.coordinates.swLng = southWest.lng;
+            OpenEO_JSON.coordinates.neLat = northEast.lat;
+            OpenEO_JSON.coordinates.neLng = northEast.lng;
+            console.log(OpenEO_JSON);
+
 
         if (type === 'rectangle') {
             drawnItems.addLayer(layer);
@@ -62,6 +89,12 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
                 var bboxPolygon = turf.bboxPolygon(bbox);
                 L.geoJSON(geojsonData).addTo(map);
                 L.geoJSON(bboxPolygon).addTo(map);
+                OpenEO_JSON.coordinates.swLat = bbox[1]; 
+                OpenEO_JSON.coordinates.swLng = bbox[0];
+                OpenEO_JSON.coordinates.neLat = bbox[3];
+                OpenEO_JSON.coordinates.neLng = bbox[2];
+                console.log(OpenEO_JSON)
+                //console.log(bbox[0])
             } catch (error) {
                 console.error("Error parsing or processing GeoJSON:", error);
             }
@@ -69,3 +102,72 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
         reader.readAsText(file);
     }
 });
+
+
+async function createDatacube() {
+  console.log("Creating Image");
+  try {
+    // fetch the tif image
+    const response = await fetch('/satelliteImage');
+    const blob = await response.blob();
+    console.log("warum")
+
+    /*const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'satelliteImage.tif';
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);*/
+    
+    // read arraybuffer
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const arrayBuffer = reader.result;
+
+      try {
+        // transform arrayBuffer to georaster
+        const georaster = await parseGeoraster(arrayBuffer);
+        const min = georaster.mins[0];
+        const max = georaster.maxs[0];
+        const range = georaster.ranges[0];
+
+            // available color scales can be found by running console.log(chroma.brewer);
+            console.log(chroma.brewer);
+            var scale = chroma.scale(['red', 'green', 'blue']);
+        console.log(georaster)
+        let layer = new GeoRasterLayer({
+          georaster: georaster,
+          opacity: 1,
+          pixelValuesToColorFn: function(pixelValues) {
+            var pixelValue = pixelValues[0]; // there's just one band in this raster
+            
+
+            // if there's zero wind, don't return a color
+            if (pixelValue === 0) return null;
+
+            // scale to 0 - 1 used by chroma
+            var scaledPixelValue = (pixelValue - min) / range;
+
+            var color = scale(scaledPixelValue).hex();
+
+            return color;
+          },
+          resolution: 512
+        });
+        layer.addTo(map);
+
+        map.fitBounds(layer.getBounds());
+        
+        
+      } catch (error) {
+        console.log("Error connecting);", error);
+        console.log(error);
+      }
+    };
+
+    reader.readAsArrayBuffer(blob);
+  } catch (error) {
+    console.log(error);
+  }
+}
