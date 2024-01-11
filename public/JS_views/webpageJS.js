@@ -39,6 +39,10 @@ var baseLayers = {
     'OpenStreetMap': osmLayer,
     'Google Satellite': googleSatLayer
 };
+  // Add Leaflet Scale Control
+  L.control.scale(
+    {imperial: false,}
+  ).addTo(map);
 
 // Add layer control to the map
 L.control.layers(baseLayers).addTo(map);
