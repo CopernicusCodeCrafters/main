@@ -25,7 +25,7 @@ var geoJSONData={
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'OpenStreetMap'
  });
-var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
     attribution: 'Google Satellite',
     maxZoom: 20,
     minZoom:2,
@@ -42,6 +42,15 @@ var baseLayers = {
 
 // Add layer control to the map
 L.control.layers(baseLayers).addTo(map);
+
+// Add Leaflet Control Geocoder
+var geocoder = L.Control.geocoder({
+  defaultMarkGeocode: false
+})
+  .on('markgeocode', function (e) {
+      map.fitBounds(e.geocode.bbox);
+  })
+  .addTo(map);
 
 
  /**
@@ -181,12 +190,25 @@ async function checkInputs () {
    var date1Value = document.getElementById('endDate').value;
    var date2Value = document.getElementById('startDate').value;
 
+   // Check if an AoI is given
+   var AoIgiven = false;
+
+   // Check if something is drawn
+   if (drawnItems.getLayers().length > 0) {
+       AoIgiven = true;
+   }
+
+   // Check if something is uploaded
+   var fileInputValue = document.getElementById('fileInput').value;
+   if (fileInputValue !== '') {
+       AoIgiven = true;
+   }
     // Check if both Dateinputs are not empty
-    if (date1Value !== '' && date2Value !== '') {
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
       // when date Inputs full call createDatacube()
       createDatacube();
     } else {
-      alert("Please fill in the Dates")
+      alert("Please fill in all the values")
     }
 }
 

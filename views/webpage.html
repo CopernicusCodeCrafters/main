@@ -35,15 +35,15 @@
     <script src="https://cdn.jsdelivr.net/npm/oidc-client@1/lib/oidc-client.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@openeo/js-client@2/openeo.min.js"></script>
-
     <!--Georasterlayer for Leaflet-->
     <script src="https://unpkg.com/georaster-layer-for-leaflet/dist/georaster-layer-for-leaflet.min.js"></script>
-
     <!--Georaster-->
     <script src="https://unpkg.com/georaster"></script>
-
     <!--Chroma-->
     <script src="https://unpkg.com/chroma-js"></script>
+    <!-- Include Leaflet Control Geocoder CSS and JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 
     <title>Copernicus Code Crafters</title>
@@ -71,7 +71,7 @@
         <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
             <div class="col-lg-9">
                 <div class="card shadow p-3 h-100 bg-white rounded">
-                    <h2 class="card-title">Viewer</h2>
+                    <h2 class="card-title">Viewer</h2><br>
                     <div id="map"></div>
                 </div>
             </div>
