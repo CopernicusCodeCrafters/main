@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--Favicon-->
     <link rel="icon" href="public\pictures\favicon.ico" type="image/x-icon">
     <!-- Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -97,7 +97,7 @@
                         <h7>Or</h7>
                         <!-- Button to activate Upload-->
                         <button id="uploadButton" class="black-btn">Upload</button>
-                        <input type="file" id="fileInput" accept=".geojson, .gpgk" style="display: none"/>
+                        <input type="file" id="fileInput" accept=".geojson, .gpkg" style="display: none"/>
                     </div> <br>
                     <!--Training model selection-->
                     <div>
@@ -112,7 +112,7 @@
 
                      <!--Submit button-->
                      <div>
-                        <button id="hyperParameterSelection" class="green-btn" onclick="createDatacube()">Submit</button>
+                        <button id="hyperParameterSelection" class="green-btn" onclick="checkInputs()">Submit</button>
                     </div> <br>
                 </div>
             </div>

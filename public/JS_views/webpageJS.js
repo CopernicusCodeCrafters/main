@@ -138,8 +138,11 @@ L.control.layers(baseLayers).addTo(map);
 
  //Option to choose a geojson in any format and adds it to the map
  document.getElementById('uploadButton').addEventListener('click', function () {
-    // Remove the existing drawn shape before adding a new one
-    drawnItems.clearLayers();
+    // Remove the existing layers
+    map.eachLayer(function(layer){
+        if (layer !== map  && !(layer instanceof L.TileLayer)) {
+        map.removeLayer(layer)};
+    });
     map.removeControl(drawControl)
     const fileInput = document.getElementById('fileInput');
     fileInput.click();
@@ -172,6 +175,20 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
         reader.readAsText(file);
     }
 });
+
+async function checkInputs () {
+   // Get the values of the datePickers
+   var date1Value = document.getElementById('endDate').value;
+   var date2Value = document.getElementById('startDate').value;
+
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '') {
+      // when date Inputs full call createDatacube()
+      createDatacube();
+    } else {
+      alert("Please fill in the Dates")
+    }
+}
 
 
 async function createDatacube() {
