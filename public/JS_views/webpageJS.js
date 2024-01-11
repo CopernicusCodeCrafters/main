@@ -76,8 +76,9 @@ console.log("webpageJS")
  var convertedNorth=0;
  var convertedSouth=0;
  var convertedWest=0;
+
  // Event listener for the button click
- document.getElementById('drawButton').addEventListener('click', function() {
+ document.getElementById('drawButton').addEventListener('click', function() { 
      // Add Leaflet Draw controls to the map
      map.addControl(drawControl);
       //Handle rectangle creation
@@ -113,6 +114,27 @@ console.log("webpageJS")
             console.log('Converted South West (EPSG:3857):', convertedSouthWest);
             console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
+            var uploadRecBtn = document.getElementById("uploadRectangle");
+            var drawBtn = document.getElementById("drawButton");
+
+            // Remove the current class
+            drawBtn.classList.remove("black-btn");
+      
+            // Add the new class
+            drawBtn.classList.add("accepted-btn");
+      
+            //Change button text
+            drawBtn.innerHTML="Drawn";
+
+            // Remove the current class from drawBtn
+            uploadRecBtn.classList.remove("black-btn");
+
+            // Add the new class for drawBtn (light grey)
+            uploadRecBtn.classList.add("light-grey-btn");
+            
+            uploadRecBtn.disabled=true;
+            drawBtn.disabled=true;
+            map.removeControl(drawControl)
 
         if (type === 'rectangle') {
             drawnItems.addLayer(layer);
@@ -161,8 +183,7 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 
                 console.log('Converted South West (EPSG:3857):', convertedSouthWest);
                 console.log('Converted North East (EPSG:3857):', convertedNorthEast);
-
-                
+         
               var uploadRecBtn = document.getElementById("uploadRectangle");
               var drawBtn = document.getElementById("drawButton");
 
@@ -181,7 +202,7 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 
             // Add the new class for drawBtn (light grey)
             drawBtn.classList.add("light-grey-btn");
-            
+
             drawBtn.disabled=true;
 
 
