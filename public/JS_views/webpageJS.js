@@ -1,21 +1,5 @@
 "use strict"
 
-const OpenEO_JSON = {
-    "name":"",
-    "coordinates":{
-        "swLat":0.0,
-        "swLng":0.0,
-        "neLat":0.0,
-        "neLng":0.0      
-    },
-    "date":{
-        "date_start":"YYYY-MM-DD",
-        "date_end": "YYYY-MM-DD"
-    }   
-
-
-};
-
 var selectedDates = [];
 
 //Function for date-picker
@@ -103,12 +87,15 @@ console.log("webpageJS")
             console.log(type)
             console.log(layer)
             const bounds = layer.getBounds();
+
             // Extract coordinates from the bounds object
             const southWest = bounds.getSouthWest(); // returns LatLng object
             const northEast = bounds.getNorthEast(); // returns LatLng object
+
             // Define the source and destination coordinate systems
             const sourceCRS = 'EPSG:4326';
             const destCRS = 'EPSG:3857';
+
             // Define the projection transformations
             proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
             proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
@@ -117,11 +104,12 @@ console.log("webpageJS")
             const convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
             const convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
 
+            //Extract LatLng from converted object
             convertedSouth = convertedSouthWest[1];
             convertedWest = convertedSouthWest[0];
             convertedNorth = convertedNorthEast[1];
             convertedEast = convertedNorthEast[0];
-            // The converted coordinates in EPSG:3857
+
             console.log('Converted South West (EPSG:3857):', convertedSouthWest);
             console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
@@ -153,12 +141,51 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
                 var bboxPolygon = turf.bboxPolygon(bbox);
                 L.geoJSON(geojsonData).addTo(map);
                 L.geoJSON(bboxPolygon).addTo(map);
-                OpenEO_JSON.coordinates.swLat = bbox[1]; 
-                OpenEO_JSON.coordinates.swLng = bbox[0];
-                OpenEO_JSON.coordinates.neLat = bbox[3];
-                OpenEO_JSON.coordinates.neLng = bbox[2];
-                console.log(OpenEO_JSON)
-                //console.log(bbox[0])
+
+                // Define the source and destination coordinate systems
+                const sourceCRS = 'EPSG:4326';
+                const destCRS = 'EPSG:3857';
+
+                // Define the projection transformations
+                proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+                proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+                
+                const convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+                const convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+
+                //Extract LatLng from converted object
+                convertedSouth = convertedSouthWest[1];
+                convertedWest = convertedSouthWest[0];
+                convertedNorth = convertedNorthEast[1];
+                convertedEast = convertedNorthEast[0];
+
+                console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+                console.log('Converted North East (EPSG:3857):', convertedNorthEast);
+
+                
+              var uploadRecBtn = document.getElementById("uploadRectangle");
+              var drawBtn = document.getElementById("drawButton");
+
+            // Remove the current class
+            uploadRecBtn.classList.remove("black-btn");
+      
+            // Add the new class
+            uploadRecBtn.classList.add("accepted-btn");
+      
+            //Change button text
+            uploadRecBtn.innerHTML="Uploaded";
+            uploadRecBtn.disabled=true;
+
+            // Remove the current class from drawBtn
+            drawBtn.classList.remove("black-btn");
+
+            // Add the new class for drawBtn (light grey)
+            drawBtn.classList.add("light-grey-btn");
+            
+            drawBtn.disabled=true;
+
+
+
             } catch (error) {
                 console.error("Error parsing or processing GeoJSON:", error);
             }
