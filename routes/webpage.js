@@ -73,7 +73,7 @@ router.get('/satelliteImage', async function (req, res, next) {
 
     var datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
-      {west: 588080.6, south: 4493092.4, east: 609472, north: 4530135},
+      {west: 598080.6, south: 4510092.4, east: 609472, north: 4520135},
       32618,
       dateArray
     );
