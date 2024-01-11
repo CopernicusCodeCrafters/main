@@ -16,50 +16,6 @@ const OpenEO_JSON = {
 
 };
 
-var selectedDates = [];
-
-//Function for date-picker
-$(document).ready(function () {
-    $('#datepicker1').datepicker();
-    $('#datepicker2').datepicker();
-});
-
-function getSelectedDates() {
-  var startDate = $('#datepicker1').datepicker('getUTCDate');
-  var endDate = $('#datepicker2').datepicker('getUTCDate');
-
-  if (startDate && endDate) {
-      // Format dates as YYYY-MM-DD
-      var formattedStartDate = formatDate(startDate);
-      var formattedEndDate = formatDate(endDate);
-
-      // Store dates in an array
-      selectedDates = [formattedStartDate, formattedEndDate];
-
-      console.log(selectedDates); 
-
-      var saveDateBtn = document.getElementById("saveDateBtn");
-
-      // Remove the current class
-      saveDateBtn.classList.remove("black-btn");
-
-      // Add the new class
-      saveDateBtn.classList.add("accepted-btn");
-
-      //Change button text
-      saveDateBtn.innerHTML="Date saved";
-      document.getElementById("datepicker1").disabled = true;
-      document.getElementById("datepicker2").disabled = true;
-      saveDateBtn.disabled=true;
-  } else {
-      alert('Please select both start and end dates.');
-  }
-}
-
-// Function to format date using Bootstrap-datepicker's format
-function formatDate(date) {
-  return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
-}
 
 console.log("webpageJS")
  //Add Leaflet Map 
@@ -103,7 +59,9 @@ console.log("webpageJS")
             OpenEO_JSON.coordinates.swLng = southWest.lng;
             OpenEO_JSON.coordinates.neLat = northEast.lat;
             OpenEO_JSON.coordinates.neLng = northEast.lng;
-            console.log(OpenEO_JSON);
+            //console.log(OpenEO_JSON);
+            console.log(bounds)
+            console.log()
 
 
         if (type === 'rectangle') {
@@ -137,8 +95,8 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
                 OpenEO_JSON.coordinates.swLng = bbox[0];
                 OpenEO_JSON.coordinates.neLat = bbox[3];
                 OpenEO_JSON.coordinates.neLng = bbox[2];
-                console.log(OpenEO_JSON)
-                //console.log(bbox[0])
+                //console.log(bboxPolygon)
+                //console.log(bbox)
             } catch (error) {
                 console.error("Error parsing or processing GeoJSON:", error);
             }
@@ -148,11 +106,12 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 });
 
 
-async function createDatacube() {
+async function createDatacube(data) {
   console.log("Creating Image");
+  startRotation();
   try {
     // fetch the tif image
-    const response = await fetch(`/satelliteImage?date=${selectedDates}`);
+    const response = await fetch('/satelliteImage');
     const blob = await response.blob();
     console.log("warum")
 
@@ -202,6 +161,8 @@ async function createDatacube() {
         layer.addTo(map);
 
         map.fitBounds(layer.getBounds());
+        stopRotation();
+        console.log(layer.getBounds())
         
         
       } catch (error) {
@@ -214,4 +175,14 @@ async function createDatacube() {
   } catch (error) {
     console.log(error);
   }
+}
+
+function startRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.add('rotate');
+}
+
+function stopRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.remove('rotate');
 }

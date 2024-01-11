@@ -178,5 +178,14 @@ input:checked+.slider:before {
 transform: translateX(26px);
 }
 
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .rotate {
+    animation: rotate 2s linear infinite; /* 2s for 2 seconds, adjust as needed */
+  }
+
 
 
