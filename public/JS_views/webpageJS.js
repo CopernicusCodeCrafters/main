@@ -251,7 +251,7 @@ async function createDatacube() {
         const maxBlue = georaster.maxs[0]/2;
         console.log(maxRed,maxGreen,maxBlue);
 
-        const overAllMax= Math.max(maxRed,maxGreen,maxBlue)/3
+        const overAllMax= 5700/2 //Math.max(maxRed,maxGreen,maxBlue)/2
 
 
         // available color scales can be found by running console.log(chroma.brewer);
