@@ -57,20 +57,24 @@ console.log("webpageJS")
  // Add Leaflet Draw controls
  var drawnItems = new L.FeatureGroup();
  map.addLayer(drawnItems);
-
  var drawControl = new L.Control.Draw({
-     draw: {
-         rectangle: true,
-         polyline: false,
-         circle: false,
-         marker: false,
-         polygon: false,
-         circlemarker: false
-     },
-     edit: {
-     featureGroup: drawnItems
-     }
- });
+  draw: {
+      rectangle: {
+          shapeOptions: {
+              fill: false,
+              color: 'red', // You can set the color as needed
+          }
+      },
+      polyline: false,
+      circle: false,
+      marker: false,
+      polygon: false,
+      circlemarker: false
+  },
+  edit: {
+      featureGroup: drawnItems
+  }
+});
 
  var convertedEast=0;
  var convertedNorth=0;
@@ -242,33 +246,34 @@ async function createDatacube() {
       try {
         // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
-        const min = georaster.mins[0];
-        const max = georaster.maxs[0];
-        const range = georaster.ranges[0];
+        const maxRed = georaster.maxs[2]/2;
+        const maxGreen = georaster.maxs[1]/2;
+        const maxBlue = georaster.maxs[0]/2;
+        console.log(maxRed,maxGreen,maxBlue);
 
-            // available color scales can be found by running console.log(chroma.brewer);
-            console.log(chroma.brewer);
-            var scale = chroma.scale(['red', 'green', 'blue']);
+        const overAllMax= Math.max(maxRed,maxGreen,maxBlue)
+
+
+        // available color scales can be found by running console.log(chroma.brewer);
         console.log(georaster)
+        
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
-          pixelValuesToColorFn: function(pixelValues) {
-            var pixelValue = pixelValues[0]; // there's just one band in this raster
-            
 
-            // if there's zero wind, don't return a color
-            if (pixelValue === 0) return null;
+          pixelValuesToColorFn: function(pixelValues) {
 
             // scale to 0 - 1 used by chroma
-            var scaledPixelValue = (pixelValue - min) / range;
+            var scaledRed = (pixelValues[2])*(255/maxRed);
+            var scaledGreen = (pixelValues[1])*(255/maxGreen);
+            var scaledBlue = (pixelValues[0])*(255/maxBlue);
 
-            var color = scale(scaledPixelValue).hex();
+            var color = chroma.rgb(scaledRed ,scaledGreen,scaledBlue).hex();
 
             return color;
           },
           resolution: 512
-        });
+        });  
         layer.addTo(map);
 
         map.fitBounds(layer.getBounds());
