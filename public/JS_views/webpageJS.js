@@ -251,7 +251,7 @@ async function createDatacube() {
         const maxBlue = georaster.maxs[0]/2;
         console.log(maxRed,maxGreen,maxBlue);
 
-        const overAllMax= Math.max(maxRed,maxGreen,maxBlue)
+        const overAllMax= Math.max(maxRed,maxGreen,maxBlue)/3
 
 
         // available color scales can be found by running console.log(chroma.brewer);
@@ -264,9 +264,9 @@ async function createDatacube() {
           pixelValuesToColorFn: function(pixelValues) {
 
             // scale to 0 - 1 used by chroma
-            var scaledRed = (pixelValues[2])*(255/maxRed);
-            var scaledGreen = (pixelValues[1])*(255/maxGreen);
-            var scaledBlue = (pixelValues[0])*(255/maxBlue);
+            var scaledRed = (pixelValues[2])*(255/overAllMax);
+            var scaledGreen = (pixelValues[1])*(255/overAllMax);
+            var scaledBlue = (pixelValues[0])*(255/overAllMax);
 
             var color = chroma.rgb(scaledRed ,scaledGreen,scaledBlue).hex();
 
