@@ -44,6 +44,8 @@
     <!--Chroma-->
     <script src="https://unpkg.com/chroma-js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script>
+
 
     <title>Copernicus Code Crafters</title>
 </head>
@@ -51,7 +53,7 @@
 <body>
     <header class="mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt=""></a>
+            <a class="navbar-brand" href="/"><img id="logo" src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt=""></a>
             <a class="navbar-brand active"area-current="page" href="/">Viewer</a>
             <button class="navbar-toggler" type="button"data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -72,38 +74,27 @@
                 <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Viewer</h2>
                     <div id="map"></div>
+                    <button id=""></button>
                 </div>
             </div>
             <div class="col-lg-3">
                 <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Options</h2><br>
-                    <!--Cloud Cover Slider-->
-                    <div>
-                        <h5 class="card-title">Choose Cloud Cover (%)</h5>
-                        <input type="range" class="custom-slider" value="50" min="10" max="100" step="1" oninput="this.nextElementSibling.value = this.value">
-                        <output>50</output>
-                    </div>
                     <!--Datepicker div-->
                     <div>
-                        <h5 class="card-title">Choose Time Period</h5>
-                        <label for="datepicker">Select a start date:</label>
-                        <input type="text" class="form-contorl" id="datepicker1">
-                        <script>
-                            $(document).ready(function(){
-                              $('#datepicker1').datepicker();
-                            });
-                          </script> 
-                    </div>
-                    <!--Datepicker div-->
-                    <div>
-                        <label for="datepicker">Select an end date:</label>
-                        <input type="text" class="form-contorl" id="datepicker2"> 
-                        <script>
-                            $(document).ready(function(){
-                              $('#datepicker2').datepicker();
-                            });
-                          </script>                         
-                    </div> <br>
+
+                        <div>
+                            <h5 class="card-title">Choose Time Period</h5>
+                            <label for="datepicker1">Select a start date:</label>
+                            <input type="text" class="form-control" id="datepicker1">
+                        </div>
+                    
+                        <div>
+                            <label for="datepicker2">Select an end date:</label>
+                            <input type="text" class="form-control" id="datepicker2">
+                        </div><br>
+                    
+                        <button id="saveDateBtn" class="black-btn" onclick="getSelectedDates()">Save Dates</button> <br><br>
                     <!--Area of Interest-->
                     <div>
                         <h5 class="card-title">Select Area of Interest</h5>

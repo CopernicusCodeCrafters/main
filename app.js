@@ -52,6 +52,21 @@ app.use("/webpage", indexRouter);
 app.use("/impressum", impressumRouter)
 app.use("/trainingsdaten",trainingsdatenRouter)
 
+//Fügt eine geotiff zu der Datenbank hinzu
+app.post('/insert-satelliteimage', async (req, res) => {
+  const { geotiff } = req.body;
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('satellite image');
+    const result = await collection.insertOne(geotiff);
+    console.log('Satellite image inserted successfully:', result.insertedId);
+    res.send('Satellite image inserted successfully');
+  } catch (error) {
+    console.error('An error occurred:', error);
+    res.status(500).send('An error occurred');
+  }
+});
+
 //Fügt eine GeoJSON zu der Datenbank hinzu
 app.post('/insert-geojson', async (req, res) => {
   const { geojson } = req.body;

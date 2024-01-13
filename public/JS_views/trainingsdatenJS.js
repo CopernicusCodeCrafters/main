@@ -1,5 +1,4 @@
 
-
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
   try {
@@ -24,6 +23,9 @@ async function startingPolygonmanager() {
             break;
           case 'settlement':
             color = 'red';
+            break;
+          case 'forest':
+            color='darkgreen';
             break;
           default:
             color = 'gray';
@@ -268,3 +270,4 @@ const addGeoJSONtoDB = async (geojson) => {
     console.error('An error occurred:', error);
   }
 };
+
