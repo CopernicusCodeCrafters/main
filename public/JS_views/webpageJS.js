@@ -211,9 +211,15 @@ async function checkInputs () {
     if (date1Value !== '' && date2Value !== '' && AoIgiven) {
       // when date Inputs full call createDatacube()
       createDatacube();
+      switchToClassificationTab(); 
     } else {
       alert("Please fill in all the values")
     }
+}
+
+function switchToClassificationTab() {
+  // Use Bootstrap JavaScript method to show the classification tab
+  $('#optionsTabs a[href="#classification"]').tab('show');
 }
 
 
