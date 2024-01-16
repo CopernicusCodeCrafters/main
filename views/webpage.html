@@ -115,6 +115,11 @@
                             <button id="uploadButton" class="black-btn">Upload</button>
                             <input type="file" id="fileInput" accept=".geojson, .gpkg" style="display: none"/>
                         </div> <br>
+                        <div>
+                            <h5 class="card-title">Select Bands</h5>
+                            <input type="text" class="form-control" id="bandspicker"><br>
+                            <button id="bandsBtn" onclick="getSelectedBands()" class="black-btn">Submit bands</button><br>
+                        </div><br>
                         <!--Submit button-->
                      <div>
                         <button id="submitBtn" class="green-btn" onclick="checkInputs()">Submit</button>

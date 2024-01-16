@@ -1,6 +1,7 @@
 "use strict"
 
 var selectedDates = [];
+var selectedBands= [];
 
 //Function for date-picker
 $(document).ready(function () {
@@ -39,6 +40,22 @@ function getSelectedDates() {
       alert('Please select both start and end dates.');
   }
 }
+
+
+function getSelectedBands() {
+  // Assuming $('#bandspicker').val() returns a string like 'B01,B02,B03'
+  var selectedBandsString = $('#bandspicker').val();
+
+  // Split the string into an array using a comma as the delimiter
+  selectedBands = selectedBandsString.split(',').map(function (band) {
+    // Remove leading and trailing whitespaces from each band
+    return band.trim();
+  });
+
+  console.log("Selected Bands (before):", selectedBands);
+}
+
+
 
 // Function to format date using Bootstrap-datepicker's format
 function formatDate(date) {
@@ -337,7 +354,7 @@ async function createDatacube() {
   startRotation();
   try {
     // Include converted bounds in the satelliteImage request
-    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}`);
+    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
     const blob = await response.blob();
     console.log("warum")
 
