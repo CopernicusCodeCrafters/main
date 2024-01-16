@@ -52,8 +52,20 @@ function getSelectedBands() {
     return band.trim();
   });
 
+  var bandsBtn = document.getElementById("bandsBtn");
+
+  bandsBtn.classList.remove("black-btn");
+
+  // Add the new class
+  bandsBtn.classList.add("accepted-btn");
+
+  bandsBtn.innerHTML="Bands saved";
+    
+  bandsBtn.disabled = true;
+
   console.log("Selected Bands (before):", selectedBands);
 }
+
 
 
 

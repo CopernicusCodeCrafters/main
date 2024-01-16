@@ -81,7 +81,7 @@ router.get('/satelliteImage', async function (req, res, next) {
       "sentinel-s2-l2a-cogs",
       {west: west, south: south, east: east, north: north},
       3857,
-      dateArray,
+      dateArray, 
       bandsArray
  
     );
@@ -89,7 +89,7 @@ router.get('/satelliteImage', async function (req, res, next) {
       //["2021-06-01", "2021-06-30"]
 
     //bands: ["B02", "B03", "B04"]
-    let datacube_filtered = builder.filter_bands(datacube);
+    let datacube_filtered = builder.filter_bands(datacube,bandsArray);
     var mean = function(data) {
       return this.mean(data);
     };
