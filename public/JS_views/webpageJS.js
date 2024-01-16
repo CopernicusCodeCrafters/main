@@ -47,7 +47,7 @@ function getSelectedDates() {
       var formattedEndDate = formatDate(endDate);
 
       // Store dates in an array
-      selectedDates = [startDate, endDate];
+      selectedDates = [formattedStartDate, formattedEndDate];
 
       console.log(selectedDates); 
 
@@ -290,7 +290,8 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 
 
             } catch (error) {
-                console.error("Error parsing or processing GeoJSON:", error);
+              stopRotation();
+              console.error("Error parsing or processing GeoJSON:", error);
             }
         };
         reader.readAsText(file);
@@ -390,6 +391,7 @@ async function createDatacube() {
         stopRotation();
         
       } catch (error) {
+        stopRotation();
         console.log("Error connecting);", error);
         console.log(error);
       }
@@ -397,6 +399,7 @@ async function createDatacube() {
 
     reader.readAsArrayBuffer(blob);
   } catch (error) {
+    stopRotation();
     console.log(error);
   }
 }
