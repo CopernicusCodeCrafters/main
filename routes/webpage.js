@@ -5,8 +5,8 @@ const { MongoClient } = require("mongodb");
 const { OpenEO } = require('@openeo/js-client'); 
 
 
-//const url = "mongodb://127.0.0.1:27017"; 
-const url = "mongodb://mongo:27017"; // connection URL
+const url = "mongodb://127.0.0.1:27017"; 
+//const url = "mongodb://mongo:27017"; // connection URL
 
 const client = new MongoClient(url); // mongodb client
 const dbName = "mydatabase"; // database name
