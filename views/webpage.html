@@ -41,10 +41,11 @@
     <script src="https://unpkg.com/georaster"></script>
     <!--Chroma-->
     <script src="https://unpkg.com/chroma-js"></script>
-    <!-- Include Leaflet Control Geocoder CSS and JS -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script>
+  <!-- Include Leaflet Control Geocoder CSS and JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
 
     <title>Copernicus Code Crafters</title>
 </head>
@@ -52,7 +53,7 @@
 <body>
     <header class="mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt=""></a>
+            <a class="navbar-brand" href="/"><img id="logo" src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt=""></a>
             <a class="navbar-brand active"area-current="page" href="/">Viewer</a>
             <button class="navbar-toggler" type="button"data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -73,6 +74,7 @@
                 <div class="card shadow p-3 h-100 bg-white rounded">
                     <h2 class="card-title">Viewer</h2><br>
                     <div id="map"></div>
+                    <button id=""></button>
                 </div>
             </div>
             <div class="col-lg-3">
@@ -94,14 +96,15 @@
                         <!--Datepicker Start date-->
                         <div>
                             <h5 class="card-title">Choose Time Period</h5>
-                            <label for="startDate">Select a start date:</label>
-                            <input type="text" class="form-contorl" id="startDate" autocomplete="off">
+                            <label for="datepicker1">Select a start date:</label>
+                            <input type="text" class="form-control" id="datepicker1">
                         </div>
                         <!--Datepicker end date-->
                         <div>
-                            <label for="endDate">Select an end date:</label>
-                            <input type="text" class="form-contorl" id="endDate" autocomplete="off">                         
+                            <label for="datepicker2">Select an end date:</label>
+                            <input type="text" class="form-control" id="datepicker2">                         
                         </div> <br>
+                        <button id="saveDateBtn" class="black-btn" onclick="getSelectedDates()">Save Dates</button> <br><br>
                         <!--Area of Interest-->
                         <div>
                             <h5 class="card-title">Select Area of Interest</h5>

@@ -61,21 +61,27 @@ router.get('/satelliteImage', async function (req, res, next) {
   try {
     console.log('Processing satellite image...'); // Indicate the code is running up to this point
 
+    const dateArray = req.query.date.split(',');
+    const south = req.query.south;
+    const west = req.query.west;
+    const north = req.query.north;
+    const east = req.query.east;
+    console.log(south,west,north,east)
+    
     // Connect to the OpenEO server
     const connection = await OpenEO.connect('http://34.209.215.214:8000');
-    //const connection = await OpenEO.connect('http://localhost:8000/');  
-  
     await connection.authenticateBasic('user', 'password');
 
     var builder = await connection.buildProcess();
 
     var datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
-      {west: 563080.6, south: 4483092.4, east: 609472, north: 4530135},
-      32618,
-      ["2021-06-01", "2021-06-30"]
+      {west: west, south: south, east: east, north: north},
+      3857,
+      dateArray
     );
-    
+
+      //["2021-06-01", "2021-06-30"]
 
     let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
     var mean = function(data) {

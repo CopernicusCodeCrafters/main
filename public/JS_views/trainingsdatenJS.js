@@ -48,6 +48,9 @@ async function startingPolygonmanager() {
           case 'settlement':
             color = 'red';
             break;
+          case 'forest':
+            color='darkgreen';
+            break;
           default:
             color = 'gray';
         }
@@ -291,3 +294,4 @@ const addGeoJSONtoDB = async (geojson) => {
     console.error('An error occurred:', error);
   }
 };
+

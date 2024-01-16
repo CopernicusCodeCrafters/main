@@ -1,22 +1,48 @@
 "use strict"
 
-const OpenEO_JSON = {
-    "name":"",
-    "coordinates":{
-        "swLat":0.0,
-        "swLng":0.0,
-        "neLat":0.0,
-        "neLng":0.0      
-    },
-    "date":{
-        "date_start":"YYYY-MM-DD",
-        "date_end": "YYYY-MM-DD"
-    }   
-};
+var selectedDates = [];
 
-var geoJSONData={
-    type:"FeatureCollection",
-    features:[]
+//Function for date-picker
+$(document).ready(function () {
+    $('#datepicker1').datepicker();
+    $('#datepicker2').datepicker();
+});
+
+function getSelectedDates() {
+  var startDate = $('#datepicker1').datepicker('getUTCDate');
+  var endDate = $('#datepicker2').datepicker('getUTCDate');
+
+  if (startDate && endDate) {
+      // Format dates as YYYY-MM-DD
+      var formattedStartDate = formatDate(startDate);
+      var formattedEndDate = formatDate(endDate);
+
+      // Store dates in an array
+      selectedDates = [formattedStartDate, formattedEndDate];
+
+      console.log(selectedDates); 
+
+      var saveDateBtn = document.getElementById("saveDateBtn");
+
+      // Remove the current class
+      saveDateBtn.classList.remove("black-btn");
+
+      // Add the new class
+      saveDateBtn.classList.add("accepted-btn");
+
+      //Change button text
+      saveDateBtn.innerHTML="Date saved";
+      document.getElementById("datepicker1").disabled = true;
+      document.getElementById("datepicker2").disabled = true;
+      saveDateBtn.disabled=true;
+  } else {
+      alert('Please select both start and end dates.');
+  }
+}
+
+// Function to format date using Bootstrap-datepicker's format
+function formatDate(date) {
+  return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
 }
 
  //Add Leaflet Map 
@@ -93,26 +119,36 @@ var geocoder = L.Control.geocoder({
  // Add Leaflet Draw controls
  var drawnItems = new L.FeatureGroup();
  map.addLayer(drawnItems);
-
  var drawControl = new L.Control.Draw({
-     draw: {
-         rectangle: true,
-         polyline: false,
-         circle: false,
-         marker: false,
-         polygon: false,
-         circlemarker: false
-     },
-     edit: {
-     featureGroup: drawnItems
-     }
- });
+  draw: {
+      rectangle: {
+          shapeOptions: {
+              fill: false,
+              color: 'red', // You can set the color as needed
+          }
+      },
+      polyline: false,
+      circle: false,
+      marker: false,
+      polygon: false,
+      circlemarker: false
+  },
+  edit: {
+      featureGroup: drawnItems
+  }
+});
+
+ var convertedEast=0;
+ var convertedNorth=0;
+ var convertedSouth=0;
+ var convertedWest=0;
+
 
  // Set maximum allowed area in square meters
  var maxAllowedArea = 20000;
 
  // Event listener for the button "Activate Draw"
- document.getElementById('drawButton').addEventListener('click', function() {
+ document.getElementById('drawButton').addEventListener('click', function() { 
     // Remove the existing drawn shape before adding a new one
     drawnItems.clearLayers(); 
     // Add Leaflet Draw controls to the map
@@ -121,33 +157,69 @@ var geocoder = L.Control.geocoder({
      var drawingEnabled = true; 
       //Handle rectangle creation
       map.on('draw:created', function (e) {
-            var layer = e.layer;
-            var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0])/100000
+        var type = e.layerType,
+            layer = e.layer;
+            console.log(type)
+            console.log(layer)
+            const bounds = layer.getBounds();
 
-        if (drawingEnabled) {
-            //limit leafletDraw to size given in maxAllowedArea
-            if (area > maxAllowedArea) {
-                alert('The drawn area exceeds the maximum allowed area.');
-            } else {
+            // Extract coordinates from the bounds object
+            const southWest = bounds.getSouthWest(); // returns LatLng object
+            const northEast = bounds.getNorthEast(); // returns LatLng object
+
+            // Define the source and destination coordinate systems
+            const sourceCRS = 'EPSG:4326';
+            const destCRS = 'EPSG:3857';
+
+            // Define the projection transformations
+            proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+            proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+
+            // Perform the coordinate transformation
+            const convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
+            const convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
+
+            //Extract LatLng from converted object
+            convertedSouth = convertedSouthWest[1];
+            convertedWest = convertedSouthWest[0];
+            convertedNorth = convertedNorthEast[1];
+            convertedEast = convertedNorthEast[0];
+
+            console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+            console.log('Converted North East (EPSG:3857):', convertedNorthEast);
+
+            var uploadRecBtn = document.getElementById("uploadButton");
+            var drawBtn = document.getElementById("drawButton");
+
+            // Remove the current class
+            drawBtn.classList.remove("black-btn");
+      
+            // Add the new class
+            drawBtn.classList.add("accepted-btn");
+      
+            //Change button text
+            drawBtn.innerHTML="Drawn";
+
+            // Remove the current class from drawBtn
+            uploadRecBtn.classList.remove("black-btn");
+
+            // Add the new class for drawBtn (light grey)
+            uploadRecBtn.classList.add("light-grey-btn");
+            
+            uploadRecBtn.disabled=true;
+            drawBtn.disabled=true;
+            map.removeControl(drawControl)
+
+        if (type === 'rectangle') {
             drawnItems.addLayer(layer);
             console.log("LayerTest")
 
-            // Convert the drawn layer to GeoJSON and add it to the FeatureCollection
-            var feature = layer.toGeoJSON();
-            geoJSONData.features.push(feature);
-            //Test
-            console.log(geoJSONData); 
-            console.log("Test")
-
-            //limit to one draw
-            drawingEnabled = false; 
             }
-        }
+      })
         });
         map.on('draw:deleted', function (e) {
             drawingEnabled = true;
           });
- });
 
  //Option to choose a geojson in any format and adds it to the map
  document.getElementById('uploadButton').addEventListener('click', function () {
@@ -175,12 +247,50 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
                 var bboxPolygon = turf.bboxPolygon(bbox);
                 L.geoJSON(geojsonData).addTo(map);
                 L.geoJSON(bboxPolygon).addTo(map);
-                OpenEO_JSON.coordinates.swLat = bbox[1]; 
-                OpenEO_JSON.coordinates.swLng = bbox[0];
-                OpenEO_JSON.coordinates.neLat = bbox[3];
-                OpenEO_JSON.coordinates.neLng = bbox[2];
-                console.log(OpenEO_JSON)
-                //console.log(bbox[0])
+
+                // Define the source and destination coordinate systems
+                const sourceCRS = 'EPSG:4326';
+                const destCRS = 'EPSG:3857';
+
+                // Define the projection transformations
+                proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+                proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+                
+                const convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+                const convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+
+                //Extract LatLng from converted object
+                convertedSouth = convertedSouthWest[1];
+                convertedWest = convertedSouthWest[0];
+                convertedNorth = convertedNorthEast[1];
+                convertedEast = convertedNorthEast[0];
+
+                console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+                console.log('Converted North East (EPSG:3857):', convertedNorthEast);
+         
+              var uploadRecBtn = document.getElementById("uploadRectangle");
+              var drawBtn = document.getElementById("drawButton");
+
+            // Remove the current class
+            uploadRecBtn.classList.remove("black-btn");
+      
+            // Add the new class
+            uploadRecBtn.classList.add("accepted-btn");
+      
+            //Change button text
+            uploadRecBtn.innerHTML="Uploaded";
+            uploadRecBtn.disabled=true;
+
+            // Remove the current class from drawBtn
+            drawBtn.classList.remove("black-btn");
+
+            // Add the new class for drawBtn (light grey)
+            drawBtn.classList.add("light-grey-btn");
+
+            drawBtn.disabled=true;
+
+
+
             } catch (error) {
                 console.error("Error parsing or processing GeoJSON:", error);
             }
@@ -190,10 +300,9 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 });
 
 async function checkInputs () {
-   // Get the values of the datePickers
-   var date1Value = document.getElementById('endDate').value;
-   var date2Value = document.getElementById('startDate').value;
-
+    // Get the values of the datePickers
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();
    // Check if an AoI is given
    var AoIgiven = false;
 
@@ -225,12 +334,14 @@ function switchToClassificationTab() {
 
 async function createDatacube() {
   console.log("Creating Image");
+  startRotation();
   try {
-    // fetch the tif image
-    const response = await fetch('/satelliteImage');
+    // Include converted bounds in the satelliteImage request
+    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}`);
     const blob = await response.blob();
     console.log("warum")
 
+    
     /*const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'satelliteImage.tif';
@@ -247,37 +358,38 @@ async function createDatacube() {
       try {
         // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
-        const min = georaster.mins[0];
-        const max = georaster.maxs[0];
-        const range = georaster.ranges[0];
+        const maxRed = georaster.maxs[2]/2;
+        const maxGreen = georaster.maxs[1]/2;
+        const maxBlue = georaster.maxs[0]/2;
+        console.log(maxRed,maxGreen,maxBlue);
 
-            // available color scales can be found by running console.log(chroma.brewer);
-            console.log(chroma.brewer);
-            var scale = chroma.scale(['red', 'green', 'blue']);
+        const overAllMax= 5700/2 //Math.max(maxRed,maxGreen,maxBlue)/2
+
+
+        // available color scales can be found by running console.log(chroma.brewer);
         console.log(georaster)
+        
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
-          pixelValuesToColorFn: function(pixelValues) {
-            var pixelValue = pixelValues[0]; // there's just one band in this raster
-            
 
-            // if there's zero wind, don't return a color
-            if (pixelValue === 0) return null;
+          pixelValuesToColorFn: function(pixelValues) {
 
             // scale to 0 - 1 used by chroma
-            var scaledPixelValue = (pixelValue - min) / range;
+            var scaledRed = (pixelValues[2])*(255/overAllMax);
+            var scaledGreen = (pixelValues[1])*(255/overAllMax);
+            var scaledBlue = (pixelValues[0])*(255/overAllMax);
 
-            var color = scale(scaledPixelValue).hex();
+            var color = chroma.rgb(scaledRed ,scaledGreen,scaledBlue).hex();
 
             return color;
           },
           resolution: 512
-        });
+        });  
         layer.addTo(map);
 
         map.fitBounds(layer.getBounds());
-        
+        stopRotation();
         
       } catch (error) {
         console.log("Error connecting);", error);
@@ -289,4 +401,14 @@ async function createDatacube() {
   } catch (error) {
     console.log(error);
   }
+}
+
+function startRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.add('rotate');
+}
+
+function stopRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.remove('rotate');
 }
