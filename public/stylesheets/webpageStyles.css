@@ -1,9 +1,18 @@
- /* Slider for cloud range */
-.custom-slider {
-    position: relative;
-    width: 80%;
-    height: 30%;
-}
+/* Custom styles for the tab pane content */
+  .tab-content {
+      padding: 20px; /* Adjust the padding as needed */
+  }
+
+  .tab-pane {
+      margin-top: 10px; /* Adjust the margin as needed */
+  }
+
+  .card-title {
+      color: #333; /* Text color */
+  }
+  .nav-tabs .nav-link {
+    border: 2px solid transparent; /* Adjust the border width as needed */
+  }
 
  /* Button for area of interest */
 .black-btn {
@@ -81,4 +90,20 @@
         background-color: #ddd;
       }
 
-  
+  .dropdown-btn {
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #000;
+  padding: 5px 10px;
+  cursor: pointer;
+  width: 100%; /* Ensure the button takes the full width of the container */
+  text-align: left; /* Align text to the left within the button */
+}
+
+.dropdown-menu .dropdown-item {
+  color: #000;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #eee;
+}

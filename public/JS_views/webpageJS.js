@@ -45,14 +45,76 @@ function formatDate(date) {
   return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
 }
 
-console.log("webpageJS")
  //Add Leaflet Map 
  var map = L.map('map').setView([51.96269732749698,7.625025563711631], 13);
- L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
- maxZoom: 20,
- minZoom:2,
- subdomains:['mt0','mt1','mt2','mt3']
- }).addTo(map);
+ // Define base layers
+var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'OpenStreetMap'
+ });
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+    attribution: 'Google Satellite',
+    maxZoom: 20,
+    minZoom:2,
+    subdomains:['mt0','mt1','mt2','mt3']
+ }); 
+// Add base layers to the map
+osmLayer.addTo(map);  // Default base layer
+
+// Create an object to store base layers with custom names
+var baseLayers = {
+    'OpenStreetMap': osmLayer,
+    'Google Satellite': googleSatLayer
+};
+  // Add Leaflet Scale Control
+  L.control.scale(
+    {imperial: false,}
+  ).addTo(map);
+
+// Add layer control to the map
+L.control.layers(baseLayers).addTo(map);
+
+// Add Leaflet Control Geocoder
+var geocoder = L.Control.geocoder({
+  defaultMarkGeocode: false
+})
+  .on('markgeocode', function (e) {
+      map.fitBounds(e.geocode.bbox);
+  })
+  .addTo(map);
+
+
+ /**
+  * function to implement datepicker and limit date selection
+  */
+ $(document).ready(function () {
+        // Initialize the first datepicker
+        $('#startDate').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+ });
+        // Initialize the second datepicker with the startDate option
+        $('#endDate').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+          });
+
+            // Update the startDate and endDate options of the datepickers when the first datepicker changes
+    $('#startDate').on('changeDate', function (e) {
+        // Calculate two weeks later
+        var endDate = new Date(e.date);
+        endDate.setDate(endDate.getDate() + 13); // 13 days to allow for a 14-day span
+  
+        // Set the new startDate for the second datepicker
+        $('#endDate').datepicker('setStartDate', e.date);
+        
+        // Set the new endDate for the second datepicker
+        $('#endDate').datepicker('setEndDate', endDate);
+      });
+    });
 
  // Add Leaflet Draw controls
  var drawnItems = new L.FeatureGroup();
@@ -81,10 +143,18 @@ console.log("webpageJS")
  var convertedSouth=0;
  var convertedWest=0;
 
- // Event listener for the button click
+
+ // Set maximum allowed area in square meters
+ var maxAllowedArea = 20000;
+
+ // Event listener for the button "Activate Draw"
  document.getElementById('drawButton').addEventListener('click', function() { 
-     // Add Leaflet Draw controls to the map
+    // Remove the existing drawn shape before adding a new one
+    drawnItems.clearLayers(); 
+    // Add Leaflet Draw controls to the map
      map.addControl(drawControl);
+    //variable for drawControl
+     var drawingEnabled = true; 
       //Handle rectangle creation
       map.on('draw:created', function (e) {
         var type = e.layerType,
@@ -118,7 +188,7 @@ console.log("webpageJS")
             console.log('Converted South West (EPSG:3857):', convertedSouthWest);
             console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
-            var uploadRecBtn = document.getElementById("uploadRectangle");
+            var uploadRecBtn = document.getElementById("uploadButton");
             var drawBtn = document.getElementById("drawButton");
 
             // Remove the current class
@@ -142,13 +212,23 @@ console.log("webpageJS")
 
         if (type === 'rectangle') {
             drawnItems.addLayer(layer);
-        }
-        });
- });
+            console.log("LayerTest")
 
+            }
+      })
+        });
+        map.on('draw:deleted', function (e) {
+            drawingEnabled = true;
+          });
 
  //Option to choose a geojson in any format and adds it to the map
- document.getElementById('uploadRectangle').addEventListener('click', function () {
+ document.getElementById('uploadButton').addEventListener('click', function () {
+    // Remove the existing layers
+    map.eachLayer(function(layer){
+        if (layer !== map  && !(layer instanceof L.TileLayer)) {
+        map.removeLayer(layer)};
+    });
+    map.removeControl(drawControl)
     const fileInput = document.getElementById('fileInput');
     fileInput.click();
 });
@@ -218,6 +298,38 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
         reader.readAsText(file);
     }
 });
+
+async function checkInputs () {
+    // Get the values of the datePickers
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();
+   // Check if an AoI is given
+   var AoIgiven = false;
+
+   // Check if something is drawn
+   if (drawnItems.getLayers().length > 0) {
+       AoIgiven = true;
+   }
+
+   // Check if something is uploaded
+   var fileInputValue = document.getElementById('fileInput').value;
+   if (fileInputValue !== '') {
+       AoIgiven = true;
+   }
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+      // when date Inputs full call createDatacube()
+      createDatacube();
+      switchToClassificationTab(); 
+    } else {
+      alert("Please fill in all the values")
+    }
+}
+
+function switchToClassificationTab() {
+  // Use Bootstrap JavaScript method to show the classification tab
+  $('#optionsTabs a[href="#classification"]').tab('show');
+}
 
 
 async function createDatacube() {
