@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/CopernicusCodeCrafters/main#readme",
   "dependencies": {
+    "@ngageoint/geopackage": "^4.2.4",
     "@openeo/js-client": "^2.5.1",
     "@turf/turf": "^6.5.0",
     "consolidate": "^1.0.3",

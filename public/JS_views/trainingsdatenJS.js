@@ -77,7 +77,7 @@ async function handleFile(event) {
         const geojson = JSON.parse(result);
 
         addFeaturesNames(geojson);
-        
+
       };
 
       reader.readAsText(file);
@@ -87,7 +87,6 @@ async function handleFile(event) {
       const reader = new FileReader();
       reader.onload = async function () {
         const result = reader.result;
-
         try {
           const fileContent = new Blob([result], { type: file.type });
           const formData = new FormData();
