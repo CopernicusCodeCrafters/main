@@ -100,49 +100,74 @@ async function handleFile(event) {
         const result = reader.result;
         const geojson = JSON.parse(result);
 
-        for (const feature of geojson.features) {
-          let object_id, name, classification;
+        addFeaturesNames(geojson);
 
-          do {
-            object_id = prompt("Enter object_id:");
-          } while (!object_id.trim());
-
-          do {
-            name = prompt("Enter name:");
-          } while (!name.trim());
-
-          do {
-            classification = prompt("Enter classification:");
-          } while (!classification.trim());
-
-          feature.properties = {
-            object_id,
-            name,
-            classification,
-          };
-
-          setGeojsonToMap(geojson);
-          await addGeoJSONtoDB(feature);
-        }
       };
+
       reader.readAsText(file);
     }
-      else if (fileName.endsWith('.gpkg')) {
-   
-        const gpkgLayer = L.geoPackageTileLayer({
-          geoPackageUrl: URL.createObjectURL(file),
-          layerName: 'features'
-        }).addTo(map);
-        gpkgLayer.once('load', function () {
-          map.fitBounds(gpkgLayer.getBounds());
-        });
-      } else {
-        console.log('Invalid file format. Supported formats: GeoJSON (.geojson) and GeoPackage (.gpkg)');
-      }
-    } else {
-      console.log('No file selected');
+
+    else if (fileName.endsWith('.gpkg')) {
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const result = reader.result;
+        try {
+          const fileContent = new Blob([result], { type: file.type });
+          const formData = new FormData();
+          formData.append('upload', fileContent, 'file');
+          const response = await fetch('http://ogre.adc4gis.com/convert', {
+            method: 'POST',
+            body: formData,
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const convertedGeoJSON = await response.json();
+          console.log('Converted GeoJSON:', convertedGeoJSON);
+
+          addFeaturesNames(convertedGeoJSON);
+
+        } catch (error) {
+        console.error('Error:', error.message || error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
     }
-  } 
+    else {
+      console.log('Invalid file format. Supported formats: GeoJSON (.geojson) and GeoPackage (.gpkg)');
+    }
+  } else {
+    console.log('No file selected');
+  }
+} 
+
+
+  async function addFeaturesNames(geojson){
+    for (const feature of geojson.features) {
+      let object_id, name, classification;
+
+      do {
+        object_id = prompt("Enter object_id:");
+      } while (!object_id.trim());
+
+      do {
+        name = prompt("Enter name:");
+      } while (!name.trim());
+
+      do {
+        classification = prompt("Enter classification:");
+      } while (!classification.trim());
+
+      feature.properties = {
+        object_id,
+        name,
+        classification,
+      };
+
+      setGeojsonToMap(geojson);
+      await addGeoJSONtoDB(feature);
+    }
+  }
 
 
 // Leaflet Draw is intialized
