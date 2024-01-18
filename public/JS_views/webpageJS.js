@@ -231,6 +231,7 @@ var geocoder = L.Control.geocoder({
     fileInput.click();
 });
 
+
 document.getElementById('fileInput').addEventListener('change', function (e) {
     const file = e.target.files[0];
 
