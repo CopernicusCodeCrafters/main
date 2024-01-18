@@ -55,4 +55,6 @@ async function addNewPOItoDB(client, dbName, collectionName, poi, res) {
     // pass the data added as input for the notification page
     res.render("add_notification", { title: "Addition Completed", newpoi: poi });
 }
+
+
 module.exports = router;

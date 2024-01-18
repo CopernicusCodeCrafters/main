@@ -320,3 +320,18 @@ const addGeoJSONtoDB = async (geojson) => {
   }
 };
 
+async function buildModel() {
+  // Get values from input fields
+  const nt = document.getElementById('ntInput').value;
+  const mt = document.getElementById('mtInput').value;
+  const name = document.getElementById('nameInput').value;
+
+  try {
+      // Call the /buildModel endpoint with the extracted data
+      const response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}`);
+
+  } catch (error) {
+      console.error('Error:', error.message);
+  }
+}
+
