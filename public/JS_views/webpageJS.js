@@ -21,7 +21,7 @@ $(document).ready(function () {
       autoclose: true,
       todayHighlight: true,
       startDate: today, // Start datepicker2 from today
-      endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 13) // Set end date 2 weeks after today
+      endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 30) // Set end date 2 weeks after today
   });
 });
 
@@ -29,7 +29,7 @@ $(document).ready(function () {
 $('#datepicker1').on('changeDate', function (e) {
   // Calculate two weeks later
   var endDate = new Date(e.date);
-  endDate.setDate(endDate.getDate() + 14); // 14 days to allow for a 14-day span
+  endDate.setDate(endDate.getDate() + 30); // 14 days to allow for a 14-day span
 
   // Set the new startDate for the second datepicker
   $('#datepicker2').datepicker('setStartDate', e.date);
@@ -39,36 +39,37 @@ $('#datepicker1').on('changeDate', function (e) {
 });
 
 function getSelectedDates() {
-  var startDate = $('#datepicker1').datepicker('getUTCDate');
-  var endDate = $('#datepicker2').datepicker('getUTCDate');
+  var startDate = $('#datepicker1').datepicker('getDate');
+  var endDate = $('#datepicker2').datepicker('getDate');
 
   if (startDate && endDate) {
-      // Format dates as YYYY-MM-DD
-      var formattedStartDate = formatDate(startDate);
-      var formattedEndDate = formatDate(endDate);
+    // Format dates as YYYY-MM-DD
+    var formattedStartDate = formatDate(startDate);
+    var formattedEndDate = formatDate(endDate);
 
-      // Store dates in an array
-      selectedDates = [formattedStartDate, formattedEndDate];
+    // Store dates in an array
+    selectedDates = [formattedStartDate, formattedEndDate];
 
-      console.log(selectedDates); 
+    console.log(selectedDates);
 
-      var saveDateBtn = document.getElementById("saveDateBtn");
+    var saveDateBtn = document.getElementById("saveDateBtn");
 
-      // Remove the current class
-      saveDateBtn.classList.remove("black-btn");
+    // Remove the current class
+    saveDateBtn.classList.remove("black-btn");
 
-      // Add the new class
-      saveDateBtn.classList.add("accepted-btn");
+    // Add the new class
+    saveDateBtn.classList.add("accepted-btn");
 
-      //Change button text
-      saveDateBtn.innerHTML="Date saved";
-      document.getElementById("datepicker1").disabled = true;
-      document.getElementById("datepicker2").disabled = true;
-      saveDateBtn.disabled=true;
+    // Change button text
+    saveDateBtn.innerHTML = "Date saved";
+    document.getElementById("datepicker1").disabled = true;
+    document.getElementById("datepicker2").disabled = true;
+    saveDateBtn.disabled = true;
   } else {
-      alert('Please select both start and end dates.');
+    alert('Please select both start and end dates.');
   }
 }
+
 
 
 function getSelectedBands() {
