@@ -43,7 +43,6 @@ function getSelectedDates() {
 
 
 function getSelectedBands() {
-  // Assuming $('#bandspicker').val() returns a string like 'B01,B02,B03'
   var selectedBandsString = $('#bandspicker').val();
 
   // Split the string into an array using a comma as the delimiter
@@ -66,6 +65,25 @@ function getSelectedBands() {
   console.log("Selected Bands (before):", selectedBands);
 }
 
+$(document).ready(function () {
+  // Initialize Bootstrap Select
+  $('#bandsPicker').selectpicker();
+
+
+  // Handle selection changes
+  $('#bandsPicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+      var selectedOptions = $('#bandsPicker').find(':selected');
+      
+      // Transform selected options data-subtext to custom format (e.g., B01, B02, etc.)
+      selectedBands = selectedOptions ? selectedOptions.map(function() {
+          return 'B' + $(this).data('subtext').slice(-2);
+      }).toArray() : [];
+
+      console.log(selectedBands); // You can use this array as needed
+  });
+});
+
+
 
 
 
@@ -80,7 +98,7 @@ function formatDate(date) {
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'OpenStreetMap'
  });
-var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
     attribution: 'Google Satellite',
     maxZoom: 20,
     minZoom:2,
