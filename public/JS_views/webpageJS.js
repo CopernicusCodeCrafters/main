@@ -2,10 +2,39 @@
 
 var selectedDates = [];
 
-//Function for date-picker
 $(document).ready(function () {
-    $('#datepicker1').datepicker();
-    $('#datepicker2').datepicker();
+  var today = new Date();
+  var minDate = new Date(2015, 0, 1); // Minimum date: January 1, 2015
+
+
+  $('#datepicker1').datepicker({
+      format: 'yyyy-mm-dd',
+      autoclose: true,
+      todayHighlight: true,
+      startDate: minDate,
+      endDate: today // Restrict datepicker1 to today
+  });
+
+  $('#datepicker2').datepicker({
+      format: 'yyyy-mm-dd',
+      autoclose: true,
+      todayHighlight: true,
+      startDate: today, // Start datepicker2 from today
+      endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 13) // Set end date 2 weeks after today
+  });
+});
+
+// Event listener for the change event on datepicker1
+$('#datepicker1').on('changeDate', function (e) {
+  // Calculate two weeks later
+  var endDate = new Date(e.date);
+  endDate.setDate(endDate.getDate() + 14); // 14 days to allow for a 14-day span
+
+  // Set the new startDate for the second datepicker
+  $('#datepicker2').datepicker('setStartDate', e.date);
+
+  // Set the new endDate for the second datepicker
+  $('#datepicker2').datepicker('setEndDate', endDate);
 });
 
 function getSelectedDates() {
@@ -83,38 +112,7 @@ var geocoder = L.Control.geocoder({
   .addTo(map);
 
 
- /**
-  * function to implement datepicker and limit date selection
-  */
- $(document).ready(function () {
-        // Initialize the first datepicker
-        $('#startDate').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true,
-            endDate: new Date()
- });
-        // Initialize the second datepicker with the startDate option
-        $('#endDate').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true,
-            endDate: new Date()
-          });
 
-            // Update the startDate and endDate options of the datepickers when the first datepicker changes
-    $('#startDate').on('changeDate', function (e) {
-        // Calculate two weeks later
-        var endDate = new Date(e.date);
-        endDate.setDate(endDate.getDate() + 13); // 13 days to allow for a 14-day span
-  
-        // Set the new startDate for the second datepicker
-        $('#endDate').datepicker('setStartDate', e.date);
-        
-        // Set the new endDate for the second datepicker
-        $('#endDate').datepicker('setEndDate', endDate);
-      });
-    });
 
  // Add Leaflet Draw controls
  var drawnItems = new L.FeatureGroup();
@@ -188,7 +186,7 @@ var geocoder = L.Control.geocoder({
             console.log('Converted South West (EPSG:3857):', convertedSouthWest);
             console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
-            var uploadRecBtn = document.getElementById("uploadRectangle");
+            var uploadRecBtn = document.getElementById("uploadButton");
             var drawBtn = document.getElementById("drawButton");
 
             // Remove the current class
@@ -214,20 +212,12 @@ var geocoder = L.Control.geocoder({
             drawnItems.addLayer(layer);
             console.log("LayerTest")
 
-            // Convert the drawn layer to GeoJSON and add it to the FeatureCollection
-            var feature = layer.toGeoJSON();
-            geoJSONData.features.push(feature);
-            //Test
-            console.log(geoJSONData); 
-            console.log("Test")
-
-            //limit to one draw
-            drawingEnabled = false; 
             }
-        }
+      })
         )});
         map.on('draw:deleted', function (e) {
             drawingEnabled = true;
+          });
           });
 
  //Option to choose a geojson in any format and adds it to the map
@@ -301,7 +291,8 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 
 
             } catch (error) {
-                console.error("Error parsing or processing GeoJSON:", error);
+              stopRotation();
+              console.error("Error parsing or processing GeoJSON:", error);
             }
         };
         reader.readAsText(file);
@@ -309,10 +300,9 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 });
 
 async function checkInputs () {
-   // Get the values of the datePickers
-   var date1Value = document.getElementById('endDate').value;
-   var date2Value = document.getElementById('startDate').value;
-
+    // Get the values of the datePickers
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();
    // Check if an AoI is given
    var AoIgiven = false;
 
@@ -402,6 +392,7 @@ async function createDatacube() {
         stopRotation();
         
       } catch (error) {
+        stopRotation();
         console.log("Error connecting);", error);
         console.log(error);
       }
@@ -409,6 +400,7 @@ async function createDatacube() {
 
     reader.readAsArrayBuffer(blob);
   } catch (error) {
+    stopRotation();
     console.log(error);
   }
 }

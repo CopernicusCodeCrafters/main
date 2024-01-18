@@ -4,8 +4,8 @@ services:
 
     backend:
        
-        # build: ./
-        image: kwundram/backend:1.0
+        build: ./
+        
         ports: 
             - 3000:3000
         
@@ -41,8 +41,8 @@ services:
         ports: 
             - '8081:8081'
 
-    openEO_Own:
-        image: kwundram/own_openeo:1.6
+    ccceocubes_con:
+        image: kwundram/ccceocubes:1.0
         ports:
             - 8000:8000
     
