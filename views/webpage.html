@@ -10,9 +10,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <!-- Bootstrap-datepicker CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">   
+
     <!-- Bootstrap-datepicker JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- Include Bootstrap Select CSS and JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <!--Leaflet-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -115,6 +119,23 @@
                             <button id="uploadButton" class="black-btn">Upload</button>
                             <input type="file" id="fileInput" accept=".geojson, .gpkg" style="display: none"/>
                         </div> <br>
+                        
+                        <!-- Add the 'selectpicker' class to your select element -->
+                        <h5 class="card-title">Select Bands</h5>
+                        <select id="bandsPicker" class="selectpicker" multiple data-max-options="8">
+                            <option data-subtext="B01">Band 1 - Coastal aerosol</option>
+                            <option data-subtext="B02">Band 2 - Blue</option>
+                            <option data-subtext="B03">Band 3 - Green</option>
+                            <option data-subtext="B04">Band 4 - Red</option>
+                            <option data-subtext="B05">Band 5 - VRE</option>
+                            <option data-subtext="B06">Band 6 - VRE</option>
+                            <option data-subtext="B07">Band 7 - VRE</option>
+                            <option data-subtext="B08">Band 8 - NIR</option>
+                        </select>
+                        
+                        <!-- Initialize Bootstrap Select and handle selection changes -->
+                        <br>
+                        <br>
                         <!--Submit button-->
                      <div>
                         <button id="submitBtn" class="green-btn" onclick="checkInputs()">Submit</button>

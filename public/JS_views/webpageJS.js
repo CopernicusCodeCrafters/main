@@ -1,6 +1,7 @@
 "use strict"
 
 var selectedDates = [];
+var selectedBands= [];
 
 $(document).ready(function () {
   var today = new Date();
@@ -20,7 +21,7 @@ $(document).ready(function () {
       autoclose: true,
       todayHighlight: true,
       startDate: today, // Start datepicker2 from today
-      endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 13) // Set end date 2 weeks after today
+      endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 30) // Set end date 2 weeks after today
   });
 });
 
@@ -28,7 +29,7 @@ $(document).ready(function () {
 $('#datepicker1').on('changeDate', function (e) {
   // Calculate two weeks later
   var endDate = new Date(e.date);
-  endDate.setDate(endDate.getDate() + 14); // 14 days to allow for a 14-day span
+  endDate.setDate(endDate.getDate() + 30); // 14 days to allow for a 14-day span
 
   // Set the new startDate for the second datepicker
   $('#datepicker2').datepicker('setStartDate', e.date);
@@ -38,36 +39,83 @@ $('#datepicker1').on('changeDate', function (e) {
 });
 
 function getSelectedDates() {
-  var startDate = $('#datepicker1').datepicker('getUTCDate');
-  var endDate = $('#datepicker2').datepicker('getUTCDate');
+  var startDate = $('#datepicker1').datepicker('getDate');
+  var endDate = $('#datepicker2').datepicker('getDate');
 
   if (startDate && endDate) {
-      // Format dates as YYYY-MM-DD
-      var formattedStartDate = formatDate(startDate);
-      var formattedEndDate = formatDate(endDate);
+    // Format dates as YYYY-MM-DD
+    var formattedStartDate = formatDate(startDate);
+    var formattedEndDate = formatDate(endDate);
 
-      // Store dates in an array
-      selectedDates = [formattedStartDate, formattedEndDate];
+    // Store dates in an array
+    selectedDates = [formattedStartDate, formattedEndDate];
 
-      console.log(selectedDates); 
+    console.log(selectedDates);
 
-      var saveDateBtn = document.getElementById("saveDateBtn");
+    var saveDateBtn = document.getElementById("saveDateBtn");
 
-      // Remove the current class
-      saveDateBtn.classList.remove("black-btn");
+    // Remove the current class
+    saveDateBtn.classList.remove("black-btn");
 
-      // Add the new class
-      saveDateBtn.classList.add("accepted-btn");
+    // Add the new class
+    saveDateBtn.classList.add("accepted-btn");
 
-      //Change button text
-      saveDateBtn.innerHTML="Date saved";
-      document.getElementById("datepicker1").disabled = true;
-      document.getElementById("datepicker2").disabled = true;
-      saveDateBtn.disabled=true;
+    // Change button text
+    saveDateBtn.innerHTML = "Date saved";
+    document.getElementById("datepicker1").disabled = true;
+    document.getElementById("datepicker2").disabled = true;
+    saveDateBtn.disabled = true;
   } else {
-      alert('Please select both start and end dates.');
+    alert('Please select both start and end dates.');
   }
 }
+
+
+
+function getSelectedBands() {
+  var selectedBandsString = $('#bandspicker').val();
+
+  // Split the string into an array using a comma as the delimiter
+  selectedBands = selectedBandsString.split(',').map(function (band) {
+    // Remove leading and trailing whitespaces from each band
+    return band.trim();
+  });
+
+  var bandsBtn = document.getElementById("bandsBtn");
+
+  bandsBtn.classList.remove("black-btn");
+
+  // Add the new class
+  bandsBtn.classList.add("accepted-btn");
+
+  bandsBtn.innerHTML="Bands saved";
+    
+  bandsBtn.disabled = true;
+
+  console.log("Selected Bands (before):", selectedBands);
+}
+
+$(document).ready(function () {
+  // Initialize Bootstrap Select
+  $('#bandsPicker').selectpicker();
+
+
+  // Handle selection changes
+  $('#bandsPicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+      var selectedOptions = $('#bandsPicker').find(':selected');
+      
+      // Transform selected options data-subtext to custom format (e.g., B01, B02, etc.)
+      selectedBands = selectedOptions ? selectedOptions.map(function() {
+          return 'B' + $(this).data('subtext').slice(-2);
+      }).toArray() : [];
+
+      console.log(selectedBands); // You can use this array as needed
+  });
+});
+
+
+
+
 
 // Function to format date using Bootstrap-datepicker's format
 function formatDate(date) {
@@ -80,7 +128,7 @@ function formatDate(date) {
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'OpenStreetMap'
  });
-var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
     attribution: 'Google Satellite',
     maxZoom: 20,
     minZoom:2,
@@ -337,7 +385,7 @@ async function createDatacube() {
   startRotation();
   try {
     // Include converted bounds in the satelliteImage request
-    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}`);
+    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
     const blob = await response.blob();
     console.log("warum")
 
