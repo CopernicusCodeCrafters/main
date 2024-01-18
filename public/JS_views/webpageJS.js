@@ -1,6 +1,7 @@
 "use strict"
 
 var selectedDates = [];
+var selectedBands= [];
 
 $(document).ready(function () {
   var today = new Date();
@@ -69,6 +70,52 @@ function getSelectedDates() {
   }
 }
 
+
+function getSelectedBands() {
+  var selectedBandsString = $('#bandspicker').val();
+
+  // Split the string into an array using a comma as the delimiter
+  selectedBands = selectedBandsString.split(',').map(function (band) {
+    // Remove leading and trailing whitespaces from each band
+    return band.trim();
+  });
+
+  var bandsBtn = document.getElementById("bandsBtn");
+
+  bandsBtn.classList.remove("black-btn");
+
+  // Add the new class
+  bandsBtn.classList.add("accepted-btn");
+
+  bandsBtn.innerHTML="Bands saved";
+    
+  bandsBtn.disabled = true;
+
+  console.log("Selected Bands (before):", selectedBands);
+}
+
+$(document).ready(function () {
+  // Initialize Bootstrap Select
+  $('#bandsPicker').selectpicker();
+
+
+  // Handle selection changes
+  $('#bandsPicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+      var selectedOptions = $('#bandsPicker').find(':selected');
+      
+      // Transform selected options data-subtext to custom format (e.g., B01, B02, etc.)
+      selectedBands = selectedOptions ? selectedOptions.map(function() {
+          return 'B' + $(this).data('subtext').slice(-2);
+      }).toArray() : [];
+
+      console.log(selectedBands); // You can use this array as needed
+  });
+});
+
+
+
+
+
 // Function to format date using Bootstrap-datepicker's format
 function formatDate(date) {
   return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
@@ -80,7 +127,7 @@ function formatDate(date) {
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'OpenStreetMap'
  });
-var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
     attribution: 'Google Satellite',
     maxZoom: 20,
     minZoom:2,
@@ -336,7 +383,7 @@ async function createDatacube() {
   startRotation();
   try {
     // Include converted bounds in the satelliteImage request
-    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}`);
+    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
     const blob = await response.blob();
     console.log("warum")
 
