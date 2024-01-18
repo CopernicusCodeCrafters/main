@@ -73,7 +73,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     // Connect to the OpenEO server
     connection = await OpenEO.connect('http://34.209.215.214:8000');
     await connection.authenticateBasic('user', 'password');
-
+    console.log(await connection.describeProcess('save_result'))
     var builder = await connection.buildProcess();
 
     var datacube = builder.load_collection(
@@ -99,10 +99,10 @@ router.get('/satelliteImage', async function (req, res, next) {
 
     let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
-    
-    let model = builder.train_model_ml(data = datacube_reduced, save = true, name = "Test1");
+      
+    let model = builder.train_model_ml(data = datacube_reduced, samples = null, nt = 100, mt = 3, name = "Test1", save = true);
     //console.log(model)
-    let result = builder.save_result(model,'RDS');    
+    let result = builder.save_result(model,'RDS'); 
     let response = await connection.computeResult(result);
     
     console.log()
