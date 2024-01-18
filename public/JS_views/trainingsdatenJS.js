@@ -1,4 +1,27 @@
 
+ //Add Leaflet Map 
+ var map = L.map('map').setView([51.96269732749698,7.625025563711631], 13);
+ // Define base layers
+var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'OpenStreetMap'
+ });
+var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    attribution: 'Google Satellite',
+    maxZoom: 20,
+    minZoom:2,
+    subdomains:['mt0','mt1','mt2','mt3']
+ }); 
+// Add base layers to the map
+googleSatLayer.addTo(map);  // Default base layer
+
+// Create an object to store base layers with custom names
+var baseLayers = {
+    'OpenStreetMap': osmLayer,
+    'Google Satellite': googleSatLayer
+};
+
+// Add layer control to the map
+L.control.layers(baseLayers).addTo(map);
 
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
@@ -24,6 +47,9 @@ async function startingPolygonmanager() {
             break;
           case 'settlement':
             color = 'red';
+            break;
+          case 'forest':
+            color='darkgreen';
             break;
           default:
             color = 'gray';
@@ -74,49 +100,74 @@ async function handleFile(event) {
         const result = reader.result;
         const geojson = JSON.parse(result);
 
-        for (const feature of geojson.features) {
-          let object_id, name, classification;
+        addFeaturesNames(geojson);
 
-          do {
-            object_id = prompt("Enter object_id:");
-          } while (!object_id.trim());
-
-          do {
-            name = prompt("Enter name:");
-          } while (!name.trim());
-
-          do {
-            classification = prompt("Enter classification:");
-          } while (!classification.trim());
-
-          feature.properties = {
-            object_id,
-            name,
-            classification,
-          };
-
-          setGeojsonToMap(geojson);
-          await addGeoJSONtoDB(feature);
-        }
       };
+
       reader.readAsText(file);
     }
-      else if (fileName.endsWith('.gpkg')) {
-   
-        const gpkgLayer = L.geoPackageTileLayer({
-          geoPackageUrl: URL.createObjectURL(file),
-          layerName: 'features'
-        }).addTo(map);
-        gpkgLayer.once('load', function () {
-          map.fitBounds(gpkgLayer.getBounds());
-        });
-      } else {
-        console.log('Invalid file format. Supported formats: GeoJSON (.geojson) and GeoPackage (.gpkg)');
-      }
-    } else {
-      console.log('No file selected');
+
+    else if (fileName.endsWith('.gpkg')) {
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const result = reader.result;
+        try {
+          const fileContent = new Blob([result], { type: file.type });
+          const formData = new FormData();
+          formData.append('upload', fileContent, 'file');
+          const response = await fetch('http://ogre.adc4gis.com/convert', {
+            method: 'POST',
+            body: formData,
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const convertedGeoJSON = await response.json();
+          console.log('Converted GeoJSON:', convertedGeoJSON);
+
+          addFeaturesNames(convertedGeoJSON);
+
+        } catch (error) {
+        console.error('Error:', error.message || error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
     }
-  } 
+    else {
+      console.log('Invalid file format. Supported formats: GeoJSON (.geojson) and GeoPackage (.gpkg)');
+    }
+  } else {
+    console.log('No file selected');
+  }
+} 
+
+
+  async function addFeaturesNames(geojson){
+    for (const feature of geojson.features) {
+      let object_id, name, classification;
+
+      do {
+        object_id = prompt("Enter object_id:");
+      } while (!object_id.trim());
+
+      do {
+        name = prompt("Enter name:");
+      } while (!name.trim());
+
+      do {
+        classification = prompt("Enter classification:");
+      } while (!classification.trim());
+
+      feature.properties = {
+        object_id,
+        name,
+        classification,
+      };
+
+      setGeojsonToMap(geojson);
+      await addGeoJSONtoDB(feature);
+    }
+  }
 
 
 // Leaflet Draw is intialized
@@ -268,3 +319,4 @@ const addGeoJSONtoDB = async (geojson) => {
     console.error('An error occurred:', error);
   }
 };
+
