@@ -463,3 +463,4 @@ function stopRotation() {
   var logo = document.getElementById('logo');
   logo.classList.remove('rotate');
 }
+

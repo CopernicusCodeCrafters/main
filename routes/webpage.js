@@ -119,29 +119,27 @@ router.get('/satelliteImage', async function (req, res, next) {
   }
 });
 
-// 
+let rdsModels = [];
+// Method to build a Model 
 router.get('/buildModel', async function (req, res, next) {
   try {
-    let { nt, mt, name } = req.query;
-    console.log(name)
+    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast} = req.query;
+    console.log(geoJSONData)
 
-    console.log('Processing satellite image...'); // Indicate the code is running up to this point
+    console.log('Processing model...'); // Indicate the code is running up to this point
     // Connect to the OpenEO server
     let connection = await OpenEO.connect('http://34.209.215.214:8000');
     await connection.authenticateBasic('user', 'password');
-    console.log(await connection.describeProcess('save_result'))
     var builder = await connection.buildProcess();
-
+    console.log(convertedWest)
     var datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
-      {west:840180.2, south:6788889.4,
-        east:852976.1,
-        north:6799716.7},
+      {west: convertedWest, south: convertedSouth,
+        east: convertedEast,
+        north: convertedNorth},
       3857,
       ["2022-01-01", "2022-12-31"]
     );
-
-      
 
     let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
     
@@ -153,7 +151,7 @@ router.get('/buildModel', async function (req, res, next) {
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
     
     // data, nt, mt und name müssen übergeben werden
-    let model = builder.train_model_ml(data = datacube_reduced, samples = null, parseInt(nt), parseInt(mt), String(name), save = true);
+    let model = builder.train_model_ml(data = datacube_reduced, samples = geoJSONData, parseInt(nt), parseInt(mt), String(name), save = true);
 
     let result = builder.save_result(model,'RDS'); 
     let response = await connection.computeResult(result);
@@ -163,13 +161,14 @@ router.get('/buildModel', async function (req, res, next) {
     console.log("Done");
     
     // Sending the result data back to the frontend
-    res.status(200).send(result); 
+    //res.status(200).send(result); 
     //res.send(response)
     //response.data.pipe(res); // Send the Tiff as response
     console.log("Send Done");
-
+    rdsModels.push(String(name))
+    console.log(rdsModels)
   } catch (error) {
-    console.error('Error:', error);
+    //console.error('Error:', error);
     res.status(500).json({ error: 'Internal Server Error' }); // Send error response
   }
   

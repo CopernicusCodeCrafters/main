@@ -28,7 +28,6 @@ async function startingPolygonmanager() {
   try {
     const response = await fetch("/getAllPolygons");
     const stationData = await response.json();
-
     if (Array.isArray(stationData)) {
       // Check if stationData is an array
       stationData.forEach((geojson) => {
@@ -143,6 +142,7 @@ async function handleFile(event) {
 
 
 async function addFeaturesNames(geojson) {
+  setGeojsonToMap(geojson);
   for (const feature of geojson.features) {
     let object_id, name, classification;
 
@@ -241,6 +241,7 @@ map.on(L.Draw.Event.CREATED, async function (event) {
 });
 
 
+let layer;
 // A Geojson is displayed in the map
 function setGeojsonToMap(geojson) {
   drawnItems.clearLayers();
@@ -262,7 +263,7 @@ function setGeojsonToMap(geojson) {
       <strong>Object ID:</strong> ${properties.object_id || 'N/A'}<br> 
       <strong>Classification:</strong> ${properties.classification || 'N/A'}
     `;
-    const layer = L.geoJSON(feature, {
+    layer = L.geoJSON(feature, {
       onEachFeature: function (feature, layer) {
         layer.bindPopup(popupContent);
       },
@@ -320,18 +321,88 @@ const addGeoJSONtoDB = async (geojson) => {
   }
 };
 
+// Function to get FeatureCollection from GeoJSON layer
+function getFeatureCollectionFromLayer(geoJSONlayer) {
+  // Check if the layer is a GeoJSON layer
+  if (geoJSONlayer instanceof L.GeoJSON) {
+    // Extract GeoJSON data from the layer
+    const geoJsonData = geoJSONlayer.toGeoJSON();
+
+    // Check if the GeoJSON data is a Feature or FeatureCollection
+    if (geoJsonData.type === 'Feature') {
+      // Convert a single Feature to a FeatureCollection
+      return {
+        type: 'FeatureCollection',
+        features: [geoJsonData]
+      };
+    } else if (geoJsonData.type === 'FeatureCollection') {
+      // Return the existing FeatureCollection
+      return geoJsonData;
+    }
+  }
+
+  // Return null if the layer is not a GeoJSON layer
+  return null;
+}
+
 async function buildModel() {
+  //startRotation();
+  const response = await fetch("/getAllPolygons");
+  const geoJSONData = await response.json();
+  let FeatureCollection = {
+    "type" : "FeatureCollection",
+    "features" : geoJSONData
+  }
+  let geoJSONDataString = JSON.stringify(FeatureCollection);
+  console.log(geoJSONDataString)
+
+  const bbox = turf.bbox(FeatureCollection);
+   // Define the source and destination coordinate systems
+   const sourceCRS = 'EPSG:4326';
+   const destCRS = 'EPSG:3857';
+
+   // Define the projection transformations
+   proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+   proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+
+   const convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+   const convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+
+   //Extract LatLng from converted object
+   convertedSouth = convertedSouthWest[1];
+   convertedWest = convertedSouthWest[0];
+   convertedNorth = convertedNorthEast[1];
+   convertedEast = convertedNorthEast[0];
+  console.log(bbox, convertedSouth);
+
+
   // Get values from input fields
   const nt = document.getElementById('ntInput').value;
   const mt = document.getElementById('mtInput').value;
   const name = document.getElementById('nameInput').value;
 
   try {
-    // Call the /buildModel endpoint with the extracted data
-    const response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}`);
+    // Call the /buildModel endpoint with the needed data
+    const encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
+    const response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
+    req.session.myArray = [1, 2, 3];
+
+    //stopRotation();
 
   } catch (error) {
+    alert('Error' , error)
     console.error('Error:', error.message);
+    //stopRotation();
   }
+}
+
+function startRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.add('rotate');
+}
+
+function stopRotation() {
+  var logo = document.getElementById('logo');
+  logo.classList.remove('rotate');
 }
 
