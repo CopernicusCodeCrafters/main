@@ -7,6 +7,9 @@
     <!--Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <!--Leaflet-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -15,8 +18,6 @@
     <!--Leaflet Draw-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
-
-    <!--<script(src='JS/trainingsdaten.js')></script>!-->
     <!--OPenEO JS Client:-->
     <script src="https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/oidc-client@1/dist/oidc-client.min.js"></script>
@@ -35,15 +36,22 @@
 <body>
     <header class="mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt=""></a>
-            <a class="navbar-brand active"area-current="page" href="/">Viewer</a>
-            <button class="navbar-toggler" type="button"data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50"
+                    class="d-inline-block align-top" alt=""></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
+                    class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link active" area-current="page"
-                            href="/trainingsdaten">Trainingsdatenverwalten
-                    <li class="nav-item active"></li></a></li>
-                    <li class="nav-item"><a class="nav-link active" area-current="page" href="/impressum">Impressum </a>
+                    <li class="nav-item">
+                        <a class="nav-link active" area-current="page" href="/webpage">Viewer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" area-current="page"
+                            href="/trainingsdaten">Trainingsdatenverwalten</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" area-current="page" href="/impressum">Impressum </a>
                     </li>
                 </ul>
             </div>
@@ -59,19 +67,38 @@
             </div>
             <div class="col-lg-3">
                 <div class="card shadow p-3 h-100 bg-white rounded">
+                    <!--Upload Trainingsdaten-->
                     <h2 class="card-title">Upload</h2><br>
                     <form id="uploadForm" onsubmit="handleFile(event)" enctype="multipart/form-data">
                         <input class="black-input" type="file" name="file" accept=".gpkg, .geojson">
                         <button class="black-btn" type="submit">Upload File</button>
                     </form> <br>
-                    <button id="save-Button1" class="black-btn">Save GeoJSON as File</button><br>
-                    <div id="savedDataButton"></div>
+                    <button id="save-Button1" class="black-btn">Save GeoJSON as File</button><br><br>
+
+
+                    <!-- Hyperparameter Selection-->
+                    <div class="hyperparameterSelectionDIV">
+                        <h2 class="card-title">Select Hyperparameters</h2>
+                        <div class="form-group">
+                            <h5 class="card-title">Choose nt Value</h5>
+                            <input type="text" class="form-control" id="ntInput" placeholder="Enter nt value">
+                        </div>
+                        <div class="form-group">
+                            <h5 class="card-title">Choose mt Value</h5>
+                            <input type="text" class="form-control" id="mtInput" placeholder="Enter mt value">
+                        </div>
+                        <div class="form-group">
+                            <h5 class="card-title">Choose name</h5>
+                            <input type="text" class="form-control" id="nameInput" placeholder="Enter name value">
+                        </div>
+                        <button class="green-btn" onclick="buildModel()">Build Model</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    
+
     </div>
     <div class="container-fluid">
         <footer>
@@ -88,4 +115,4 @@
             </div>
         </footer>
     </div>
-
+</body>

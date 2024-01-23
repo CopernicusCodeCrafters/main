@@ -1,23 +1,23 @@
 
- //Add Leaflet Map 
- var map = L.map('map').setView([51.96269732749698,7.625025563711631], 13);
- // Define base layers
+//Add Leaflet Map 
+var map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
+// Define base layers
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'OpenStreetMap'
- });
-var googleSatLayer =  L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-    attribution: 'Google Satellite',
-    maxZoom: 20,
-    minZoom:2,
-    subdomains:['mt0','mt1','mt2','mt3']
- }); 
+  attribution: 'OpenStreetMap'
+});
+var googleSatLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+  attribution: 'Google Satellite',
+  maxZoom: 20,
+  minZoom: 2,
+  subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+});
 // Add base layers to the map
 googleSatLayer.addTo(map);  // Default base layer
 
 // Create an object to store base layers with custom names
 var baseLayers = {
-    'OpenStreetMap': osmLayer,
-    'Google Satellite': googleSatLayer
+  'OpenStreetMap': osmLayer,
+  'Google Satellite': googleSatLayer
 };
 
 // Add layer control to the map
@@ -49,7 +49,7 @@ async function startingPolygonmanager() {
             color = 'red';
             break;
           case 'forest':
-            color='darkgreen';
+            color = 'darkgreen';
             break;
           default:
             color = 'gray';
@@ -62,7 +62,7 @@ async function startingPolygonmanager() {
             weight: 2,
           },
           onEachFeature: function (feature, layer) {
-            const popupContent =`
+            const popupContent = `
             <strong>Name:</strong> ${feature.properties.name || 'N/A'}<br>
             <strong>Object ID:</strong> ${feature.properties.object_id || 'N/A'}<br> 
             <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}
@@ -128,7 +128,7 @@ async function handleFile(event) {
           addFeaturesNames(convertedGeoJSON);
 
         } catch (error) {
-        console.error('Error:', error.message || error);
+          console.error('Error:', error.message || error);
         }
       };
       reader.readAsArrayBuffer(file);
@@ -139,42 +139,42 @@ async function handleFile(event) {
   } else {
     console.log('No file selected');
   }
-} 
+}
 
 
-  async function addFeaturesNames(geojson){
-    for (const feature of geojson.features) {
-      let object_id, name, classification;
+async function addFeaturesNames(geojson) {
+  for (const feature of geojson.features) {
+    let object_id, name, classification;
 
-      do {
-        object_id = prompt("Enter object_id:");
-      } while (!object_id.trim());
+    do {
+      object_id = prompt("Enter object_id:");
+    } while (!object_id.trim());
 
-      do {
-        name = prompt("Enter name:");
-      } while (!name.trim());
+    do {
+      name = prompt("Enter name:");
+    } while (!name.trim());
 
-      do {
-        classification = prompt("Enter classification:");
-      } while (!classification.trim());
+    do {
+      classification = prompt("Enter classification:");
+    } while (!classification.trim());
 
-      feature.properties = {
-        object_id,
-        name,
-        classification,
-      };
+    feature.properties = {
+      object_id,
+      name,
+      classification,
+    };
 
-      setGeojsonToMap(geojson);
-      await addGeoJSONtoDB(feature);
-    }
+    setGeojsonToMap(geojson);
+    await addGeoJSONtoDB(feature);
   }
+}
 
 
 // Leaflet Draw is intialized
-  const container = L.DomUtil.create(
-    "div",
-    "leaflet-control "
-  );
+const container = L.DomUtil.create(
+  "div",
+  "leaflet-control "
+);
 
 let drawnItems = L.featureGroup().addTo(map);
 
@@ -191,53 +191,53 @@ map.addControl(
         allowIntersection: false,
         showArea: true,
       },
-      polyline : false,
-      marker : false
+      polyline: false,
+      marker: false
     },
   })
 );
 
 map.on(L.Draw.Event.CREATED, async function (event) {
-    let layer = event.layer;
-    let feature = (layer.feature = layer.feature || {});
-    let type = event.layerType;
+  let layer = event.layer;
+  let feature = (layer.feature = layer.feature || {});
+  let type = event.layerType;
 
-    let object_id, name, classification;
+  let object_id, name, classification;
 
-    do {
-      object_id = prompt("Enter object_id:");
-    } while (!object_id.trim()); // Repeat the prompt until a non-empty string is entered
+  do {
+    object_id = prompt("Enter object_id:");
+  } while (!object_id.trim()); // Repeat the prompt until a non-empty string is entered
 
-    do {
-      name = prompt("Enter name:");
-    } while (!name.trim());
+  do {
+    name = prompt("Enter name:");
+  } while (!name.trim());
 
-    do {
-      classification = prompt("Enter classification:");
-    } while (!classification.trim());
+  do {
+    classification = prompt("Enter classification:");
+  } while (!classification.trim());
 
-    let geojson = {
-      type: "Feature",
-      properties: {
-        object_id,
-        name,
-        classification,
-      },
-      geometry: layer.toGeoJSON().geometry,
-    };
+  let geojson = {
+    type: "Feature",
+    properties: {
+      object_id,
+      name,
+      classification,
+    },
+    geometry: layer.toGeoJSON().geometry,
+  };
 
-    feature.type = feature.type || "Feature";
-    let props = (feature.properties = feature.properties || {});
+  feature.type = feature.type || "Feature";
+  let props = (feature.properties = feature.properties || {});
 
-    props.type = type;
+  props.type = type;
 
-    if (type === "circle") {
-      props.radius = layer.getRadius();
-    }
+  if (type === "circle") {
+    props.radius = layer.getRadius();
+  }
 
-    drawnItems.addLayer(layer);
+  drawnItems.addLayer(layer);
 
-    await addGeoJSONtoDB(geojson);
+  await addGeoJSONtoDB(geojson);
 });
 
 
@@ -283,23 +283,23 @@ function setGeojsonToMap(geojson) {
 const download = document.getElementById("save-Button1");
 
 download.addEventListener("click", () => {
-    // Extract GeoJSON from featureGroup
-    const data = drawnItems.toGeoJSON();
+  // Extract GeoJSON from featureGroup
+  const data = drawnItems.toGeoJSON();
 
-    if (data.features.length === 0) {
-        alert("No features in GeoJSON data");
-        return;
-    }
+  if (data.features.length === 0) {
+    alert("No features in GeoJSON data");
+    return;
+  }
 
-    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
 
-    const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = "trainingsdaten.geojson";
+  const downloadLink = document.createElement("a");
+  downloadLink.href = URL.createObjectURL(blob);
+  downloadLink.download = "trainingsdaten.geojson";
 
-    downloadLink.click();
+  downloadLink.click();
 
-    //URL.revokeObjectURL(downloadLink.href);
+  //URL.revokeObjectURL(downloadLink.href);
 });
 
 //Funktion, welche eine GeoJSON der Trainingsgebiete in der MongoDB speichert
@@ -319,4 +319,19 @@ const addGeoJSONtoDB = async (geojson) => {
     console.error('An error occurred:', error);
   }
 };
+
+async function buildModel() {
+  // Get values from input fields
+  const nt = document.getElementById('ntInput').value;
+  const mt = document.getElementById('mtInput').value;
+  const name = document.getElementById('nameInput').value;
+
+  try {
+    // Call the /buildModel endpoint with the extracted data
+    const response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}`);
+
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}
 
