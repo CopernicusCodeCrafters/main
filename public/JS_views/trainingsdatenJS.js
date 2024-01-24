@@ -345,18 +345,57 @@ function getFeatureCollectionFromLayer(geoJSONlayer) {
   return null;
 }
 
+// Method to exchange the classifiers to numbers (needed in openeobackend)
+function exchangeClassifier(featureCollection) {
+  try {
+    let features = featureCollection.features;
+    let classifications = new Set();
+
+  features.forEach((element) => {
+      if (element.properties && element.properties.classification) {
+          classifications.add(element.properties.classification);
+      }
+  });
+
+  // Convert the Set to an array
+  let uniqueClassificationsArray = Array.from(classifications);
+
+  let classificationMapping = {};
+  let numberCounter = 1;
+
+  uniqueClassificationsArray.forEach((classification) => {
+      classificationMapping[classification] = numberCounter;
+      numberCounter++;
+  });
+
+  // replace classifications with numbers
+  features.forEach((element) => {
+      if (element.properties && element.properties.classification) {
+          element.properties.classification = classificationMapping[element.properties.classification];
+      }
+  });
+
+  // Output the updated featureCollection
+  return featureCollection;
+  } catch (error) {
+      console.log("Error: ", error);
+      alert ("error");
+  }
+}
+
 async function buildModel() {
   //startRotation();
   const response = await fetch("/getAllPolygons");
   const geoJSONData = await response.json();
-  let FeatureCollection = {
+  let featureCollection = {
     "type" : "FeatureCollection",
     "features" : geoJSONData
   }
-  let geoJSONDataString = JSON.stringify(FeatureCollection);
+  featureCollection = exchangeClassifier(featureCollection);
+  let geoJSONDataString = JSON.stringify(featureCollection);
   console.log(geoJSONDataString)
 
-  const bbox = turf.bbox(FeatureCollection);
+  const bbox = turf.bbox(featureCollection);
    // Define the source and destination coordinate systems
    const sourceCRS = 'EPSG:4326';
    const destCRS = 'EPSG:3857';
@@ -375,7 +414,7 @@ async function buildModel() {
    convertedEast = convertedNorthEast[0];
   console.log(bbox, convertedSouth);
 
-
+  
   // Get values from input fields
   const nt = document.getElementById('ntInput').value;
   const mt = document.getElementById('mtInput').value;
