@@ -281,64 +281,44 @@ document.getElementById('uploadButton').addEventListener('click', function () {
 });
 
 
+async function convertGeoPackageToGeoJSON(file) {
+  const formData = new FormData();
+    formData.append('upload', file, file.name);
+
+    try {
+        const response = await fetch('http://ogre.adc4gis.com/convert', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const convertedGeoJSON = await response.json();
+        // proceed with normal geojson usage
+        processGeoJSON(convertedGeoJSON);
+    } catch (error) {
+        console.error('Error during GeoPackage to GeoJSON conversion:', error); //This throws an error but does work
+    }
+}
+
+
 document.getElementById('fileInput').addEventListener('change', function (e) {
   const file = e.target.files[0];
-
+  console.log(file);
   if (file) {
     // Read GeoJSON file
     const reader = new FileReader();
     reader.onload = function (e) {
       try {
-        const geojsonData = JSON.parse(e.target.result);
-        //Using Turf.js to create bounding box for OpenEO Request
-        var bbox = turf.bbox(geojsonData);
-        var bboxPolygon = turf.bboxPolygon(bbox);
-        L.geoJSON(geojsonData).addTo(map);
-        L.geoJSON(bboxPolygon).addTo(map);
-
-        // Define the source and destination coordinate systems
-        const sourceCRS = 'EPSG:4326';
-        const destCRS = 'EPSG:3857';
-
-        // Define the projection transformations
-        proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
-        proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
-
-        const convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
-        const convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
-
-        //Extract LatLng from converted object
-        convertedSouth = convertedSouthWest[1];
-        convertedWest = convertedSouthWest[0];
-        convertedNorth = convertedNorthEast[1];
-        convertedEast = convertedNorthEast[0];
-
-        console.log('Converted South West (EPSG:3857):', convertedSouthWest);
-        console.log('Converted North East (EPSG:3857):', convertedNorthEast);
-
-        var uploadRecBtn = document.getElementById("uploadRectangle");
-        var drawBtn = document.getElementById("drawButton");
-
-        // Remove the current class
-        uploadRecBtn.classList.remove("black-btn");
-
-        // Add the new class
-        uploadRecBtn.classList.add("accepted-btn");
-
-        //Change button text
-        uploadRecBtn.innerHTML = "Uploaded";
-        uploadRecBtn.disabled = true;
-
-        // Remove the current class from drawBtn
-        drawBtn.classList.remove("black-btn");
-
-        // Add the new class for drawBtn (light grey)
-        drawBtn.classList.add("light-grey-btn");
-
-        drawBtn.disabled = true;
-
-
-
+        var geojsonData;
+        if (file.name.endsWith('.geojson')){
+          geojsonData = JSON.parse(e.target.result);
+          processGeoJSON(geojsonData);
+          // Read Geopackage File 
+        } else {
+          convertGeoPackageToGeoJSON(file);
+        }      
       } catch (error) {
         stopRotation();
         console.error("Error parsing or processing GeoJSON:", error);
@@ -347,6 +327,56 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
     reader.readAsText(file);
   }
 });
+
+function processGeoJSON(geojsonData){
+  //Using Turf.js to create bounding box for OpenEO Request
+  var bbox = turf.bbox(geojsonData);
+  var bboxPolygon = turf.bboxPolygon(bbox);
+  L.geoJSON(geojsonData).addTo(map);
+  L.geoJSON(bboxPolygon).addTo(map);
+
+  // Define the source and destination coordinate systems
+  const sourceCRS = 'EPSG:4326';
+  const destCRS = 'EPSG:3857';
+
+  // Define the projection transformations
+  proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+  proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+
+  const convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+  const convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+
+  //Extract LatLng from converted object
+  convertedSouth = convertedSouthWest[1];
+  convertedWest = convertedSouthWest[0];
+  convertedNorth = convertedNorthEast[1];
+  convertedEast = convertedNorthEast[0];
+
+  console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+  console.log('Converted North East (EPSG:3857):', convertedNorthEast);
+
+  var uploadRecBtn = document.getElementById("uploadRectangle");
+  var drawBtn = document.getElementById("drawButton");
+
+  // Remove the current class
+  uploadRecBtn.classList.remove("black-btn");
+
+  // Add the new class
+  uploadRecBtn.classList.add("accepted-btn");
+
+  //Change button text
+  uploadRecBtn.innerHTML = "Uploaded";
+  uploadRecBtn.disabled = true;
+
+  // Remove the current class from drawBtn
+  drawBtn.classList.remove("black-btn");
+
+  // Add the new class for drawBtn (light grey)
+  drawBtn.classList.add("light-grey-btn");
+
+  drawBtn.disabled = true;
+
+}
 
 async function checkInputs() {
   // Get the values of the datePickers
