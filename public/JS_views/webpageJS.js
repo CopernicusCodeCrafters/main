@@ -486,7 +486,7 @@ async function createDatacube() {
 
 async function createClassification() {
   console.log("Creating Image");
-  //startRotation();
+  startRotation();
   try {
     // Include converted bounds in the satelliteImage request
     const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
@@ -555,18 +555,19 @@ async function createClassification() {
         layer.addTo(map);
 
         map.fitBounds(layer.getBounds());
-        //stopRotation();
+        stopRotation();
 
       } catch (error) {
-        //stopRotation();
+        stopRotation();
         console.log("Error connecting);", error);
-        console.log(error);
+        alert("Error")
       }
     };
 
     reader.readAsArrayBuffer(blob);
   } catch (error) {
     stopRotation();
+    alert(Error)
     console.log(error);
   }
 }

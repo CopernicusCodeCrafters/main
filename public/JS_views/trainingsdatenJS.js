@@ -374,15 +374,17 @@ function exchangeClassifier(featureCollection) {
   });
 
   // Output the updated featureCollection
+  console.log(classificationMapping)
   return featureCollection;
   } catch (error) {
       console.log("Error: ", error);
       alert ("error");
   }
 }
+
 // function to create a ml model in the openeobackend
 async function buildModel() {
-  //startRotation();
+  startRotation();
   const response = await fetch("/getAllPolygons");
   const geoJSONData = await response.json();
   let featureCollection = {
@@ -411,7 +413,6 @@ async function buildModel() {
    convertedWest = convertedSouthWest[0];
    convertedNorth = convertedNorthEast[1];
    convertedEast = convertedNorthEast[0];
-    console.log(convertedSouth,convertedWest, convertedNorth, convertedEast);
 
   
   // Get values from input fields
@@ -424,14 +425,14 @@ async function buildModel() {
     const encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
     const response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
 
-    //stopRotation();
-    
+    stopRotation();
+    alert("Done");
   } catch (error) {
     alert('Error' , error)
     console.error('Error:', error.message);
-    //stopRotation();
+    stopRotation();
   }
-  
+  stopRotation();
 }
 
 function startRotation() {

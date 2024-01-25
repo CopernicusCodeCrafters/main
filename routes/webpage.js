@@ -156,14 +156,16 @@ router.get('/getClassification', async function (req, res, next) {
 
     //filter bands
     let datacube_filtered = builder.filter_bands(datacube,bandsArray);
+    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
+    //let datacube_agg = builder.aggregate_temporal_period(data = datacube_filled, period = "month");
 
     //Reduce Dimension of Datacube
     var mean = function(data) {
       return this.mean(data);
     };
-    let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");  
+    let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
 
-    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = "testbander")
+    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = "testneu")
     //Compute result 
     let result = builder.save_result(datacube_classified, "GTiff");    
     let response = await connection.computeResult(result);
@@ -201,16 +203,17 @@ router.get('/buildModel', async function (req, res, next) {
         east: convertedEast,
         north: convertedNorth},
       3857,
-      ["2022-01-01", "2022-12-31"]
+      ["2021-06-01", "2021-06-30"]
     );
 
-    //let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
+    let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
     
-    let datacube_filled = builder.fill_NAs_cube(datacube);
+    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
 
     var mean = function(data) {
       return this.mean(data);
     };
+
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
     
     // data, nt, mt und name müssen übergeben werden
