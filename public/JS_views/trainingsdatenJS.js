@@ -143,9 +143,9 @@ async function handleFile(event) {
 
 async function addFeaturesNames(geojson) {
   setGeojsonToMap(geojson);
+
   for (const feature of geojson.features) {
     let object_id, name, classification;
-
     do {
       object_id = prompt("Enter object_id:");
     } while (!object_id.trim());
@@ -163,8 +163,6 @@ async function addFeaturesNames(geojson) {
       name,
       classification,
     };
-
-    setGeojsonToMap(geojson);
     await addGeoJSONtoDB(feature);
   }
 }
@@ -382,7 +380,7 @@ function exchangeClassifier(featureCollection) {
       alert ("error");
   }
 }
-
+// function to create a ml model in the openeobackend
 async function buildModel() {
   //startRotation();
   const response = await fetch("/getAllPolygons");
@@ -391,10 +389,11 @@ async function buildModel() {
     "type" : "FeatureCollection",
     "features" : geoJSONData
   }
+
   featureCollection = exchangeClassifier(featureCollection);
   let geoJSONDataString = JSON.stringify(featureCollection);
   console.log(geoJSONDataString)
-
+  
   const bbox = turf.bbox(featureCollection);
    // Define the source and destination coordinate systems
    const sourceCRS = 'EPSG:4326';
@@ -412,7 +411,7 @@ async function buildModel() {
    convertedWest = convertedSouthWest[0];
    convertedNorth = convertedNorthEast[1];
    convertedEast = convertedNorthEast[0];
-  console.log(bbox, convertedSouth);
+    console.log(convertedSouth,convertedWest, convertedNorth, convertedEast);
 
   
   // Get values from input fields
@@ -424,15 +423,15 @@ async function buildModel() {
     // Call the /buildModel endpoint with the needed data
     const encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
     const response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
-    req.session.myArray = [1, 2, 3];
 
     //stopRotation();
-
+    
   } catch (error) {
     alert('Error' , error)
     console.error('Error:', error.message);
     //stopRotation();
   }
+  
 }
 
 function startRotation() {

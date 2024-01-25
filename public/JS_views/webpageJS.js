@@ -398,7 +398,7 @@ async function checkInputs() {
   // Check if both Dateinputs are not empty
   if (date1Value !== '' && date2Value !== '' && AoIgiven) {
     // when date Inputs full call createDatacube()
-    createDatacube();
+    createClassification();
     switchToClassificationTab();
   } else {
     alert("Please fill in all the values")
@@ -420,8 +420,8 @@ async function createDatacube() {
     const blob = await response.blob();
     console.log("warum")
 
-
-    /*const downloadLink = document.createElement('a');
+    /*
+    const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'satelliteImage.tif';
     downloadLink.style.display = 'none';
@@ -462,6 +462,93 @@ async function createDatacube() {
             var color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
 
             return color;
+          },
+          resolution: 512
+        });
+        layer.addTo(map);
+
+        map.fitBounds(layer.getBounds());
+        //stopRotation();
+
+      } catch (error) {
+        //stopRotation();
+        console.log("Error connecting);", error);
+        console.log(error);
+      }
+    };
+
+    reader.readAsArrayBuffer(blob);
+  } catch (error) {
+    stopRotation();
+    console.log(error);
+  }
+}
+
+async function createClassification() {
+  console.log("Creating Image");
+  //startRotation();
+  try {
+    // Include converted bounds in the satelliteImage request
+    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
+    const blob = await response.blob();
+    console.log("warum")
+
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'satelliteImage.tif';
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    // read arraybuffer
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const arrayBuffer = reader.result;
+
+      try {
+        // transform arrayBuffer to georaster
+        const georaster = await parseGeoraster(arrayBuffer);
+
+        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+
+
+        // available color scales can be found by running console.log(chroma.brewer);
+        console.log(georaster)
+
+        let layer = new GeoRasterLayer({
+          georaster: georaster,
+          opacity: 1,
+
+          pixelValuesToColorFn: function (pixelValues) {
+
+            var channelValue = pixelValues[0]; // Assuming only one channel value for simplicity
+
+              // Set default values in case of invalid input
+              var scaledRed = 0.5;
+              var scaledGreen = 0.5;
+              var scaledBlue = 0.5;
+
+              // Assign colors based on the channel value
+              if (channelValue === 1) {
+                  scaledRed = 1;
+                  scaledGreen = 0;
+                  scaledBlue = 0;
+              } else if (channelValue === 2) {
+                  scaledRed = 0;
+                  scaledGreen = 1;
+                  scaledBlue = 0;
+              } else if (channelValue === 3) {
+                  scaledRed = 0;
+                  scaledGreen = 0;
+                  scaledBlue = 1;
+              }
+
+              // Create a chroma color object and convert it to hex
+              var color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
+
+              return color;
           },
           resolution: 512
         });
