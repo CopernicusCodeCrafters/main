@@ -21,10 +21,12 @@
     <!--OPenEO JS Client:-->
     <script src="https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/oidc-client@1/dist/oidc-client.min.js"></script>
-    <!-- Only required if you'd like to enable authentication via OpenID Connect -->
     <script src="https://cdn.jsdelivr.net/npm/multihashes@3/src/index.min.js"></script>
-    <!-- Only required if you have checksums in the STAC metadata -->
     <script src="https://cdn.jsdelivr.net/npm/@openeo/js-client@2/openeo.min.js"></script>
+    <!--Proj4-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script>
+    <!--Turf.js for bounding box-->
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
     <!--Own stylesheet:-->
     <link rel="stylesheet" href="stylesheets/style.css">
     <link rel="stylesheet" href="stylesheets/webpageStyles.css">
@@ -36,7 +38,7 @@
 <body>
     <header class="mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50"
+            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" id = "logo" width="50" height="50"
                     class="d-inline-block align-top" alt=""></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span

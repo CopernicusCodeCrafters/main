@@ -101,8 +101,9 @@ router.get('/satelliteImage', async function (req, res, next) {
     };
     let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");  
 
+    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = "TestKlass")
     //Compute result 
-    let result = builder.save_result(datacube_filtered, "GTiff");    
+    let result = builder.save_result(datacube_classified, "GTiff");    
     let response = await connection.computeResult(result);
 
 
@@ -119,33 +120,93 @@ router.get('/satelliteImage', async function (req, res, next) {
   }
 });
 
-// 
+router.get('/getClassification', async function (req, res, next) {
+  try {
+    console.log('Processing satellite image...'); // Indicate the code is running up to this point
+
+    // Passed variables
+    const dateArray = req.query.date.split(',');
+    const bandsArray = req.query.bands.split(',');
+    const south = req.query.south;
+    const west = req.query.west;
+    const north = req.query.north;
+    const east = req.query.east;
+    console.log(south,west,north,east)
+    console.log("Bands:",bandsArray)
+    console.log("Date:",dateArray)
+    
+    // Connect to the OpenEO server and authenticate
+    const connection = await OpenEO.connect('http://34.209.215.214:8000');
+    await connection.authenticateBasic('user', 'password');
+
+    // build processes
+    var builder = await connection.buildProcess();
+
+
+  //build datacube
+    var datacube = builder.load_collection(
+      "sentinel-s2-l2a-cogs",
+      {west: west, south: south, east: east, north: north},
+      3857,
+      dateArray, 
+      bandsArray
+ 
+    );
+
+
+    //filter bands
+    let datacube_filtered = builder.filter_bands(datacube,bandsArray);
+
+    //Reduce Dimension of Datacube
+    var mean = function(data) {
+      return this.mean(data);
+    };
+    let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");  
+
+    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = "testbander")
+    //Compute result 
+    let result = builder.save_result(datacube_classified, "GTiff");    
+    let response = await connection.computeResult(result);
+
+
+    console.log("Done");
+
+    // Sending the result data back to the frontend
+    res.status(200).set('Content-Type', response.type); 
+    response.data.pipe(res); // Send the Tiff as response
+    console.log("Send Done");
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+  }
+});
+
+let rdsModels = [];
+// Method to build a Model 
 router.get('/buildModel', async function (req, res, next) {
   try {
-    let { nt, mt, name } = req.query;
-    console.log(name)
+    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast} = req.query;
+    console.log(geoJSONData)
 
-    console.log('Processing satellite image...'); // Indicate the code is running up to this point
+    console.log('Processing model...'); // Indicate the code is running up to this point
     // Connect to the OpenEO server
     let connection = await OpenEO.connect('http://34.209.215.214:8000');
     await connection.authenticateBasic('user', 'password');
-    console.log(await connection.describeProcess('save_result'))
     var builder = await connection.buildProcess();
-
+    console.log(convertedWest)
     var datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
-      {west:840180.2, south:6788889.4,
-        east:852976.1,
-        north:6799716.7},
+      {west: convertedWest, south: convertedSouth,
+        east: convertedEast,
+        north: convertedNorth},
       3857,
       ["2022-01-01", "2022-12-31"]
     );
 
-      
-
-    let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
+    //let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
     
-    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
+    let datacube_filled = builder.fill_NAs_cube(datacube);
 
     var mean = function(data) {
       return this.mean(data);
@@ -153,7 +214,7 @@ router.get('/buildModel', async function (req, res, next) {
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
     
     // data, nt, mt und name müssen übergeben werden
-    let model = builder.train_model_ml(data = datacube_reduced, samples = null, nt, mt, String(name), save = true);
+    let model = builder.train_model_ml(data = datacube_reduced, samples = geoJSONData, parseInt(nt), parseInt(mt), String(name), save = true);
 
     let result = builder.save_result(model,'RDS'); 
     let response = await connection.computeResult(result);
@@ -163,13 +224,14 @@ router.get('/buildModel', async function (req, res, next) {
     console.log("Done");
     
     // Sending the result data back to the frontend
-    res.status(200).send(result); 
+    //res.status(200).send(result); 
     //res.send(response)
     //response.data.pipe(res); // Send the Tiff as response
     console.log("Send Done");
-
+    rdsModels.push(String(name))
+    console.log(rdsModels)
   } catch (error) {
-    console.error('Error:', error);
+    //console.error('Error:', error);
     res.status(500).json({ error: 'Internal Server Error' }); // Send error response
   }
   
