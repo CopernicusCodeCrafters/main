@@ -61,12 +61,23 @@ async function startingPolygonmanager() {
             weight: 2,
           },
           onEachFeature: function (feature, layer) {
-            const popupContent = `
+            const div = document.createElement("div");
+            div.innerHTML = `
             <strong>Name:</strong> ${feature.properties.name || 'N/A'}<br>
             <strong>Object ID:</strong> ${feature.properties.object_id || 'N/A'}<br> 
-            <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}
+            <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}<br>
           `;
-            layer.bindPopup(popupContent);
+
+            const button = document.createElement("button");
+            button.innerHTML = "Delete";
+
+            button.onclick = function() {
+              console.log("start deleting");
+              console.log(feature);
+              deleteFeaturefromMapAndDB(feature, layer);
+            }
+            div.appendChild(button);
+            layer.bindPopup(div);
           }
         }).addTo(map);
       });
@@ -164,7 +175,7 @@ async function addFeaturesNames(geojson) {
       classification,
     };
 
-    setGeojsonToMap(geojson);
+    setGeojsonToMap(geojson); // müsste es hier nicht immer das einzelne feature sein? Oder geht das nicht
     await addGeoJSONtoDB(feature);
   }
 }
@@ -320,6 +331,35 @@ const addGeoJSONtoDB = async (geojson) => {
     console.error('An error occurred:', error);
   }
 };
+
+// Function to Delete a Polygon
+async function deleteFeaturefromMapAndDB(feature, layer){
+  map.removeLayer(layer);
+  try{
+    const response = await fetch ("/delete-feature", {
+      method: 'DELETE',
+      body: feature,
+    });
+    const result = await response.text();
+    console.log(result);
+  }catch (error) {
+    console.error('An error occured: ', error)
+  }
+  
+  // fetch(`/deletePolygon/${feature.properties.object_id}`, {
+  //   method: 'DELETE',
+  // })
+  // .then(response => {
+  //   if (!response.ok) {
+  //       throw new Error(`Failed to delete polygon. Status: ${response.status}`);
+  //   }
+  //   console.log('Polygon deleted successfully.');
+  // })
+  // .catch(error => {
+  //   console.error('Error deleting polygon:', error);
+  //   // Optionally, you might want to add UI feedback or retry logic
+  // });
+}
 
 // Function to get FeatureCollection from GeoJSON layer
 function getFeatureCollectionFromLayer(geoJSONlayer) {

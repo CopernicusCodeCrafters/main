@@ -79,6 +79,24 @@ app.post('/insert-geojson', async (req, res) => {
   }
 });
 
+app.delete('/delete-feature', async (req, res) => {
+  const objectId = req.params.objectId;
+  try {
+    console.log(objectId);
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
+    const result = await collection.deleteOne({object_id: objectId});
+    if (result.deletedCount === 1) {
+      res.status(200).send('Polygon deleted successfully.');
+    } else {
+      res.status(404).send('Polygon not found.');
+    }
+  } catch (error) {
+    console.error("An error occured deleting object: ", error);
+    res.status(500).send('An error occured');
+  }
+})
+
 //get-Befehl(Stationen),der alle Datenbank-Objekte als Array zurückgibt
 app.get('/getAllPolygons', async (req, res) => {
   try {
