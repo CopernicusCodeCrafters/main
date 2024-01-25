@@ -23,6 +23,26 @@ var baseLayers = {
 // Add layer control to the map
 L.control.layers(baseLayers).addTo(map);
 
+
+function makeEditable (data) {
+    var group = new L.featureGroup().addTo(map);
+    var geojsonlayer;
+    var selectedFeature = null;
+    geojsonlayer=L.geoJson(data, {
+        onEachFeature: function (feature, layer) {
+            group.addLayer(layer);
+            layer.on('click', function(e){
+                if(selectedFeature){
+                    selectedFeature.editing.disable();
+                    // and Here I'll add the code to store my edited polygon in the DB or whatever I want to do with it
+                }
+                selectedFeature = e.target;
+                e.target.editing.enable();
+            });
+        }
+    }).addTo(group);
+}
+
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
   try {
@@ -68,15 +88,25 @@ async function startingPolygonmanager() {
             <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}<br>
           `;
 
-            const button = document.createElement("button");
-            button.innerHTML = "Delete";
+            const deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "Delete";
 
-            button.onclick = function() {
+            deleteButton.onclick = function() {
               console.log("start deleting");
               console.log(feature);
               deleteFeaturefromMapAndDB(feature, layer);
             }
-            div.appendChild(button);
+            div.appendChild(deleteButton);
+
+            const editButton = document.createElement("button");
+            editButton.innerHTML = "Edit";
+
+            editButton.onclick = function() {
+              console.log("start editing");
+              makeEditable(feature);
+            }
+            div.appendChild(editButton);
+
             layer.bindPopup(div);
           }
         }).addTo(map);
@@ -335,30 +365,19 @@ const addGeoJSONtoDB = async (geojson) => {
 // Function to Delete a Polygon
 async function deleteFeaturefromMapAndDB(feature, layer){
   map.removeLayer(layer);
+  console.log(feature.params);
   try{
     const response = await fetch ("/delete-feature", {
-      method: 'DELETE',
-      body: feature,
+      method: 'DELETE',headers: {
+        'Content-Type': 'application/json', // Specify content type as JSON
+      },
+      body: JSON.stringify(feature),
     });
     const result = await response.text();
     console.log(result);
   }catch (error) {
     console.error('An error occured: ', error)
   }
-  
-  // fetch(`/deletePolygon/${feature.properties.object_id}`, {
-  //   method: 'DELETE',
-  // })
-  // .then(response => {
-  //   if (!response.ok) {
-  //       throw new Error(`Failed to delete polygon. Status: ${response.status}`);
-  //   }
-  //   console.log('Polygon deleted successfully.');
-  // })
-  // .catch(error => {
-  //   console.error('Error deleting polygon:', error);
-  //   // Optionally, you might want to add UI feedback or retry logic
-  // });
 }
 
 // Function to get FeatureCollection from GeoJSON layer

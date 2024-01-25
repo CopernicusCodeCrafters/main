@@ -80,12 +80,12 @@ app.post('/insert-geojson', async (req, res) => {
 });
 
 app.delete('/delete-feature', async (req, res) => {
-  const objectId = req.params.objectId;
+  const object_Id = req.body._id;
+  console.log(req.body._id);
   try {
-    console.log(objectId);
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
-    const result = await collection.deleteOne({object_id: objectId});
+    const result = await collection.deleteOne({_id: object_Id});
     if (result.deletedCount === 1) {
       res.status(200).send('Polygon deleted successfully.');
     } else {
@@ -93,6 +93,18 @@ app.delete('/delete-feature', async (req, res) => {
     }
   } catch (error) {
     console.error("An error occured deleting object: ", error);
+    res.status(500).send('An error occured');
+  }
+})
+
+app.post('/update.feature', async (req, res) => {
+  const object = req;
+  try{
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
+    const result = await collection.updateOne ({_id: object})
+  } catch (error){
+    console.error("An error occured updating a object: ", error)
     res.status(500).send('An error occured');
   }
 })
