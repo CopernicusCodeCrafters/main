@@ -30,6 +30,7 @@
     "html": "^1.0.0",
     "http-errors": "~1.6.3",
     "install": "^0.13.0",
+    "lowdb": "^7.0.1",
     "mapbox-gl": "^2.15.0",
     "mongodb": "^6.0.0",
     "morgan": "~1.9.1",
