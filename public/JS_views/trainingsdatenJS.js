@@ -24,25 +24,7 @@ var baseLayers = {
 L.control.layers(baseLayers).addTo(map);
 
 
-function makeEditable (data) {
-    var group = new L.featureGroup().addTo(map);
-    var geojsonlayer;
-    var selectedFeature = null;
-    geojsonlayer=L.geoJson(data, {
-        onEachFeature: function (feature, layer) {
-            group.addLayer(layer);
-            layer.on('click', function(e){
-                if(selectedFeature){
-                    selectedFeature.editing.disable();
-                    // and Here I'll add the code to store my edited polygon in the DB or whatever I want to do with it
-                }
-                selectedFeature = e.target;
-                e.target.editing.enable();
-            });
-        }
-    }).addTo(group);
-}
-
+var selectedFeature = null;
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
   try {
@@ -87,25 +69,35 @@ async function startingPolygonmanager() {
             <strong>Object ID:</strong> ${feature.properties.object_id || 'N/A'}<br> 
             <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}<br>
           `;
-
+            //Delete Function
             const deleteButton = document.createElement("button");
             deleteButton.innerHTML = "Delete";
-
             deleteButton.onclick = function() {
               console.log("start deleting");
               console.log(feature);
               deleteFeaturefromMapAndDB(feature, layer);
             }
             div.appendChild(deleteButton);
-
+            
+            // End edit button
             const editButton = document.createElement("button");
-            editButton.innerHTML = "Edit";
-
-            editButton.onclick = function() {
-              console.log("start editing");
-              makeEditable(feature);
-            }
+            editButton.innerHTML = "End Edit";
             div.appendChild(editButton);
+
+            //When a polygon is clicked it gets editable, when another one is clicked or the "end edit" button ist clicked the polygon gets uneditbale andthe changes are uploaded to the DB
+            layer.on('click', function(e){
+              if(selectedFeature){
+                  selectedFeature.editing.disable();
+                  updateFeatureinDB(selectedFeature.feature, selectedFeature.feature._id);
+              }
+              editButton.onclick = function(){
+                selectedFeature.editing.disable();
+                console.log(selectedFeature.feature._id);
+                updateFeatureinDB(selectedFeature.feature, selectedFeature.feature._id);
+              }
+              selectedFeature = e.target;
+              e.target.editing.enable();
+            });
 
             layer.bindPopup(div);
           }
@@ -369,7 +361,7 @@ async function deleteFeaturefromMapAndDB(feature, layer){
   try{
     const response = await fetch ("/delete-feature", {
       method: 'DELETE',headers: {
-        'Content-Type': 'application/json', // Specify content type as JSON
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(feature),
     });
@@ -378,6 +370,23 @@ async function deleteFeaturefromMapAndDB(feature, layer){
   }catch (error) {
     console.error('An error occured: ', error)
   }
+}
+
+//Function to update/modify a polygon
+async function updateFeatureinDB(feature, obID){
+  const objectId = obID;
+  const updatedData = { feature };
+
+  fetch(`/update-feature/${objectId}`, {
+    method: 'PUT',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedData),
+  })
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.error('Error updating polygon:', error));
 }
 
 // Function to get FeatureCollection from GeoJSON layer
