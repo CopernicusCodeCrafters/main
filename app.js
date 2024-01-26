@@ -66,7 +66,7 @@ app.post('/insert-satelliteimage', async (req, res) => {
 
 //Fügt eine GeoJSON zu der Datenbank hinzu
 app.post('/insert-geojson', async (req, res) => {
-  const { geojson } = req.body;
+  const { geojson } = req.body; //hier
   try {
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
@@ -80,8 +80,8 @@ app.post('/insert-geojson', async (req, res) => {
 });
 
 app.delete('/delete-feature', async (req, res) => {
-  const object_Id = req.body._id;
-  console.log(req.body._id);
+  const object_Id = req.body._id;// und hier
+  console.log(object_Id);
   try {
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
@@ -97,12 +97,23 @@ app.delete('/delete-feature', async (req, res) => {
   }
 })
 
-app.post('/update.feature', async (req, res) => {
-  const object = req;
+app.put('/update-feature/:objectId', async (req, res) => {
+  const objectId = req.params.objectId;
+  console.log(objectId);
+  const updatedData = req.body;
   try{
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
-    const result = await collection.updateOne ({_id: object})
+    const result = await collection.updateOne(
+      { _id: objectId },
+      { $set: updatedData }
+    );
+
+    if (result.matchedCount === 1) {
+      res.status(200).send('Polygon updated successfully.');
+    } else {
+      res.status(404).send('Polygon not found.');
+    }
   } catch (error){
     console.error("An error occured updating a object: ", error)
     res.status(500).send('An error occured');
