@@ -7,8 +7,8 @@ var mongodb = require("mongodb");
 var engines = require('consolidate')
 
 
-//const url = "mongodb://127.0.0.1:27017"
-const url = "mongodb://mongo:27017";
+const url = "mongodb://127.0.0.1:27017"
+//const url = "mongodb://mongo:27017";
 let dbName = "geosoft2";
 
 let client = new mongodb.MongoClient(url);
@@ -127,5 +127,27 @@ app.get('/getGeoJSON', async (req, res) => {
       res.status(500).send('Fehler beim Abrufen der Daten');
   }
 });
+
+async function clearCollectionOnStart() {
+  try {
+    const dbName1 = 'geosoft2';
+    const collectionName1 = 'class';
+    await client.connect();
+    const db = client.db(dbName1);
+    const collection = db.collection(collectionName1);
+
+    // Lösche alle Dokumente aus der Sammlung
+    await collection.deleteMany({});
+
+    console.log('MongoDB collection cleared on server start.');
+
+    await client.close();
+  } catch (error) {
+    console.error('Error clearing MongoDB collection on server start:', error);
+  }
+}
+
+//clearCollectionOnStart();
+
 
 module.exports = app;

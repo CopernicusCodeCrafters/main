@@ -582,3 +582,20 @@ function stopRotation() {
   logo.classList.remove('rotate');
 }
 
+fetch('/getModel')
+  .then(response => response.json())
+  .then(data => {
+    // Get the dropdown menu element
+    const dropdownMenu = $('#trainingModelOptions');
+
+    // Clear existing options
+    dropdownMenu.empty();
+
+    // Populate the dropdown menu with training model names
+    data.forEach(entry => {
+      if(entry){
+        dropdownMenu.append(`<a class="dropdown-item" href="#">${entry.name}</a>`);
+      }
+    });
+  })
+  .catch(error => console.error('Error:', error));
