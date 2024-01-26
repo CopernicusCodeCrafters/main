@@ -585,8 +585,6 @@ function stopRotation() {
 fetch('/getModel')
   .then(response => response.json())
   .then(data => {
-    console.log(data)
-
     // Get the dropdown menu element
     const dropdownMenu = $('#trainingModelOptions');
 
@@ -594,8 +592,10 @@ fetch('/getModel')
     dropdownMenu.empty();
 
     // Populate the dropdown menu with training model names
-    data.forEach(name => {
-      dropdownMenu.append(`<a class="dropdown-item" href="#">${name}</a>`);
+    data.forEach(entry => {
+      if(entry){
+        dropdownMenu.append(`<a class="dropdown-item" href="#">${entry.name}</a>`);
+      }
     });
   })
   .catch(error => console.error('Error:', error));

@@ -5,30 +5,18 @@ let { MongoClient } = require("mongodb");
 let { OpenEO, FileTypes, Capabilities } = require('@openeo/js-client'); 
 let { format } = require("morgan");
 const bodyParser = require('body-parser');
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
+
 
 
 let url = "mongodb://127.0.0.1:27017"; 
 //let url = "mongodb://mongo:27017"; // connection URL
-
-let client = new MongoClient(url); // mongodb client
-let dbName = "mydatabase"; // database name
-let collectionName = "newpois"; // collection name
-console.log("test");
 
 
 /* GET home page. */
 router.use(bodyParser.json());
 
 router.get("/", async (req, res, next) => {
-  let db = client.db(dbName);
-  let collection = await db.collection(collectionName);
-  let docs = await collection.find({}).limit(50).toArray();
-
-  res.render("webpage", {
-    data: docs,
-  });
+  res.render("webpage");
 });
 
 router.post("/newstation", function (req, res, next) {
@@ -226,37 +214,57 @@ router.get('/buildModel', async function (req, res, next) {
 
     let result = builder.save_result(model,'RDS'); 
     let response = await connection.computeResult(result);
-    
     res.status(200).send("Model build");
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' }); // Send error response
   }
   
 });
+classNames = [];
+router.post('/saveModel', async (req, res) => {
+  try{
+    let receivedData = req.body.classIDs;
+    console.log(receivedData)
+    let client = new MongoClient(url); // mongodb client
+    let dbName = "geosoft2"; // database name
+    let collectionName = "class"; // collection name
+    let db = client.db(dbName);
+    let collection = db.collection(collectionName);
 
-
-//Save created Models with ClassIDs and the corresponding names 
-const adapter = new FileSync('dbtmp.json');
-const dbtmp = low(adapter);
-
-// Set up a 'classNames' collection in the database
-dbtmp.defaults({ classNames: [] }).write();
-let classNames = [];
-router.post('/saveModel', (req, res) => {
-  const receivedData = req.body.classIDs;
-
-  // Push the data to the 'classNames' collection in the database
-  dbtmp.get('classNames').push(receivedData).write();
-
-  console.log(dbtmp.get('classNames').value());
-
+    // Replace existing entries with the new data
+    await collection.insertOne(receivedData);
+    
+    await client.close();
+  //classNames.push(receivedData);
   res.json({ message: 'Data saved successfully on the server.' });
+} catch (error) {
+  console.error('Error:', error);
+  res.status(500).json({ error: 'Internal Server Error' });
+}
 });
 
 // GET endpoint to retrieve data
-router.get('/getModel', (req, res) => {
-  const classNames = dbtmp.get('classNames').value();
-  res.json({ classNames: classNames });
+router.get('/getModel', async (req, res) => {
+  try {
+    let client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true }); // mongodb client
+    let dbName = "geosoft2"; // database name
+    let collectionName = "class"; // collection name
+    let db = client.db(dbName);
+    let collection = db.collection(collectionName);
+
+    // Fetch all documents from the collection
+    const cursor = collection.find({});
+    
+    // Convert the cursor to an array
+    const documentsArray = await cursor.toArray();
+
+    await client.close();
+
+    res.json(documentsArray);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 module.exports = router;
 

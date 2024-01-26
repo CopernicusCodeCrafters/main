@@ -343,7 +343,7 @@ function getFeatureCollectionFromLayer(geoJSONlayer) {
   return null;
 }
 
-let nameClass = [];
+
 
 // Method to exchange the classifiers to numbers (needed in openeobackend)
 function exchangeClassifier(featureCollection) {
@@ -427,9 +427,6 @@ async function buildModel() {
     class : classificationMapping
   }
 
-  nameClass.push(classID)
-  console.log(classID)
-
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
@@ -443,13 +440,14 @@ async function buildModel() {
         body: JSON.stringify({ classIDs: classID })
       })
         .then(response => response.json())
-        .then(data => console.log('Data saved:', data))
+        .then(data => {
+          console.log('Data saved:', data);
+          alert("Done");})
         .catch(error => console.error('Error saving data:', error));
     } else {
       console.error('Error in the first fetch:', response.statusText);
     }
 
-    alert("Done");
     stopRotation();
   } catch (error) {
     stopRotation();
