@@ -26,12 +26,12 @@ L.control.layers(baseLayers).addTo(map);
 //Funktion, welche onload alle Trainingypolygone hinzufügt
 async function startingPolygonmanager() {
   try {
-    const response = await fetch("/getAllPolygons");
-    const stationData = await response.json();
+    let response = await fetch("/getAllPolygons");
+    let stationData = await response.json();
     if (Array.isArray(stationData)) {
       // Check if stationData is an array
       stationData.forEach((geojson) => {
-        const classification = geojson && geojson.properties && geojson.properties.classification;
+        let classification = geojson && geojson.properties && geojson.properties.classification;
         let color;
 
         switch (classification) {
@@ -61,7 +61,7 @@ async function startingPolygonmanager() {
             weight: 2,
           },
           onEachFeature: function (feature, layer) {
-            const popupContent = `
+            let popupContent = `
             <strong>Name:</strong> ${feature.properties.name || 'N/A'}<br>
             <strong>Object ID:</strong> ${feature.properties.object_id || 'N/A'}<br> 
             <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}
@@ -87,17 +87,17 @@ startingPolygonmanager();
 async function handleFile(event) {
   event.preventDefault();
 
-  const formData = new FormData(document.getElementById('uploadForm'));
-  const file = formData.get('file');
+  let formData = new FormData(document.getElementById('uploadForm'));
+  let file = formData.get('file');
 
   if (file) {
-    const fileName = file.name.toLowerCase();
+    let fileName = file.name.toLowerCase();
 
     if (fileName.endsWith('.geojson')) {
-      const reader = new FileReader();
+      let reader = new FileReader();
       reader.onload = async function () {
-        const result = reader.result;
-        const geojson = JSON.parse(result);
+        let result = reader.result;
+        let geojson = JSON.parse(result);
 
         addFeaturesNames(geojson);
 
@@ -107,21 +107,21 @@ async function handleFile(event) {
     }
 
     else if (fileName.endsWith('.gpkg')) {
-      const reader = new FileReader();
+      let reader = new FileReader();
       reader.onload = async function () {
-        const result = reader.result;
+        let result = reader.result;
         try {
-          const fileContent = new Blob([result], { type: file.type });
-          const formData = new FormData();
+          let fileContent = new Blob([result], { type: file.type });
+          let formData = new FormData();
           formData.append('upload', fileContent, 'file');
-          const response = await fetch('http://ogre.adc4gis.com/convert', {
+          let response = await fetch('http://ogre.adc4gis.com/convert', {
             method: 'POST',
             body: formData,
           });
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          const convertedGeoJSON = await response.json();
+          let convertedGeoJSON = await response.json();
           console.log('Converted GeoJSON:', convertedGeoJSON);
 
           addFeaturesNames(convertedGeoJSON);
@@ -144,7 +144,7 @@ async function handleFile(event) {
 async function addFeaturesNames(geojson) {
   setGeojsonToMap(geojson);
 
-  for (const feature of geojson.features) {
+  for (let feature of geojson.features) {
     let object_id, name, classification;
     do {
       object_id = prompt("Enter object_id:");
@@ -169,7 +169,7 @@ async function addFeaturesNames(geojson) {
 
 
 // Leaflet Draw is intialized
-const container = L.DomUtil.create(
+let container = L.DomUtil.create(
   "div",
   "leaflet-control "
 );
@@ -255,8 +255,8 @@ function setGeojsonToMap(geojson) {
   }
 
   function displayFeature(feature) {
-    const properties = feature.properties;
-    const popupContent = `
+    let properties = feature.properties;
+    let popupContent = `
       <strong>Name:</strong> ${properties.name || 'N/A'}<br>
       <strong>Object ID:</strong> ${properties.object_id || 'N/A'}<br> 
       <strong>Classification:</strong> ${properties.classification || 'N/A'}
@@ -279,20 +279,20 @@ function setGeojsonToMap(geojson) {
 
 // Geojson is transformed into a Download Link using a Blob object
 
-const download = document.getElementById("save-Button1");
+let download = document.getElementById("save-Button1");
 
 download.addEventListener("click", () => {
   // Extract GeoJSON from featureGroup
-  const data = drawnItems.toGeoJSON();
+  let data = drawnItems.toGeoJSON();
 
   if (data.features.length === 0) {
     alert("No features in GeoJSON data");
     return;
   }
 
-  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+  let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
 
-  const downloadLink = document.createElement("a");
+  let downloadLink = document.createElement("a");
   downloadLink.href = URL.createObjectURL(blob);
   downloadLink.download = "trainingsdaten.geojson";
 
@@ -302,17 +302,17 @@ download.addEventListener("click", () => {
 });
 
 //Funktion, welche eine GeoJSON der Trainingsgebiete in der MongoDB speichert
-const fetchButton = document.getElementById('insertTrainingsdata_button');
-const addGeoJSONtoDB = async (geojson) => {
+let fetchButton = document.getElementById('insertTrainingsdata_button');
+let addGeoJSONtoDB = async (geojson) => {
   try {
-    const response = await fetch('/insert-geojson', {
+    let response = await fetch('/insert-geojson', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ geojson }),
     });
-    const result = await response.text();
+    let result = await response.text();
     console.log(result);
   } catch (error) {
     console.error('An error occurred:', error);
@@ -324,7 +324,7 @@ function getFeatureCollectionFromLayer(geoJSONlayer) {
   // Check if the layer is a GeoJSON layer
   if (geoJSONlayer instanceof L.GeoJSON) {
     // Extract GeoJSON data from the layer
-    const geoJsonData = geoJSONlayer.toGeoJSON();
+    let geoJsonData = geoJSONlayer.toGeoJSON();
 
     // Check if the GeoJSON data is a Feature or FeatureCollection
     if (geoJsonData.type === 'Feature') {
@@ -342,6 +342,8 @@ function getFeatureCollectionFromLayer(geoJSONlayer) {
   // Return null if the layer is not a GeoJSON layer
   return null;
 }
+
+let nameClass = [];
 
 // Method to exchange the classifiers to numbers (needed in openeobackend)
 function exchangeClassifier(featureCollection) {
@@ -375,7 +377,7 @@ function exchangeClassifier(featureCollection) {
 
   // Output the updated featureCollection
   console.log(classificationMapping)
-  return featureCollection;
+  return {featureCollection , classificationMapping};
   } catch (error) {
       console.log("Error: ", error);
       alert ("error");
@@ -385,28 +387,28 @@ function exchangeClassifier(featureCollection) {
 // function to create a ml model in the openeobackend
 async function buildModel() {
   startRotation();
-  const response = await fetch("/getAllPolygons");
-  const geoJSONData = await response.json();
+  let response = await fetch("/getAllPolygons");
+  let geoJSONData = await response.json();
   let featureCollection = {
     "type" : "FeatureCollection",
     "features" : geoJSONData
   }
 
-  featureCollection = exchangeClassifier(featureCollection);
-  let geoJSONDataString = JSON.stringify(featureCollection);
-  console.log(geoJSONDataString)
+  let { featureCollection: updatedFeatureCollection, classificationMapping } = exchangeClassifier(featureCollection);
+  let geoJSONDataString = JSON.stringify(updatedFeatureCollection);
+
   
-  const bbox = turf.bbox(featureCollection);
+  let bbox = turf.bbox(featureCollection);
    // Define the source and destination coordinate systems
-   const sourceCRS = 'EPSG:4326';
-   const destCRS = 'EPSG:3857';
+   let sourceCRS = 'EPSG:4326';
+   let destCRS = 'EPSG:3857';
 
    // Define the projection transformations
    proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
    proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
 
-   const convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
-   const convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+   let convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+   let convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
 
    //Extract LatLng from converted object
    convertedSouth = convertedSouthWest[1];
@@ -416,21 +418,43 @@ async function buildModel() {
 
   
   // Get values from input fields
-  const nt = document.getElementById('ntInput').value;
-  const mt = document.getElementById('mtInput').value;
-  const name = document.getElementById('nameInput').value;
+  let nt = document.getElementById('ntInput').value;
+  let mt = document.getElementById('mtInput').value;
+  let name = document.getElementById('nameInput').value;
+
+  let classID = {
+    name : name,
+    class : classificationMapping
+  }
+
+  nameClass.push(classID)
+  console.log(classID)
 
   try {
     // Call the /buildModel endpoint with the needed data
-    const encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    const response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
+    let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
+    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
+    if (response.ok) {
+      fetch('/saveModel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ classIDs: classID })
+      })
+        .then(response => response.json())
+        .then(data => console.log('Data saved:', data))
+        .catch(error => console.error('Error saving data:', error));
+    } else {
+      console.error('Error in the first fetch:', response.statusText);
+    }
 
-    stopRotation();
     alert("Done");
-  } catch (error) {
-    alert('Error' , error)
-    console.error('Error:', error.message);
     stopRotation();
+  } catch (error) {
+    stopRotation();
+    alert('Error')
+    console.error('Error:', error.message);
   }
   stopRotation();
 }
