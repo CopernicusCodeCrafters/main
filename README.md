@@ -1,46 +1,26 @@
 
 # Copernicus Code Crafters
 
-## Team:
-Severin Krohne
-Kjell Wundram
-Finn Geßner
-Jan Becker
-Emil Erlenkötter
-Joaquin Valdez
+### Team:
+Severin Krohne      @skrohne
+Kjell Wundram       @kwundram2602
+Finn Geßner         @sivenDalmatin
+Jan Becker          @job2002
+Emil Erlenkötter    @emil282
+Joaquin Valdez      @jova10
 
-### for starting openeocubes on VM in folder :
-folder : ubuntu@ip-172-31-29-252:~/test2/openeocubes
-sudo apt install r-base-core
 
-###  For Co-Authoring:
-Commit message
+## How to use CCC-eocubes
 
-Co-authored-by: Kjell Wundram           @kwundram2602
-                Jan Becker              @job2002
-                Severin Krohne          @skrohne
-                Finn Geßner             @sivenDalmatin 
-                Emil Erlenkötter        @emil282
-                Joaquin Valdez          @jova10
-
-( oder in Github Desktop)
-
-## OpenEOcubes
+1. git clone git@github.com:CopernicusCodeCrafters/main.git
+2. set environment variable "AWSHOST" to your AWS-IPv4-adress in docker-compose.yml
+    if you are running the application on your local machine, leave "AWSHOST" empty : ""
+3. docker-compose up --build
 
 
 
-#### Container
-
-1.  docker pull brianpondi/openeocubes ( in cmd )
-2. 
-    a) docker run -p 8000:8000  --env AWSHOST=<AWS-IPv4-ADDRESS>  brianpondi/openeocubes
-    __For light tasks and processes you can host the service on pc and therefore you don't need AWS IPv4 Address__
-    b) docker run -p 8000:8000  brianpondi/openeocubes
+## Demo
 
 
-#### Paths
-http://localhost:8000/collections/
-http://localhost:8000/processes
-http://localhost:8000/credentials/basic
-http://localhost:8000/file_formats
-http://localhost:8000/result
+
+
