@@ -366,7 +366,7 @@ function processGeoJSON(geojsonData) {
   //Using Turf.js to create bounding box for OpenEO Request
   var bbox = turf.bbox(geojsonData);
   var bboxPolygon = turf.bboxPolygon(bbox);
-  L.geoJSON(geojsonData).addTo(map);
+    L.geoJSON(geojsonData).addTo(map);
   L.geoJSON(bboxPolygon).addTo(map);
 
   // Define the source and destination coordinate systems
@@ -504,6 +504,7 @@ async function createDatacube() {
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
+          zIndex: 10,
 
           pixelValuesToColorFn: function (pixelValues) {
 
