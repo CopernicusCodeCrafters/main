@@ -2,6 +2,7 @@
 
 var selectedDates = [];
 var selectedBands = [];
+let model = '';
 
 $(document).ready(function () {
   var today = new Date();
@@ -420,7 +421,40 @@ function selectTrainingModel(event, model) {
   document.getElementById("trainingModelDropdown").textContent = model;
 }
 async function checkInputsClassifications(){
+   // Get the values of the datePickers
+   var date1Value = $('#datepicker1').val();
+   var date2Value = $('#datepicker2').val();
+   
+   // Check if an AoI is given
+   var AoIgiven = false;
+   var bandsGiven = false;
+ 
+   // Check if something is drawn
+   if (drawnItems.getLayers().length > 0) {
+     AoIgiven = true;
+   }
+ 
+   // Check if something is uploaded
+   var fileInputValue = document.getElementById('fileInput').value;
+   if (fileInputValue !== '') {
+     AoIgiven = true;
+   }
+   // Check if more than 0 Bands are selected
+   var bandsInputCheck = document.getElementById("bandsPicker").value;
+   if (bandsInputCheck != ""){
+     bandsGiven = true;
+   }
+   let input = document.getElementById('trainingModelDropdown');
+   model = input.textContent;
+   console.log("Model:", model)
 
+   // Check if both Dateinputs are not empty
+   if (date1Value !== '' && date2Value !== '' && AoIgiven && bandsGiven && model != '') {
+     // when date Inputs full call createDatacube()
+     await createClassification();
+   } else {
+     alert("Please fill in all the values")
+   }
 }
 
 async function createDatacube() {
@@ -444,7 +478,7 @@ async function createDatacube() {
     // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {
-      const arrayBuffer = reader.result;
+    const arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
@@ -484,6 +518,7 @@ async function createDatacube() {
 
       } catch (error) {
         stopRotation();
+        alert("Error")
         console.log("Error connecting);", error);
         console.log(error);
       }
@@ -491,9 +526,11 @@ async function createDatacube() {
 
     reader.readAsArrayBuffer(blob);
   } catch (error) {
+    alert("Error")
     stopRotation();
     console.log(error);
   }
+  stopRotation();
 }
 
 async function createClassification() {
@@ -501,7 +538,8 @@ async function createClassification() {
   startRotation();
   try {
     // Include converted bounds in the satelliteImage request
-    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
+    console.log(model)
+    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     const blob = await response.blob();
     console.log("warum")
 

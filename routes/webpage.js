@@ -123,9 +123,11 @@ router.get('/getClassification', async function (req, res, next) {
     let west = req.query.west;
     let north = req.query.north;
     let east = req.query.east;
+    let model = req.query.model;
     console.log(south,west,north,east)
     console.log("Bands:",bandsArray)
     console.log("Date:",dateArray)
+    console.log("Model:",model)
     
     // Connect to the OpenEO server and authenticate
     let connection = await OpenEO.connect('http://34.209.215.214:8000');
@@ -157,7 +159,7 @@ router.get('/getClassification', async function (req, res, next) {
     };
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
 
-    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = "testneu")
+    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = String(model))
     //Compute result 
     let result = builder.save_result(datacube_classified, "GTiff");    
     let response = await connection.computeResult(result);
@@ -266,4 +268,3 @@ router.get('/getModel', async (req, res) => {
   }
 });
 module.exports = router;
-
