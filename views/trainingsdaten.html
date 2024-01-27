@@ -28,8 +28,9 @@
     <!--Turf.js for bounding box-->
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
     <!--Own stylesheet:-->
-    <link rel="stylesheet" href="stylesheets/style.css">
-    <link rel="stylesheet" href="stylesheets/webpageStyles.css">
+    <!--<link rel="stylesheet" href="stylesheets/style.css">-->
+    <!--<link rel="stylesheet" href="stylesheets/webpageStyles.css">-->
+    <link rel="stylesheet" href="stylesheets/trainingsdatenStyles.css">
     <!--Own Script-->
     <script defer src="JS_views/trainingsdatenJS.js"></script>
     <title>Copernicus Code Crafters</title>
@@ -38,7 +39,7 @@
 <body>
     <header class="mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" id = "logo" width="50" height="50"
+            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" id="logo" width="50" height="50"
                     class="d-inline-block align-top" alt=""></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
@@ -63,7 +64,14 @@
         <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
             <div class="col-lg-9">
                 <div class="card shadow p-3 h-100 bg-white rounded">
-                    <h2 class="card-title">Trainingsdaten</h2>
+                    <div class="ueberschrift">
+                        <h2 class="trainingsdaten">Trainingsdaten</h2>
+                        <div id="wave">
+                          <span class="dot"></span>
+                          <span class="dot"></span>
+                          <span class="dot"></span>
+                        </div>
+                      </div>
                     <div id="map"></div>
                 </div>
             </div>
@@ -74,8 +82,9 @@
                     <form id="uploadForm" onsubmit="handleFile(event)" enctype="multipart/form-data">
                         <input class="black-input" type="file" name="file" accept=".gpkg, .geojson">
                         <button class="black-btn" type="submit">Upload File</button>
-                    </form> <br>
-                    <button id="save-Button1" class="black-btn">Save GeoJSON as File</button><br><br>
+                    </form>
+                     <br>
+                    <button id="save-Button1" class="black-btn">Download Trainingsdaten</button><br><br>
 
 
                     <!-- Hyperparameter Selection-->

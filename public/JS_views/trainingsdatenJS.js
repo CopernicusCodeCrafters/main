@@ -180,17 +180,14 @@ map.addControl(
   new L.Control.Draw({
     edit: {
       featureGroup: drawnItems,
-      poly: {
-        allowIntersection: false,
-      },
     },
     draw: {
       polygon: {
-        allowIntersection: false,
         showArea: true,
       },
       polyline: false,
-      marker: false
+      marker: false,
+      circle: false,
     },
   })
 );
@@ -281,24 +278,34 @@ function setGeojsonToMap(geojson) {
 
 let download = document.getElementById("save-Button1");
 
-download.addEventListener("click", () => {
-  // Extract GeoJSON from featureGroup
-  let data = drawnItems.toGeoJSON();
+download.addEventListener("click", async () => {
+  try {
+      // Extract GeoJSON from featureGroup
+      let response = await fetch("/getAllPolygons");
+      let geoJSONData = await response.json();
 
-  if (data.features.length === 0) {
-    alert("No features in GeoJSON data");
-    return;
+      let featureCollection = {
+          "type": "FeatureCollection",
+          "features": geoJSONData
+      };
+
+      if (featureCollection.features.length === 0) {
+          alert("No features in GeoJSON data");
+          return;
+      }
+
+      let blob = new Blob([JSON.stringify(featureCollection)], { type: "application/json" });
+
+      let downloadLink = document.createElement("a");
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = "trainingsdaten.geojson";
+
+      downloadLink.click();
+
+      URL.revokeObjectURL(downloadLink.href);
+  } catch (error) {
+      console.error("Error downloading GeoJSON:", error);
   }
-
-  let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-
-  let downloadLink = document.createElement("a");
-  downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = "trainingsdaten.geojson";
-
-  downloadLink.click();
-
-  //URL.revokeObjectURL(downloadLink.href);
 });
 
 //Funktion, welche eine GeoJSON der Trainingsgebiete in der MongoDB speichert
@@ -383,13 +390,13 @@ function exchangeClassifier(featureCollection) {
       alert ("error");
   }
 }
-
+let featureCollection;
 // function to create a ml model in the openeobackend
 async function buildModel() {
   startRotation();
   let response = await fetch("/getAllPolygons");
   let geoJSONData = await response.json();
-  let featureCollection = {
+  featureCollection = {
     "type" : "FeatureCollection",
     "features" : geoJSONData
   }
@@ -445,6 +452,7 @@ async function buildModel() {
           alert("Done");})
         .catch(error => console.error('Error saving data:', error));
     } else {
+      stopRotation();
       console.error('Error in the first fetch:', response.statusText);
     }
 
@@ -458,12 +466,16 @@ async function buildModel() {
 }
 
 function startRotation() {
-  var logo = document.getElementById('logo');
+  let logo = document.getElementById('logo');
   logo.classList.add('rotate');
+  let wave = document.getElementById('wave');
+  wave.classList.toggle('show');
 }
 
 function stopRotation() {
-  var logo = document.getElementById('logo');
+  let logo = document.getElementById('logo');
   logo.classList.remove('rotate');
+  let wave = document.getElementById('wave');
+  wave.classList.remove('show');
 }
 
