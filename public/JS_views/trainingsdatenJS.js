@@ -226,10 +226,6 @@ map.on(L.Draw.Event.CREATED, async function (event) {
 
   props.type = type;
 
-  if (type === "circle") {
-    props.radius = layer.getRadius();
-  }
-
   drawnItems.addLayer(layer);
 
   await addGeoJSONtoDB(geojson);

@@ -1,3 +1,56 @@
+/* mobile devices : */
+@media screen and (max-width: 600px) {
+  #map {
+      height: 100vh;
+      width: 100%;
+
+      border: 5px;
+      margin: 0;
+      padding: 50px;
+
+  }
+}
+
+/*Tablets*/
+@media screen and (min-width: 601px) {
+  #map {
+      height: 80vh;
+      width: 100%;
+
+
+      border: 5px;
+      margin: 0;
+      padding: 0;
+
+  }
+}
+
+@media only screen and (min-width: 992px) {
+
+  #map {
+      border: 3px solid #000000;
+      height: 80vh;
+  }
+
+  #col-lg-6 {
+      width: 50%;
+  }
+
+}
+
+
+
+#map {
+  border: 3px solid #000000;
+  height: 80vh;
+}
+
+#col-lg-6 {
+  width: 50%;
+}
+
+
+
 /* Custom styles for the tab pane content */
 .tab-content {
   padding: 20px;
@@ -179,4 +232,18 @@
 }
 #wave.stop {
   display: none;
+}
+
+@keyframes rotate {
+  0% {
+      transform: rotate(0deg);
+  }
+
+  100% {
+      transform: rotate(360deg);
+  }
+}
+
+.rotate {
+  animation: rotate 1s linear infinite;
 }
