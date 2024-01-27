@@ -68,3 +68,7 @@ body {
 #col-lg-6 {
     width: 50%;
 }
+
+body {
+    background-color: #ffffff; 
+}
