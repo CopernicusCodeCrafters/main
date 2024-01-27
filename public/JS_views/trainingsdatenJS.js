@@ -355,21 +355,25 @@ const addGeoJSONtoDB = async (geojson) => {
 };
 
 // Function to Delete a Polygon
-async function deleteFeaturefromMapAndDB(feature, layer){
-  map.removeLayer(layer);
-  console.log(feature.params);
-  try{
-    const response = await fetch ("/delete-feature", {
-      method: 'DELETE',headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(feature),
+async function deleteFeaturefromMapAndDB(feature, layer) {
+  try {
+    const objectId = feature._id; // Replace with the actual property name of your objectId
+
+    // Make a request to the server to delete the feature
+    const response = await fetch(`/delete-feature?_id=${objectId}`, {
+      method: 'GET', // Since the server route is defined as app.get
     });
+
     const result = await response.text();
     console.log(result);
-  }catch (error) {
-    console.error('An error occured: ', error)
+
+    // Perform any additional actions, such as removing the feature from the map
+    // map.removeLayer(layer);
+  } catch (error) {
+    console.error('An error occurred deleting feature: ', error);
   }
+  location.reload();
+
 }
 
 //Function to update/modify a polygon
@@ -378,7 +382,7 @@ async function updateFeatureinDB(feature, obID){
   const updatedData = { feature };
 
   fetch(`/update-feature/${objectId}`, {
-    method: 'PUT',
+    method: 'POST',
     headers: {
         'Content-Type': 'application/json',
     },

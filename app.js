@@ -79,25 +79,25 @@ app.post('/insert-geojson', async (req, res) => {
   }
 });
 
-app.delete('/delete-feature', async (req, res) => {
-  const object_Id = req.body._id;// und hier
-  console.log(object_Id);
+app.get('/delete-feature', async (req, res) => {
+  const objectId = req.query._id; 
+  console.log(objectId);
   try {
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
-    const result = await collection.deleteOne({_id: object_Id});
+    const result = await collection.deleteOne({ _id: new mongodb.ObjectId(objectId) });
     if (result.deletedCount === 1) {
       res.status(200).send('Polygon deleted successfully.');
     } else {
       res.status(404).send('Polygon not found.');
     }
   } catch (error) {
-    console.error("An error occured deleting object: ", error);
-    res.status(500).send('An error occured');
+    console.error("An error occurred deleting object: ", error);
+    res.status(500).send('An error occurred');
   }
-})
+});
 
-app.put('/update-feature/:objectId', async (req, res) => {
+app.post('/update-feature/:objectId', async (req, res) => {
   const objectId = req.params.objectId;
   console.log(objectId);
   const updatedData = req.body;
@@ -105,7 +105,7 @@ app.put('/update-feature/:objectId', async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
     const result = await collection.updateOne(
-      { _id: objectId },
+      { _id: new mongodb.ObjectId(objectId) },
       { $set: updatedData }
     );
 
