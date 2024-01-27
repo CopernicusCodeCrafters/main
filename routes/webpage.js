@@ -94,9 +94,8 @@ router.get('/satelliteImage', async function (req, res, next) {
     };
     let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");  
 
-    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = "TestKlass")
     //Compute result 
-    let result = builder.save_result(datacube_classified, "GTiff");    
+    let result = builder.save_result(datacube_filtered, "GTiff");    
     let response = await connection.computeResult(result);
 
 
