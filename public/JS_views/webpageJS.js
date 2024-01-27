@@ -384,6 +384,7 @@ async function checkInputs() {
   var date2Value = $('#datepicker2').val();
   // Check if an AoI is given
   var AoIgiven = false;
+  var bandsGiven = false;
 
   // Check if something is drawn
   if (drawnItems.getLayers().length > 0) {
@@ -395,8 +396,13 @@ async function checkInputs() {
   if (fileInputValue !== '') {
     AoIgiven = true;
   }
+  // Check if more than 0 Bands are selected
+  var bandsInputCheck = document.getElementById("bandsPicker").value;
+  if (bandsInputCheck != ""){
+    bandsGiven = true;
+  }
   // Check if both Dateinputs are not empty
-  if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+  if (date1Value !== '' && date2Value !== '' && AoIgiven && bandsGiven) {
     // when date Inputs full call createDatacube()
     createClassification();
     switchToClassificationTab();
