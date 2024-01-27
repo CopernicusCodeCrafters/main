@@ -83,9 +83,15 @@
         <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
             <div class="col-lg-9">
                 <div class="card shadow p-3 h-100 bg-white rounded">
-                    <h2 class="card-title">Viewer</h2><br>
+                    <div class="ueberschrift">
+                        <h2 class="viewer">Viewer</h2>
+                        <div id="wave">
+                          <span class="dot"></span>
+                          <span class="dot"></span>
+                          <span class="dot"></span>
+                        </div>
+                      </div>
                     <div id="map"></div>
-                    <button id=""></button>
                 </div>
             </div>
             <div class="col-lg-3">
@@ -148,7 +154,8 @@
                             <!--Submit button-->
                             <div>
                                 <button id="submitBtn" class="green-btn" onclick="checkInputs()">Submit</button>
-                            </div> <br>
+                            </div> 
+                            <br>
                         </div>
                         <!-- Classification tab -->
                         <div class="tab-pane fade" id="classification">
@@ -157,18 +164,11 @@
                                 <h5 class="card-title">Select Trainingsmodel</h5>
                                 <button class="dropdown-btn dropdown-toggle" type="button" id="trainingModelDropdown"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Choose trainings model
+                                    Choose trainings model  
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="trainingModelDropdown" id="trainingModelOptions">
-                                    <!-- Options will be dynamically added here -->
                                 </div>
                             </div>
-                                <div class="dropdown-menu" aria-labelledby="trainingModelDropdown">
-                                    <!--ToDO: customize and connect-->
-                                    <a class="dropdown-item" href="#">Model 1</a>
-                                    <a class="dropdown-item" href="#">Model 2</a>
-                                    <a class="dropdown-item" href="#">Model 3</a>
-                                </div>
                             </div> <br>
                             <!--Classifaction Buttons-->
                             <div>

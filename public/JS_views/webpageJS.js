@@ -398,7 +398,7 @@ async function checkInputs() {
   // Check if both Dateinputs are not empty
   if (date1Value !== '' && date2Value !== '' && AoIgiven) {
     // when date Inputs full call createDatacube()
-    createClassification();
+    await createDatacube();
     switchToClassificationTab();
   } else {
     alert("Please fill in all the values")
@@ -406,14 +406,20 @@ async function checkInputs() {
 }
 
 function switchToClassificationTab() {
-  // Use Bootstrap JavaScript method to show the classification tab
   $('#optionsTabs a[href="#classification"]').tab('show');
 }
 
+function selectTrainingModel(event, model) {
+  event.preventDefault();
+  document.getElementById("trainingModelDropdown").textContent = model;
+}
+async function checkInputsClassifications(){
+
+}
 
 async function createDatacube() {
   console.log("Creating Image");
-  //startRotation();
+  startRotation();
   try {
     // Include converted bounds in the satelliteImage request
     const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
@@ -468,10 +474,10 @@ async function createDatacube() {
         layer.addTo(map);
 
         map.fitBounds(layer.getBounds());
-        //stopRotation();
+        stopRotation();
 
       } catch (error) {
-        //stopRotation();
+        stopRotation();
         console.log("Error connecting);", error);
         console.log(error);
       }
@@ -485,7 +491,7 @@ async function createDatacube() {
 }
 
 async function createClassification() {
-  console.log("Creating Image");
+  console.log("Creating Classification");
   startRotation();
   try {
     // Include converted bounds in the satelliteImage request
@@ -571,16 +577,34 @@ async function createClassification() {
     console.log(error);
   }
 }
+function loadingAnimation() {
+  const dotsElement = document.getElementById('loading-dots');
+  let dots = 0;
+
+  function updateDots() {
+    dots = (dots + 1) % 4;
+    const dotsText = '.'.repeat(dots);
+    dotsElement.textContent = `Loading${dotsText}`;
+  }
+  setInterval(updateDots, 500);
+
+}
 
 function startRotation() {
-  var logo = document.getElementById('logo');
+  let logo = document.getElementById('logo');
   logo.classList.add('rotate');
+  let wave = document.getElementById('wave');
+  wave.classList.toggle('show');
 }
 
 function stopRotation() {
-  var logo = document.getElementById('logo');
+  let logo = document.getElementById('logo');
   logo.classList.remove('rotate');
+  let wave = document.getElementById('wave');
+  wave.classList.remove('show');
 }
+
+
 
 fetch('/getModel')
   .then(response => response.json())
@@ -594,7 +618,7 @@ fetch('/getModel')
     // Populate the dropdown menu with training model names
     data.forEach(entry => {
       if(entry){
-        dropdownMenu.append(`<a class="dropdown-item" href="#">${entry.name}</a>`);
+        dropdownMenu.append(`<a class="dropdown-item" href="#" onclick="selectTrainingModel(event, '${entry.name}')">${entry.name}</a>`);
       }
     });
   })

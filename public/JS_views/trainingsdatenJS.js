@@ -445,6 +445,7 @@ async function buildModel() {
           alert("Done");})
         .catch(error => console.error('Error saving data:', error));
     } else {
+      stopRotation();
       console.error('Error in the first fetch:', response.statusText);
     }
 
@@ -458,12 +459,16 @@ async function buildModel() {
 }
 
 function startRotation() {
-  var logo = document.getElementById('logo');
+  let logo = document.getElementById('logo');
   logo.classList.add('rotate');
+  let wave = document.getElementById('wave');
+  wave.classList.toggle('show');
 }
 
 function stopRotation() {
-  var logo = document.getElementById('logo');
+  let logo = document.getElementById('logo');
   logo.classList.remove('rotate');
+  let wave = document.getElementById('wave');
+  wave.classList.remove('show');
 }
 
