@@ -2,8 +2,8 @@
 @media screen and (max-width: 600px) {
 
     #map2 {
-        border: 2px solid #000000;
         height: 41vh;
+        border: 2px solid #000000;
     }
 
     #col-lg-6 {
@@ -15,8 +15,8 @@
 @media screen and (min-width: 601px) {
 
     #map2 {
-        border: 2px solid #000000;
         height: 41vh;
+        border: 2px solid #000000;
     }
 
     #col-lg-6 {
@@ -27,8 +27,8 @@
 @media only screen and (min-width: 992px) {
 
     #map2 {
-        border: 3px solid #000000;
         height: 41vh;
+        border: 2px solid #000000;
     }
 
     #col-lg-6 {
@@ -65,11 +65,12 @@ body {
 
 
 #map2 {
-    border: 2px solid #ffffff;
-    height: 70vh;
+    height: 100%;
+    border: 2px solid #000000;
 }
 
 #col-lg-6 {
     width: 50%;
 }
+
 
