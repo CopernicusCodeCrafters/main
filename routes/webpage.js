@@ -8,10 +8,10 @@ const bodyParser = require('body-parser');
 
 
 
-let url = "mongodb://127.0.0.1:27017"; 
-//let url = "mongodb://mongo:27017"; // connection URL
-
-
+//let url = "mongodb://127.0.0.1:27017";
+let url = "mongodb://mongo:27017"; // connection URL
+//let openeo_url = 'http://0.0.0.0:8000'
+let openeo_url = 'http://34.209.215.214:8000'
 /* GET home page. */
 router.use(bodyParser.json());
 
@@ -67,7 +67,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     console.log("Date:",dateArray)
     
     // Connect to the OpenEO server and authenticate
-    let connection = await OpenEO.connect('http://34.209.215.214:8000');
+    let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
 
     // build processes
@@ -130,7 +130,7 @@ router.get('/getClassification', async function (req, res, next) {
     console.log("Model:",model)
     
     // Connect to the OpenEO server and authenticate
-    let connection = await OpenEO.connect('http://34.209.215.214:8000');
+    let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
 
     // build processes
@@ -187,7 +187,7 @@ router.get('/buildModel', async function (req, res, next) {
 
     console.log('Processing model...'); // Indicate the code is running up to this point
     // Connect to the OpenEO server
-    let connection = await OpenEO.connect('http://34.209.215.214:8000');
+    let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
     var builder = await connection.buildProcess();
     console.log(convertedWest)

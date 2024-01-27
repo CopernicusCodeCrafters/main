@@ -44,7 +44,7 @@ services:
     ccceocubes_con:
         image: kwundram/ccceocubes:b3
         environment:
-        #- AWSHOST=34.209.215.214
+        - AWSHOST=34.209.215.214
         - TZ=Etc/UTC
         - DEBIAN_FRONTEND=noninteractive
         ports:

@@ -237,24 +237,26 @@ document.getElementById('drawButton').addEventListener('click', function () {
 
     var uploadRecBtn = document.getElementById("uploadButton");
     var drawBtn = document.getElementById("drawButton");
+    var refreshDrawBtn = document.getElementById("refreshDrawBtn")
 
-    // Remove the current class
+    //Remove the current class
+    uploadRecBtn.classList.remove("black-btn");
     drawBtn.classList.remove("black-btn");
+    refreshDrawBtn.classList.remove("light-grey-btn")
 
     // Add the new class
+    uploadRecBtn.classList.add("light-grey-btn");
     drawBtn.classList.add("accepted-btn");
+    refreshDrawBtn.classList.add("black-btn")
 
     //Change button text
     drawBtn.innerHTML = "Drawn";
 
-    // Remove the current class from drawBtn
-    uploadRecBtn.classList.remove("black-btn");
-
-    // Add the new class for drawBtn (light grey)
-    uploadRecBtn.classList.add("light-grey-btn");
-
+    //Change disabled functions
     uploadRecBtn.disabled = true;
     drawBtn.disabled = true;
+    refreshDrawBtn.disabled = false;
+
     map.removeControl(drawControl)
 
     if (type === 'rectangle') {
@@ -264,6 +266,7 @@ document.getElementById('drawButton').addEventListener('click', function () {
     }
   })
 });
+
 map.on('draw:deleted', function (e) {
   drawingEnabled = true;
 });
@@ -281,26 +284,55 @@ document.getElementById('uploadButton').addEventListener('click', function () {
   fileInput.click();
 });
 
+document.getElementById('refreshDrawBtn').addEventListener('click', function () {
+
+  var uploadRecBtn = document.getElementById("uploadButton");
+  var drawBtn = document.getElementById("drawButton");
+  var refreshDrawBtn = document.getElementById("refreshDrawBtn")
+
+  //Remove the current class
+  uploadRecBtn.classList.remove(uploadRecBtn.classList);
+  drawBtn.classList.remove(drawBtn.classList);
+  refreshDrawBtn.classList.remove(refreshDrawBtn.classList)
+
+  // Add the new class
+  uploadRecBtn.classList.add("black-btn");
+  drawBtn.classList.add("black-btn");
+  refreshDrawBtn.classList.add("light-grey-btn")
+
+  //Change disabled functions
+  uploadRecBtn.disabled = false;
+  drawBtn.disabled = false;
+  refreshDrawBtn.disabled = true;
+
+  //Change button text
+  drawBtn.innerHTML = "Draw"
+  uploadRecBtn.innerHTML = "Upload";
+
+  // Remove the existing drawn shape
+  drawnItems.clearLayers();
+
+});
 
 async function convertGeoPackageToGeoJSON(file) {
   const formData = new FormData();
-    formData.append('upload', file, file.name);
+  formData.append('upload', file, file.name);
 
-    try {
-        const response = await fetch('http://ogre.adc4gis.com/convert', {
-          method: 'POST',
-          body: formData,
-        });
+  try {
+    const response = await fetch('http://ogre.adc4gis.com/convert', {
+      method: 'POST',
+      body: formData,
+    });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const convertedGeoJSON = await response.json();
-        // proceed with normal geojson usage
-        processGeoJSON(convertedGeoJSON);
-    } catch (error) {
-        console.error('Error during GeoPackage to GeoJSON conversion:', error); //This throws an error but does work
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+    const convertedGeoJSON = await response.json();
+    // proceed with normal geojson usage
+    processGeoJSON(convertedGeoJSON);
+  } catch (error) {
+    console.error('Error during GeoPackage to GeoJSON conversion:', error); //This throws an error but does work
+  }
 }
 
 
@@ -313,13 +345,13 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
     reader.onload = function (e) {
       try {
         var geojsonData;
-        if (file.name.endsWith('.geojson')){
+        if (file.name.endsWith('.geojson')) {
           geojsonData = JSON.parse(e.target.result);
           processGeoJSON(geojsonData);
           // Read Geopackage File 
         } else {
           convertGeoPackageToGeoJSON(file);
-        }      
+        }
       } catch (error) {
         stopRotation();
         console.error("Error parsing or processing GeoJSON:", error);
@@ -329,7 +361,7 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
   }
 });
 
-function processGeoJSON(geojsonData){
+function processGeoJSON(geojsonData) {
   //Using Turf.js to create bounding box for OpenEO Request
   var bbox = turf.bbox(geojsonData);
   var bboxPolygon = turf.bboxPolygon(bbox);
@@ -358,32 +390,34 @@ function processGeoJSON(geojsonData){
 
   var uploadRecBtn = document.getElementById("uploadRectangle");
   var drawBtn = document.getElementById("drawButton");
+  var refreshDrawBtn = document.getElementById("refreshDrawBtn");
 
   // Remove the current class
   uploadRecBtn.classList.remove("black-btn");
+  drawBtn.classList.remove("black-btn");
+  refreshDrawBtn.classList.remove("light-grey-btn");
 
   // Add the new class
   uploadRecBtn.classList.add("accepted-btn");
+  drawBtn.classList.add("light-grey-btn");
+  refreshDrawBtn.classList.add("black-btn");
 
   //Change button text
   uploadRecBtn.innerHTML = "Uploaded";
+
+  //Change disabled functions
   uploadRecBtn.disabled = true;
-
-  // Remove the current class from drawBtn
-  drawBtn.classList.remove("black-btn");
-
-  // Add the new class for drawBtn (light grey)
-  drawBtn.classList.add("light-grey-btn");
-
   drawBtn.disabled = true;
-
+  refreshDrawBtn = false;
 }
 
 async function checkInputs() {
   // Get the values of the datePickers
   var date1Value = $('#datepicker1').val();
   var date2Value = $('#datepicker2').val();
-  // Check if an AoI is given
+
+  var submitBtn = document.getElementById("submitBtn");
+
   var AoIgiven = false;
   var bandsGiven = false;
 
@@ -399,14 +433,19 @@ async function checkInputs() {
   }
   // Check if more than 0 Bands are selected
   var bandsInputCheck = document.getElementById("bandsPicker").value;
-  if (bandsInputCheck != ""){
+  if (bandsInputCheck != "") {
     bandsGiven = true;
   }
   // Check if both Dateinputs are not empty
   if (date1Value !== '' && date2Value !== '' && AoIgiven && bandsGiven) {
     // when date Inputs full call createDatacube()
+
     await createDatacube();
-    switchToClassificationTab();
+    switchToClassificationTab()
+    submitBtn.classList.remove("black-btn");
+    submitBtn.classList.add("green-btn");
+    submitBtn.innerHTML = "Submitted";
+    submitBtn.disabled = true;
   } else {
     alert("Please fill in all the values")
   }
@@ -575,30 +614,30 @@ async function createClassification() {
 
             var channelValue = pixelValues[0]; // Assuming only one channel value for simplicity
 
-              // Set default values in case of invalid input
-              var scaledRed = 0.5;
-              var scaledGreen = 0.5;
-              var scaledBlue = 0.5;
+            // Set default values in case of invalid input
+            var scaledRed = 0.5;
+            var scaledGreen = 0.5;
+            var scaledBlue = 0.5;
 
-              // Assign colors based on the channel value
-              if (channelValue === 1) {
-                  scaledRed = 1;
-                  scaledGreen = 0;
-                  scaledBlue = 0;
-              } else if (channelValue === 2) {
-                  scaledRed = 0;
-                  scaledGreen = 1;
-                  scaledBlue = 0;
-              } else if (channelValue === 3) {
-                  scaledRed = 0;
-                  scaledGreen = 0;
-                  scaledBlue = 1;
-              }
+            // Assign colors based on the channel value
+            if (channelValue === 1) {
+              scaledRed = 1;
+              scaledGreen = 0;
+              scaledBlue = 0;
+            } else if (channelValue === 2) {
+              scaledRed = 0;
+              scaledGreen = 1;
+              scaledBlue = 0;
+            } else if (channelValue === 3) {
+              scaledRed = 0;
+              scaledGreen = 0;
+              scaledBlue = 1;
+            }
 
-              // Create a chroma color object and convert it to hex
-              var color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
+            // Create a chroma color object and convert it to hex
+            var color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
 
-              return color;
+            return color;
           },
           resolution: 512
         });
@@ -661,7 +700,7 @@ fetch('/getModel')
 
     // Populate the dropdown menu with training model names
     data.forEach(entry => {
-      if(entry){
+      if (entry) {
         dropdownMenu.append(`<a class="dropdown-item" href="#" onclick="selectTrainingModel(event, '${entry.name}')">${entry.name}</a>`);
       }
     });
