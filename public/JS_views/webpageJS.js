@@ -283,6 +283,8 @@ document.getElementById('uploadButton').addEventListener('click', function () {
   fileInput.click();
 });
 
+
+//Refresh-Button (Enable the Leafletdraw to improve the Area of Interest)
 document.getElementById('refreshDrawBtn').addEventListener('click', function () {
 
   var uploadRecBtn = document.getElementById("uploadButton");
@@ -517,7 +519,7 @@ async function createDatacube() {
           resolution: 512
         });
         layer.addTo(map);
-
+        
         map.fitBounds(layer.getBounds());
         stopRotation();
 
