@@ -97,28 +97,6 @@ app.get('/delete-feature', async (req, res) => {
   }
 });
 
-app.post('/update-feature/:objectId', async (req, res) => {
-  const objectId = req.params.objectId;
-  console.log(objectId);
-  const updatedData = req.body;
-  try{
-    const db = client.db(dbName);
-    const collection = db.collection('Trainingspolygone');
-    const result = await collection.updateOne(
-      { _id: new mongodb.ObjectId(objectId) },
-      { $set: updatedData }
-    );
-
-    if (result.matchedCount === 1) {
-      res.status(200).send('Polygon updated successfully.');
-    } else {
-      res.status(404).send('Polygon not found.');
-    }
-  } catch (error){
-    console.error("An error occured updating a object: ", error)
-    res.status(500).send('An error occured');
-  }
-})
 
 //get-Befehl(Stationen),der alle Datenbank-Objekte als Array zurückgibt
 app.get('/getAllPolygons', async (req, res) => {
