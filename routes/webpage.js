@@ -1,29 +1,22 @@
 var express = require("express");
 var router = express.Router();
 var mongodb = require("mongodb");
-const { MongoClient } = require("mongodb");
-const { OpenEO, FileTypes, Capabilities } = require('@openeo/js-client'); 
-const { format } = require("morgan");
+let { MongoClient } = require("mongodb");
+let { OpenEO, FileTypes, Capabilities } = require('@openeo/js-client'); 
+let { format } = require("morgan");
+const bodyParser = require('body-parser');
 
 
-const url = "mongodb://127.0.0.1:27017"; 
-//const url = "mongodb://mongo:27017"; // connection URL
 
-const client = new MongoClient(url); // mongodb client
-const dbName = "mydatabase"; // database name
-const collectionName = "newpois"; // collection name
-console.log("test");
-
-
+//let url = "mongodb://127.0.0.1:27017";
+let url = "mongodb://mongo:27017"; // connection URL
+//let openeo_url = 'http://0.0.0.0:8000'
+let openeo_url = 'http://34.209.215.214:8000'
 /* GET home page. */
-router.get("/", async (req, res, next) => {
-  const db = client.db(dbName);
-  let collection = await db.collection(collectionName);
-  let docs = await collection.find({}).limit(50).toArray();
+router.use(bodyParser.json());
 
-  res.render("webpage", {
-    data: docs,
-  });
+router.get("/", async (req, res, next) => {
+  res.render("webpage");
 });
 
 router.post("/newstation", function (req, res, next) {
@@ -46,9 +39,9 @@ router.post("/newstation", function (req, res, next) {
 
 //   console.log("Connected successfully to server");
 
-//   const db = client.db(dbName);
+//   let db = client.db(dbName);
 
-//   const collection = db.collection(collectionName);
+//   let collection = db.collection(collectionName);
 
 //   collection.insertOne(poi); // see https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertOne/
 //   console.log("New poi inserted in the database");
@@ -63,18 +56,18 @@ router.get('/satelliteImage', async function (req, res, next) {
     console.log('Processing satellite image...'); // Indicate the code is running up to this point
 
     // Passed variables
-    const dateArray = req.query.date.split(',');
-    const bandsArray = req.query.bands.split(',');
-    const south = req.query.south;
-    const west = req.query.west;
-    const north = req.query.north;
-    const east = req.query.east;
+    let dateArray = req.query.date.split(',');
+    let bandsArray = req.query.bands.split(',');
+    let south = req.query.south;
+    let west = req.query.west;
+    let north = req.query.north;
+    let east = req.query.east;
     console.log(south,west,north,east)
     console.log("Bands:",bandsArray)
     console.log("Date:",dateArray)
     
     // Connect to the OpenEO server and authenticate
-    const connection = await OpenEO.connect('http://34.209.215.214:8000');
+    let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
 
     // build processes
@@ -119,6 +112,72 @@ router.get('/satelliteImage', async function (req, res, next) {
   }
 });
 
+router.get('/getClassification', async function (req, res, next) {
+  try {
+    console.log('Processing satellite image...'); // Indicate the code is running up to this point
+
+    // Passed variables
+    let dateArray = req.query.date.split(',');
+    let bandsArray = req.query.bands.split(',');
+    let south = req.query.south;
+    let west = req.query.west;
+    let north = req.query.north;
+    let east = req.query.east;
+    let model = req.query.model;
+    console.log(south,west,north,east)
+    console.log("Bands:",bandsArray)
+    console.log("Date:",dateArray)
+    console.log("Model:",model)
+    
+    // Connect to the OpenEO server and authenticate
+    let connection = await OpenEO.connect(openeo_url);
+    await connection.authenticateBasic('user', 'password');
+
+    // build processes
+    var builder = await connection.buildProcess();
+
+
+  //build datacube
+    var datacube = builder.load_collection(
+      "sentinel-s2-l2a-cogs",
+      {west: west, south: south, east: east, north: north},
+      3857,
+      dateArray, 
+      bandsArray
+ 
+    );
+
+
+    //filter bands
+    let datacube_filtered = builder.filter_bands(datacube,bandsArray);
+    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
+    //let datacube_agg = builder.aggregate_temporal_period(data = datacube_filled, period = "month");
+
+    //Reduce Dimension of Datacube
+    var mean = function(data) {
+      return this.mean(data);
+    };
+    let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
+
+    let datacube_classified = builder.cube_classify(data = datacube_reduced, model = String(model))
+    //Compute result 
+    let result = builder.save_result(datacube_classified, "GTiff");    
+    let response = await connection.computeResult(result);
+
+
+    console.log("Done");
+
+    // Sending the result data back to the frontend
+    res.status(200).set('Content-Type', response.type); 
+    response.data.pipe(res); // Send the Tiff as response
+    console.log("Send Done");
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+  }
+});
+
 let rdsModels = [];
 // Method to build a Model 
 router.get('/buildModel', async function (req, res, next) {
@@ -128,7 +187,7 @@ router.get('/buildModel', async function (req, res, next) {
 
     console.log('Processing model...'); // Indicate the code is running up to this point
     // Connect to the OpenEO server
-    let connection = await OpenEO.connect('http://34.209.215.214:8000');
+    let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
     var builder = await connection.buildProcess();
     console.log(convertedWest)
@@ -138,7 +197,7 @@ router.get('/buildModel', async function (req, res, next) {
         east: convertedEast,
         north: convertedNorth},
       3857,
-      ["2022-01-01", "2022-12-31"]
+      ["2021-06-01", "2021-06-30"]
     );
 
     let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
@@ -148,6 +207,7 @@ router.get('/buildModel', async function (req, res, next) {
     var mean = function(data) {
       return this.mean(data);
     };
+
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
     
     // data, nt, mt und name müssen übergeben werden
@@ -155,23 +215,56 @@ router.get('/buildModel', async function (req, res, next) {
 
     let result = builder.save_result(model,'RDS'); 
     let response = await connection.computeResult(result);
-    
-    
-
-    console.log("Done");
-    
-    // Sending the result data back to the frontend
-    //res.status(200).send(result); 
-    //res.send(response)
-    //response.data.pipe(res); // Send the Tiff as response
-    console.log("Send Done");
-    rdsModels.push(String(name))
-    console.log(rdsModels)
+    res.status(200).send("Model build");
   } catch (error) {
-    //console.error('Error:', error);
     res.status(500).json({ error: 'Internal Server Error' }); // Send error response
   }
   
 });
-module.exports = router;
+classNames = [];
+router.post('/saveModel', async (req, res) => {
+  try{
+    let receivedData = req.body.classIDs;
+    console.log(receivedData)
+    let client = new MongoClient(url); // mongodb client
+    let dbName = "geosoft2"; // database name
+    let collectionName = "class"; // collection name
+    let db = client.db(dbName);
+    let collection = db.collection(collectionName);
 
+    // Replace existing entries with the new data
+    await collection.insertOne(receivedData);
+    
+    await client.close();
+  //classNames.push(receivedData);
+  res.json({ message: 'Data saved successfully on the server.' });
+} catch (error) {
+  console.error('Error:', error);
+  res.status(500).json({ error: 'Internal Server Error' });
+}
+});
+
+// GET endpoint to retrieve data
+router.get('/getModel', async (req, res) => {
+  try {
+    let client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true }); // mongodb client
+    let dbName = "geosoft2"; // database name
+    let collectionName = "class"; // collection name
+    let db = client.db(dbName);
+    let collection = db.collection(collectionName);
+
+    // Fetch all documents from the collection
+    const cursor = collection.find({});
+    
+    // Convert the cursor to an array
+    const documentsArray = await cursor.toArray();
+
+    await client.close();
+
+    res.json(documentsArray);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+module.exports = router;

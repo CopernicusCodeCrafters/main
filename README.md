@@ -1,46 +1,36 @@
 
 # Copernicus Code Crafters
 
-## Team:
-Severin Krohne
-Kjell Wundram
-Finn Geßner
-Jan Becker
-Emil Erlenkötter
-Joaquin Valdez
-
-### for starting openeocubes on VM in folder :
-folder : ubuntu@ip-172-31-29-252:~/test2/openeocubes
-sudo apt install r-base-core
-
-###  For Co-Authoring:
-Commit message
-
-Co-authored-by: Kjell Wundram           @kwundram2602
-                Jan Becker              @job2002
-                Severin Krohne          @skrohne
-                Finn Geßner             @sivenDalmatin 
-                Emil Erlenkötter        @emil282
-                Joaquin Valdez          @jova10
-
-( oder in Github Desktop)
-
-## OpenEOcubes
+### Team:
+Severin Krohne      @skrohne
+Kjell Wundram       @kwundram2602
+Finn Geßner         @sivenDalmatin
+Jan Becker          @job2002
+Emil Erlenkötter    @emil282
+Joaquin Valdez      @jova10
 
 
+## How to use CCC-eocubes
 
-#### Container
+1. git clone git@github.com:CopernicusCodeCrafters/main.git
+2. set environment variable "AWSHOST" to your AWS-IPv4-adress in docker-compose.yml
+    if you are running the application on your local machine, leave "AWSHOST" empty .
+    On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance.
+3. docker-compose up --build
 
-1.  docker pull brianpondi/openeocubes ( in cmd )
-2. 
-    a) docker run -p 8000:8000  --env AWSHOST=<AWS-IPv4-ADDRESS>  brianpondi/openeocubes
-    __For light tasks and processes you can host the service on pc and therefore you don't need AWS IPv4 Address__
-    b) docker run -p 8000:8000  brianpondi/openeocubes
+4. Enter your AWS adress or "localhost" in the browser to connect to the backend.
 
 
-#### Paths
-http://localhost:8000/collections/
-http://localhost:8000/processes
-http://localhost:8000/credentials/basic
-http://localhost:8000/file_formats
-http://localhost:8000/result
+## Demo and Tutorial
+
+### Model Creation
+You can create a machine learning model by uploading or drawing training polygons.
+
+After you have created the training polygons you can choose the hyperparamters ntree and mtry.
+You als can give a name to the model. The model will be saved as a .rds file.
+
+### Classification
+
+
+
+

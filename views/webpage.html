@@ -50,14 +50,15 @@
     <!-- Include Leaflet Control Geocoder CSS and JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
+    <!--Icon stylesheet for Refreshbutton-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Copernicus Code Crafters</title>
 </head>
 
 <body>
     <header class="mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" width="50" height="50"
+            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" id = "logo" width="50" height="50"
                     class="d-inline-block align-top" alt=""></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
@@ -83,9 +84,15 @@
         <div class="row gy-4 gx-lg-3 justify-content-md-center mt-">
             <div class="col-lg-9">
                 <div class="card shadow p-3 h-100 bg-white rounded">
-                    <h2 class="card-title">Viewer</h2><br>
+                    <div class="ueberschrift">
+                        <h2 class="viewer">Viewer</h2>
+                        <div id="wave">
+                          <span class="dot"></span>
+                          <span class="dot"></span>
+                          <span class="dot"></span>
+                        </div>
+                      </div>
                     <div id="map"></div>
-                    <button id=""></button>
                 </div>
             </div>
             <div class="col-lg-3">
@@ -122,10 +129,13 @@
                             <div>
                                 <h5 class="card-title">Select Area of Interest</h5>
                                 <!-- Button to activate Leaflet Draw -->
-                                <button id="drawButton" class="black-btn">Activate Draw</button>
+                                <button id="drawButton" class="black-btn">Draw</button>
                                 <h7>Or</h7>
                                 <!-- Button to activate Upload-->
                                 <button id="uploadButton" class="black-btn">Upload</button>
+                                <button id="refreshDrawBtn" class="light-grey-btn" disabled>
+                                    <i class="fa fa-refresh" style="color:white"></i> 
+                                </button>
                                 <input type="file" id="fileInput" accept=".geojson, .gpkg" style="display: none" />
                             </div> <br>
 
@@ -147,25 +157,36 @@
                             <br>
                             <!--Submit button-->
                             <div>
-                                <button id="submitBtn" class="green-btn" onclick="checkInputs()">Submit</button>
-                            </div> <br>
+                                <button id="submitBtn" class="black-btn" onclick="checkInputs()">Submit</button>
+                            </div> 
+                            <br>
                         </div>
                         <!-- Classification tab -->
                         <div class="tab-pane fade" id="classification">
-                            <!-- Training model selection as dropdown -->
+                            <!-- Training model selection -->
                             <div class="dropdown">
-                                <h5 class="card-title">Select Trainingsmodel</h5>
+                                <h5 class="card-title">Select Training Model</h5>
                                 <button class="dropdown-btn dropdown-toggle" type="button" id="trainingModelDropdown"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Choose trainings model
+                                    Choose training model
                                 </button>
-                                <div class="dropdown-menu" aria-labelledby="trainingModelDropdown">
-                                    <!--ToDO: customize and connect-->
-                                    <a class="dropdown-item" href="#">Model 1</a>
-                                    <a class="dropdown-item" href="#">Model 2</a>
-                                    <a class="dropdown-item" href="#">Model 3</a>
+                                <div class="dropdown-menu" aria-labelledby="trainingModelDropdown" id="trainingModelOptions">
+                                    <!-- Add your dropdown options here -->
                                 </div>
-                            </div> <br>
+                            </div>
+                        
+                            <!-- Classification Buttons -->
+                            <div>
+                                <h5 class="card-title">Start Classification</h5>
+                                <button class="green-btn" onclick="checkInputsClassifications()">Classify</button>                                
+                            </div>
+                        
+                            <br>
+                        
+                            <div>
+                                <h5 class="card-title">Download Classification</h5>
+                                <button type="button" disabled>Download</button>
+                            </div>
                         </div>
                     </div>
                 </div>
