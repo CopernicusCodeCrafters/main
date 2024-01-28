@@ -75,30 +75,83 @@ async function startingPolygonmanager() {
             deleteButton.onclick = function() {
               console.log("start deleting");
               console.log(feature);
-              deleteFeaturefromMapAndDB(feature, layer);
+              deleteFeaturefromMapAndDB(feature);
             }
             div.appendChild(deleteButton);
+            div.appendChild(document.createElement("br"));
             
-            // End edit button
-            const editButton = document.createElement("button");
-            editButton.innerHTML = "End Edit";
-            div.appendChild(editButton);
+            // Save edit button
+            const submitEditButton = document.createElement("button");
+            submitEditButton.innerHTML = "Submit Edit";
+            div.appendChild(submitEditButton);
+            div.appendChild(document.createElement("br"));
 
-            //When a polygon is clicked it gets editable, when another one is clicked or the "end edit" button ist clicked the polygon gets uneditbale andthe changes are uploaded to the DB
+            // End edit button
+            const stopEditButton = document.createElement("button");
+            stopEditButton.innerHTML = "Dismiss Edit";
+            div.appendChild(stopEditButton);
+
+
+            //When a feature is edited its new coordinates get saved
+            var newCoordinates;
+            layer.on('edit', function(e){
+              newCoordinates = e.target.getLatLngs()[0];
+              console.log("New coordinates:", newCoordinates);
+            }) 
+
+            //When a polygon is clicked it gets editable and can be uploaded
             layer.on('click', function(e){
               if(selectedFeature){
                   selectedFeature.editing.disable();
-                  updateFeatureinDB(selectedFeature.feature, selectedFeature.feature._id);
               }
-              editButton.onclick = function(){
-                selectedFeature.editing.disable();
-                console.log(selectedFeature.feature._id);
-                updateFeatureinDB(selectedFeature.feature, selectedFeature.feature._id);
-              }
-              selectedFeature = e.target;
-              e.target.editing.enable();
-            });
 
+              submitEditButton.onclick = function(){
+                selectedFeature.editing.disable();
+                var object_id = selectedFeature.feature.properties.object_id;
+                var name = selectedFeature.feature.properties.name;
+                var classification = selectedFeature.feature.properties.classification;
+
+                // User can input different values if he wants to              
+                do {
+                  object_id = prompt("Change 'object_id' if necessary:", object_id);
+                } while (!object_id.trim());                          
+                do {
+                  name = prompt("Change 'name' if necessary:", name);
+                } while (!name.trim());
+                do {
+                  classification = prompt("Change 'classification' if necessary:", classification);
+                } while (!classification.trim());
+              
+                let newCoords = [];
+                for (let i = 0; i < newCoordinates.length; i++){
+                  newCoords[i] = [];
+                  newCoords[i][0] = newCoordinates[i].lng;
+                  newCoords[i][1] = newCoordinates[i].lat;
+                }
+                newCoords.push([newCoordinates[0].lng, newCoordinates[0].lat]);
+
+                let newFeature = {
+                  type: "Feature",
+                  properties: {
+                    object_id,
+                    name,
+                    classification,
+                  },
+                  geometry: {
+                    type : "Polygon",
+                    coordinates: [ newCoords ]
+                  }
+                };
+                updateFeatureinDB(feature, newFeature);
+              }
+
+              selectedFeature = e.target;
+              selectedFeature.editing.enable();            
+
+              stopEditButton.onclick = function(){
+                selectedFeature.editing.disable();
+              }
+            });
             layer.bindPopup(div);
           }
         }).addTo(map);
@@ -355,7 +408,7 @@ const addGeoJSONtoDB = async (geojson) => {
 };
 
 // Function to Delete a Polygon
-async function deleteFeaturefromMapAndDB(feature, layer) {
+async function deleteFeaturefromMapAndDB(feature) {
   try {
     const objectId = feature._id; // Replace with the actual property name of your objectId
 
@@ -367,8 +420,6 @@ async function deleteFeaturefromMapAndDB(feature, layer) {
     const result = await response.text();
     console.log(result);
 
-    // Perform any additional actions, such as removing the feature from the map
-    // map.removeLayer(layer);
   } catch (error) {
     console.error('An error occurred deleting feature: ', error);
   }
@@ -376,21 +427,10 @@ async function deleteFeaturefromMapAndDB(feature, layer) {
 
 }
 
-//Function to update/modify a polygon
-async function updateFeatureinDB(feature, obID){
-  const objectId = obID;
-  const updatedData = { feature };
-
-  fetch(`/update-feature/${objectId}`, {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(updatedData),
-  })
-  .then(response => response.text())
-  .then(result => console.log(result))
-  .catch(error => console.error('Error updating polygon:', error));
+//Function to modify a polygon and update properties
+async function updateFeatureinDB(oldFeature, newFeature){
+  await addGeoJSONtoDB(newFeature);
+  deleteFeaturefromMapAndDB(oldFeature);
 }
 
 // Function to get FeatureCollection from GeoJSON layer
