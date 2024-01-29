@@ -10,8 +10,8 @@ const bodyParser = require('body-parser');
 
 let url = "mongodb://127.0.0.1:27017";
 //let url = "mongodb://mongo:27017"; // connection URL
-let openeo_url = 'http://0.0.0.0:8000'
-//let openeo_url = 'http://34.209.215.214:8000'
+//let openeo_url = 'http://0.0.0.0:8000'
+let openeo_url = 'http://34.209.215.214:8000'
 /* GET home page. */
 router.use(bodyParser.json());
 
@@ -84,7 +84,6 @@ router.get('/satelliteImage', async function (req, res, next) {
  
     );
 
-
     //filter bands
     let datacube_filtered = builder.filter_bands(datacube,bandsArray);
 
@@ -92,7 +91,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     var mean = function(data) {
       return this.mean(data);
     };
-    let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");  
+    let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");
 
     //Compute result 
     let result = builder.save_result(datacube_filtered, "GTiff");    
@@ -112,80 +111,7 @@ router.get('/satelliteImage', async function (req, res, next) {
   }
 });
 
-router.get('/allSatelliteImages', async function (req, res, next) {
-  try {
-    console.log('Processing satellite images...'); // Indicate the code is running up to this point
 
-    // Passed variables
-    let dateArray = req.query.date.split(',');
-    // let bandsArray = req.query.bands.split(',');
-    let south = req.query.south;
-    let west = req.query.west;
-    let north = req.query.north;
-    let east = req.query.east;
-    console.log(south,west,north,east)
-    // console.log("Bands:",bandsArray)
-    console.log("Date:",dateArray)
-    
-    // Connect to the OpenEO server and authenticate
-    let connection = await OpenEO.connect(openeo_url);
-    await connection.authenticateBasic('user', 'password');
-
-    // build processes
-    var builder = await connection.buildProcess();
-
-
-  //build datacube
-    var datacube = builder.load_collection(
-      "sentinel-s2-l2a-cogs",
-      {west: west, south: south, east: east, north: north},
-      3857,
-      dateArray, 
-      bandsArray
- 
-    );
-
-
-    //filter bands
-    let datacube_filtered = builder.filter_bands(datacube, ['B02','B03','B04']);
-
-    //Reduce Dimension of Datacube
-    // var mean = function(data) {
-    //   return this.mean(data);
-    // };
-    // let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");  
-
-    datacube_filtered = builder.apply(datacube_filtered, new Formula("linear_scale_range(x, -20, -5, 0, 255)"));
-
-    //Compute result 
-    let images = [];
-    for (let date of dateArray) {
-      let result = builder.save_result(datacube_filtered, "PNG", {
-        red: "B04",
-        green: "B03",
-        blue: "B02"
-      }, {
-        date: date // Include date in the filename or identifier
-      });
-      let response = await connection.computeResult(result);
-      let imageBuffer = await response.arrayBuffer();
-      images.push({
-        date: date,
-        data: Buffer.from(imageBuffer).toString('base64') // Convert image data to base64
-      });
-    }
-
-
-    console.log("Done");
-
-    // Sending the result data back to the frontend
-    res.status(200).json({ images: images });
-
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
-  }
-});
 
 
 router.get('/getClassification', async function (req, res, next) {
