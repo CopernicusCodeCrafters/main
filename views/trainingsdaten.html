@@ -28,8 +28,7 @@
     <!--Turf.js for bounding box-->
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
     <!--Own stylesheet:-->
-    <!--<link rel="stylesheet" href="stylesheets/style.css">-->
-    <link rel="stylesheet" href="stylesheets/webpageStyles.css">
+    <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/trainingsdatenStyles.css">
     <!--Own Script-->
     <script defer src="JS_views/trainingsdatenJS.js"></script>
@@ -78,13 +77,12 @@
             <div class="col-lg-3">
                 <div class="card shadow p-3 h-100 bg-white rounded">
                     <!--Upload Trainingsdaten-->
-                    <h2 class="card-title">Upload</h2><br>
+                    <h2 class="card-title">Upload</h2>
                     <form id="uploadForm" onsubmit="handleFile(event)" enctype="multipart/form-data">
                         <input class="black-input" type="file" name="file" accept=".gpkg, .geojson">
                         <button class="black-btn" type="submit">Upload File</button>
                     </form>
-                    <br>
-                    <button id="save-Button1" class="black-btn">Download Trainingsdaten</button><br><br>
+                    <button id="save-Button1" class="black-btn">Download Trainingsdaten</button>
 
 
                     <!-- Hyperparameter Selection-->
