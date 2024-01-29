@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 
 
 
-//let url = "mongodb://127.0.0.1:27017";
-let url = "mongodb://mongo:27017"; // connection URL
+let url = "mongodb://127.0.0.1:27017";
+//let url = "mongodb://mongo:27017"; // connection URL
 //let openeo_url = 'http://0.0.0.0:8000'
 let openeo_url = 'http://34.209.215.214:8000'
 /* GET home page. */
@@ -258,6 +258,29 @@ router.get('/getModel', async (req, res) => {
     
     // Convert the cursor to an array
     const documentsArray = await cursor.toArray();
+
+    await client.close();
+
+    res.json(documentsArray);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.get('/getOneModel', async (req, res) => {
+  try {
+    let modelname = req.body.modelname;
+    let client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true }); // mongodb client
+    let dbName = "geosoft2"; // database name
+    let collectionName = "class"; // collection name
+    let db = client.db(dbName);
+    let collection = db.collection(collectionName);
+
+    // Fetch all documents from the collection
+    const model = collection.find({"name" : modelname});
+    
+    // Convert the cursor to an array
 
     await client.close();
 
