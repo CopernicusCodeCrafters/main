@@ -748,19 +748,31 @@ fetch('/getModel')
       console.error('Error fetching specific model:', error.message);
     }
   }
-let legend = L.control({ position: "topleft" });
 
-legend.onAdd = function(map) {
-  let div = L.DomUtil.create("div", "legend");
-  div.innerHTML += "<h4>Legende</h4>";
-  getSpecificModel("TEstz").then(model => {
-    let nameClass = model.class;
-    for(let value in nameClass){
-      div.innerHTML += `<i style="background: #E8E6E0"></i><span>${value}</span><br>`;
-    }
-  let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
-  console.log(keyWithValue2); // This will output: "Siedlung"
-});
-  return div;
-};
-legend.addTo(map);
+  let legend = L.control({ position: "topleft" });
+
+  legend.onAdd = function(map) {
+    let div = L.DomUtil.create("div", "legend");
+    div.innerHTML += "<h4>Legende</h4>";
+  
+    getSpecificModel("TEstz").then(model => {
+      let nameClass = model.class;
+      console.log("nameClass:",nameClass);
+      console.log(Object.keys(nameClass));
+  
+      // Loop through class values and get colors using getColorForClass function
+      Object.values(nameClass).forEach(value => {
+        let color = getColorForClass(value);
+        div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
+      });
+  
+      // Example: Find the key for class value 2
+      let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
+      console.log(keyWithValue2); // This will output: "Siedlung"
+    });
+  
+    return div;
+  };
+  
+  legend.addTo(map);
+  
