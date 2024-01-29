@@ -2,7 +2,7 @@
 @media screen and (max-width: 600px) {
     #map {
         height: 100vh;
-        width: 50%;
+        width: 100%;
 
         border: 5px;
         margin: 0;
@@ -61,3 +61,26 @@
 .full-height-card {
     height: calc(100vh-50px); /* 100% of the viewport height */
   }
+
+input[type="file"] {
+    font-size: 0;
+}
+
+::file-selector-button {
+    font-size: initial;
+}
+
+
+input:checked+.slider {
+    background-color: #ffffff;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #000000;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}

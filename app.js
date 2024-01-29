@@ -66,7 +66,7 @@ app.post('/insert-satelliteimage', async (req, res) => {
 
 //Fügt eine GeoJSON zu der Datenbank hinzu
 app.post('/insert-geojson', async (req, res) => {
-  const { geojson } = req.body;
+  const { geojson } = req.body; //hier
   try {
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
@@ -78,6 +78,25 @@ app.post('/insert-geojson', async (req, res) => {
     res.status(500).send('An error occurred');
   }
 });
+
+app.get('/delete-feature', async (req, res) => {
+  const objectId = req.query._id; 
+  console.log(objectId);
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
+    const result = await collection.deleteOne({ _id: new mongodb.ObjectId(objectId) });
+    if (result.deletedCount === 1) {
+      res.status(200).send('Polygon deleted successfully.');
+    } else {
+      res.status(404).send('Polygon not found.');
+    }
+  } catch (error) {
+    console.error("An error occurred deleting object: ", error);
+    res.status(500).send('An error occurred');
+  }
+});
+
 
 //get-Befehl(Stationen),der alle Datenbank-Objekte als Array zurückgibt
 app.get('/getAllPolygons', async (req, res) => {
