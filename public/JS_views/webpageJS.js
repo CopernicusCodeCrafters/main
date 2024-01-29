@@ -575,95 +575,107 @@ async function createDatacube() {
   stopRotation();
 }
 
+createClassification();
+
 async function createClassification() {
   console.log("Creating Classification");
   startRotation();
+  
   try {
-    // Include converted bounds in the satelliteImage request
-    console.log(model)
-    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    const localTIFPath = 'pictures/satelliteImage.tif';
+    const response = await fetch(localTIFPath);
     const blob = await response.blob();
-    console.log("warum")
 
-
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-
-    // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {
       const arrayBuffer = reader.result;
 
       try {
-        // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
-
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
-
-
-        // available color scales can be found by running console.log(chroma.brewer);
-        console.log(georaster)
+        console.log(georaster);
 
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
 
           pixelValuesToColorFn: function (pixelValues) {
+            // Assuming "class" is at index 0 in pixelValues array
+            var classValue = pixelValues[0];
 
-            var channelValue = pixelValues[0]; // Assuming only one channel value for simplicity
-
-            // Set default values in case of invalid input
-            var scaledRed = 0.5;
-            var scaledGreen = 0.5;
-            var scaledBlue = 0.5;
-
-            // Assign colors based on the channel value
-            if (channelValue === 1) {
-              scaledRed = 1;
-              scaledGreen = 0;
-              scaledBlue = 0;
-            } else if (channelValue === 2) {
-              scaledRed = 0;
-              scaledGreen = 1;
-              scaledBlue = 0;
-            } else if (channelValue === 3) {
-              scaledRed = 0;
-              scaledGreen = 0;
-              scaledBlue = 1;
-            }
-
-            // Create a chroma color object and convert it to hex
-            var color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
+            // Define colors dynamically based on class values
+            var color = getColorForClass(classValue);
 
             return color;
           },
           resolution: 512
         });
-        layer.addTo(map);
 
+        layer.addTo(map);
         map.fitBounds(layer.getBounds());
         stopRotation();
-
       } catch (error) {
         stopRotation();
-        console.log("Error connecting);", error);
-        alert("Error")
+        console.log("Error connecting:", error);
+        alert("Error");
       }
     };
 
     reader.readAsArrayBuffer(blob);
   } catch (error) {
     stopRotation();
-    alert(Error)
+    alert("Error");
     console.log(error);
   }
 }
-  
+
+var randomColors= generateRandomColors();
+function generateRandomColors() {
+  const colors = [];
+
+  // Funktion, um eine zufällige Farbe zu generieren
+  function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  // Array mit 10 verschiedenen zufälligen Farben füllen
+  for (let i = 0; i < 100; i++) {
+    let newColor;
+    
+    // Überprüfen, ob die generierte Farbe bereits im Array vorhanden ist
+    do {
+      newColor = getRandomColor();
+    } while (colors.includes(newColor));
+
+    // Neue Farbe dem Array hinzufügen
+    colors.push(newColor);
+  }
+
+  return colors;
+}
+
+function getColorForClass(classValue) {
+  // Define colors dynamically based on class values
+  // You can modify this logic based on your specific class-color mapping
+  var classColors = {
+    1: randomColors[0],
+    2: randomColors[1],
+    3: randomColors[2],
+    4: randomColors[3],
+    // Add more class-color mappings as needed
+  };
+
+  // Default color for unknown class
+  var defaultColor = chroma('gray').hex();
+
+  // Return the color based on the class value or default color if not found
+  return classColors[classValue] || defaultColor;
+}
+
 function loadingAnimation() {
   const dotsElement = document.getElementById('loading-dots');
   let dots = 0;
