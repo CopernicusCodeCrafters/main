@@ -663,7 +663,7 @@ async function createClassification() {
     console.log(error);
   }
 }
-
+  
 function loadingAnimation() {
   const dotsElement = document.getElementById('loading-dots');
   let dots = 0;
