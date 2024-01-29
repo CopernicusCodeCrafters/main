@@ -487,8 +487,8 @@ async function checkInputsClassifications(){
    model = input.textContent;
    console.log("Model:", model)
 
-   // Check if both Dateinputs are not empty
-   if (date1Value !== '' && date2Value !== '' && AoIgiven && bandsGiven && model != '') {
+   // Check if both Dateinputs are not empty . bandsgiven deleted
+   if (date1Value !== '' && date2Value !== '' && AoIgiven  && model != '') {
      // when date Inputs full call createDatacube()
      await createClassification();
    } else {
@@ -499,6 +499,7 @@ async function checkInputsClassifications(){
 async function createDatacube() {
   console.log("Creating Image");
   startRotation();
+  
   try {
     // Include converted bounds in the satelliteImage request
     const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
@@ -512,8 +513,8 @@ async function createDatacube() {
     downloadLink.style.display = 'none';
     document.body.appendChild(downloadLink);
     downloadLink.click();
-    document.body.removeChild(downloadLink);*/
-
+    document.body.removeChild(downloadLink)
+      */
     // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {
@@ -582,7 +583,7 @@ async function createClassification() {
     const blob = await response.blob();
     console.log("warum")
 
-
+    
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'satelliteImage.tif';
@@ -590,7 +591,7 @@ async function createClassification() {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-
+    
     // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {

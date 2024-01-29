@@ -23,6 +23,11 @@ Joaquin Valdez      @jova10
 
 ## Demo and Tutorial
 
+### Exploration with "Viewer"
+
+1. Enter starting and ending time
+
+
 ### Model Creation
 You can create a machine learning model by uploading or drawing training polygons.
 
