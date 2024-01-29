@@ -605,22 +605,24 @@ async function createClassification() {
         const georaster = await parseGeoraster(arrayBuffer);
         console.log(georaster);
 
-        let layer = new GeoRasterLayer({
+                let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
-
+          
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
             var classValue = pixelValues[0];
 
-            // Define colors dynamically based on class values
+// Define colors dynamically based on class values
             var color = getColorForClass(classValue);
 
             return color;
+
+
           },
           resolution: 512
         });
-
+        
         layer.addTo(map);
         map.fitBounds(layer.getBounds());
         stopRotation();
@@ -671,7 +673,6 @@ function generateRandomColors() {
 
 function getColorForClass(classValue) {
   // Define colors dynamically based on class values
-  // You can modify this logic based on your specific class-color mapping
   var classColors = {
     1: randomColors[0],
     2: randomColors[1],
@@ -757,8 +758,9 @@ fetch('/getModel')
   
     getSpecificModel("TEstz").then(model => {
       let nameClass = model.class;
-      console.log("nameClass:",nameClass);
-      console.log(Object.keys(nameClass));
+      console.log("nameClass(keys):",nameClass.keys);
+      console.log("nameClass (values):",nameClass.values)
+      console.log(Object.keys(nameClass))
   
       // Loop through class values and get colors using getColorForClass function
       Object.values(nameClass).forEach(value => {
