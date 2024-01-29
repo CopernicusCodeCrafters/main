@@ -587,7 +587,7 @@ async function createClassification() {
     const response = await fetch(localTIFPath);
     const blob = await response.blob();
 
-    
+    /*
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'satelliteImage.tif';
@@ -595,7 +595,7 @@ async function createClassification() {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-    
+    */
     // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {
