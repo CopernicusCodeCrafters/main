@@ -189,6 +189,10 @@ var convertedEast = 0;
 var convertedNorth = 0;
 var convertedSouth = 0;
 var convertedWest = 0;
+var south;
+var west;
+var north;
+var east;
 
 
 // Set maximum allowed area in square meters
@@ -213,6 +217,11 @@ document.getElementById('drawButton').addEventListener('click', function () {
     // Extract coordinates from the bounds object
     const southWest = bounds.getSouthWest(); // returns LatLng object
     const northEast = bounds.getNorthEast(); // returns LatLng object
+
+    south = southWest.lat;
+    west = southWest.lng;
+    north = northEast.lat;
+    east = northEast.lng;
 
     // Define the source and destination coordinate systems
     const sourceCRS = 'EPSG:4326';
@@ -706,52 +715,3 @@ fetch('/getModel')
     });
   })
   .catch(error => console.error('Error:', error));
-
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const openPopupButton = document.getElementById('previewImages');
-    
-    openPopupButton.addEventListener('click', selectImage);
-  });
-
-
-  selectButton.addEventListener("click", function(){
-    //Something to take the dates of the selected image and pass them on to the selectedDates variable
-  })
-
-
-  async function selectImage(){
-    try {
-      const response = await fetch(`/allSatelliteImages?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}`);
-      console.log(response);
-      const imageData = await response.json();
-  
-      // Create a popup container
-      const popupContainer = document.createElement('div');
-      popupContainer.classList.add('popup');
-  
-      // Create a content container for images
-      const imagesContainer = document.createElement('div');
-      imagesContainer.classList.add('popup-content');
-
-      const selectButton = document.createElement('button');     
-      
-  
-      // Append images to the content container
-      imageData.images.forEach(imageInfo => {
-        const img = document.createElement('img');
-        img.src = 'data:image/png;base64,' + imageInfo.data;
-        img.alt = 'Satellite Image on ' + imageInfo.date;
-        imagesContainer.appendChild(img);
-      });
-  
-      // Append the content container to the popup container
-      popupContainer.appendChild(imagesContainer);
-      popupContainer.appendChild(selectButton);
-  
-      // Append the popup container to the document body
-      document.body.appendChild(popupContainer);
-    } catch (error) {
-      console.log("An error occurred: ", error);
-    }
-  }
