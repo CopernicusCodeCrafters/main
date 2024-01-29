@@ -478,7 +478,7 @@ function exchangeClassifier(featureCollection) {
   let uniqueClassificationsArray = Array.from(classifications);
 
   let classificationMapping = {};
-  let numberCounter = 1;
+  let numberCounter = 0;
 
   uniqueClassificationsArray.forEach((classification) => {
       classificationMapping[classification] = numberCounter;

@@ -1,12 +1,12 @@
 "use strict"
 
-var selectedDates = [];
-var selectedBands = [];
+let selectedDates = [];
+let selectedBands = [];
 let model = '';
 
 $(document).ready(function () {
-  var today = new Date();
-  var minDate = new Date(2015, 0, 1); // Minimum date: January 1, 2015
+  let today = new Date();
+  let minDate = new Date(2015, 0, 1); // Minimum date: January 1, 2015
 
 
   $('#datepicker1').datepicker({
@@ -29,7 +29,7 @@ $(document).ready(function () {
 // Event listener for the change event on datepicker1
 $('#datepicker1').on('changeDate', function (e) {
   // Calculate two weeks later
-  var endDate = new Date(e.date);
+  let endDate = new Date(e.date);
   endDate.setDate(endDate.getDate() + 30); // 14 days to allow for a 14-day span
 
   // Set the new startDate for the second datepicker
@@ -40,20 +40,20 @@ $('#datepicker1').on('changeDate', function (e) {
 });
 
 function getSelectedDates() {
-  var startDate = $('#datepicker1').datepicker('getDate');
-  var endDate = $('#datepicker2').datepicker('getDate');
+  let startDate = $('#datepicker1').datepicker('getDate');
+  let endDate = $('#datepicker2').datepicker('getDate');
 
   if (startDate && endDate) {
     // Format dates as YYYY-MM-DD
-    var formattedStartDate = formatDate(startDate);
-    var formattedEndDate = formatDate(endDate);
+    let formattedStartDate = formatDate(startDate);
+    let formattedEndDate = formatDate(endDate);
 
     // Store dates in an array
     selectedDates = [formattedStartDate, formattedEndDate];
 
     console.log(selectedDates);
 
-    var saveDateBtn = document.getElementById("saveDateBtn");
+    let saveDateBtn = document.getElementById("saveDateBtn");
 
     // Remove the current class
     saveDateBtn.classList.remove("black-btn");
@@ -74,7 +74,7 @@ function getSelectedDates() {
 
 
 function getSelectedBands() {
-  var selectedBandsString = $('#bandspicker').val();
+  let selectedBandsString = $('#bandspicker').val();
 
   // Split the string into an array using a comma as the delimiter
   selectedBands = selectedBandsString.split(',').map(function (band) {
@@ -82,7 +82,7 @@ function getSelectedBands() {
     return band.trim();
   });
 
-  var bandsBtn = document.getElementById("bandsBtn");
+  let bandsBtn = document.getElementById("bandsBtn");
 
   bandsBtn.classList.remove("black-btn");
 
@@ -103,7 +103,7 @@ $(document).ready(function () {
 
   // Handle selection changes
   $('#bandsPicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-    var selectedOptions = $('#bandsPicker').find(':selected');
+    let selectedOptions = $('#bandsPicker').find(':selected');
 
     // Transform selected options data-subtext to custom format (e.g., B01, B02, etc.)
     selectedBands = selectedOptions ? selectedOptions.map(function () {
@@ -124,12 +124,12 @@ function formatDate(date) {
 }
 
 //Add Leaflet Map 
-var map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
+let map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
 // Define base layers
-var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+let osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'OpenStreetMap'
 });
-var googleSatLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+let googleSatLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
   attribution: 'Google Satellite',
   maxZoom: 20,
   minZoom: 2,
@@ -139,7 +139,7 @@ var googleSatLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z=
 osmLayer.addTo(map);  // Default base layer
 
 // Create an object to store base layers with custom names
-var baseLayers = {
+let baseLayers = {
   'OpenStreetMap': osmLayer,
   'Google Satellite': googleSatLayer
 };
@@ -152,7 +152,7 @@ L.control.scale(
 L.control.layers(baseLayers).addTo(map);
 
 // Add Leaflet Control Geocoder
-var geocoder = L.Control.geocoder({
+let geocoder = L.Control.geocoder({
   defaultMarkGeocode: false
 })
   .on('markgeocode', function (e) {
@@ -164,9 +164,9 @@ var geocoder = L.Control.geocoder({
 
 
 // Add Leaflet Draw controls
-var drawnItems = new L.FeatureGroup();
+let drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
-var drawControl = new L.Control.Draw({
+let drawControl = new L.Control.Draw({
   draw: {
     rectangle: {
       shapeOptions: {
@@ -185,14 +185,14 @@ var drawControl = new L.Control.Draw({
   }
 });
 
-var convertedEast = 0;
-var convertedNorth = 0;
-var convertedSouth = 0;
-var convertedWest = 0;
+let convertedEast = 0;
+let convertedNorth = 0;
+let convertedSouth = 0;
+let convertedWest = 0;
 
 
 // Set maximum allowed area in square meters
-var maxAllowedArea = 20000;
+let maxAllowedArea = 20000;
 
 // Event listener for the button "Activate Draw"
 document.getElementById('drawButton').addEventListener('click', function () {
@@ -200,31 +200,31 @@ document.getElementById('drawButton').addEventListener('click', function () {
   drawnItems.clearLayers();
   // Add Leaflet Draw controls to the map
   map.addControl(drawControl);
-  //variable for drawControl
-  var drawingEnabled = true;
+  //letiable for drawControl
+  let drawingEnabled = true;
   //Handle rectangle creation
   map.on('draw:created', function (e) {
-    var type = e.layerType,
+    let type = e.layerType,
       layer = e.layer;
     console.log(type)
     console.log(layer)
-    const bounds = layer.getBounds();
+    let bounds = layer.getBounds();
 
     // Extract coordinates from the bounds object
-    const southWest = bounds.getSouthWest(); // returns LatLng object
-    const northEast = bounds.getNorthEast(); // returns LatLng object
+    let southWest = bounds.getSouthWest(); // returns LatLng object
+    let northEast = bounds.getNorthEast(); // returns LatLng object
 
     // Define the source and destination coordinate systems
-    const sourceCRS = 'EPSG:4326';
-    const destCRS = 'EPSG:3857';
+    let sourceCRS = 'EPSG:4326';
+    let destCRS = 'EPSG:3857';
 
     // Define the projection transformations
     proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
     proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
 
     // Perform the coordinate transformation
-    const convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
-    const convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
+    let convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
+    let convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
 
     //Extract LatLng from converted object
     convertedSouth = convertedSouthWest[1];
@@ -235,9 +235,9 @@ document.getElementById('drawButton').addEventListener('click', function () {
     console.log('Converted South West (EPSG:3857):', convertedSouthWest);
     console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
-    var uploadRecBtn = document.getElementById("uploadButton");
-    var drawBtn = document.getElementById("drawButton");
-    var refreshDrawBtn = document.getElementById("refreshDrawBtn")
+    let uploadRecBtn = document.getElementById("uploadButton");
+    let drawBtn = document.getElementById("drawButton");
+    let refreshDrawBtn = document.getElementById("refreshDrawBtn")
 
     //Remove the current class
     uploadRecBtn.classList.remove("black-btn");
@@ -280,7 +280,7 @@ document.getElementById('uploadButton').addEventListener('click', function () {
     };
   });
   map.removeControl(drawControl)
-  const fileInput = document.getElementById('fileInput');
+  let fileInput = document.getElementById('fileInput');
   fileInput.click();
 });
 
@@ -288,9 +288,9 @@ document.getElementById('uploadButton').addEventListener('click', function () {
 //Refresh-Button (Enable the Leafletdraw to improve the Area of Interest)
 document.getElementById('refreshDrawBtn').addEventListener('click', function () {
 
-  var uploadRecBtn = document.getElementById("uploadButton");
-  var drawBtn = document.getElementById("drawButton");
-  var refreshDrawBtn = document.getElementById("refreshDrawBtn")
+  let uploadRecBtn = document.getElementById("uploadButton");
+  let drawBtn = document.getElementById("drawButton");
+  let refreshDrawBtn = document.getElementById("refreshDrawBtn")
 
   //Remove the current class
   uploadRecBtn.classList.remove(uploadRecBtn.classList);
@@ -317,11 +317,11 @@ document.getElementById('refreshDrawBtn').addEventListener('click', function () 
 });
 
 async function convertGeoPackageToGeoJSON(file) {
-  const formData = new FormData();
+  let formData = new FormData();
   formData.append('upload', file, file.name);
 
   try {
-    const response = await fetch('http://ogre.adc4gis.com/convert', {
+    let response = await fetch('http://ogre.adc4gis.com/convert', {
       method: 'POST',
       body: formData,
     });
@@ -329,7 +329,7 @@ async function convertGeoPackageToGeoJSON(file) {
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    const convertedGeoJSON = await response.json();
+    let convertedGeoJSON = await response.json();
     // proceed with normal geojson usage
     processGeoJSON(convertedGeoJSON);
   } catch (error) {
@@ -339,14 +339,14 @@ async function convertGeoPackageToGeoJSON(file) {
 
 
 document.getElementById('fileInput').addEventListener('change', function (e) {
-  const file = e.target.files[0];
+  let file = e.target.files[0];
   console.log(file);
   if (file) {
     // Read GeoJSON file
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = function (e) {
       try {
-        var geojsonData;
+        let geojsonData;
         if (file.name.endsWith('.geojson')) {
           geojsonData = JSON.parse(e.target.result);
           processGeoJSON(geojsonData);
@@ -365,21 +365,21 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
 
 function processGeoJSON(geojsonData) {
   //Using Turf.js to create bounding box for OpenEO Request
-  var bbox = turf.bbox(geojsonData);
-  var bboxPolygon = turf.bboxPolygon(bbox);
+  let bbox = turf.bbox(geojsonData);
+  let bboxPolygon = turf.bboxPolygon(bbox);
     L.geoJSON(geojsonData).addTo(map);
   L.geoJSON(bboxPolygon).addTo(map);
 
   // Define the source and destination coordinate systems
-  const sourceCRS = 'EPSG:4326';
-  const destCRS = 'EPSG:3857';
+  let sourceCRS = 'EPSG:4326';
+  let destCRS = 'EPSG:3857';
 
   // Define the projection transformations
   proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
   proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
 
-  const convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
-  const convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+  let convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+  let convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
 
   //Extract LatLng from converted object
   convertedSouth = convertedSouthWest[1];
@@ -390,9 +390,9 @@ function processGeoJSON(geojsonData) {
   console.log('Converted South West (EPSG:3857):', convertedSouthWest);
   console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
-  var uploadRecBtn = document.getElementById("uploadRectangle");
-  var drawBtn = document.getElementById("drawButton");
-  var refreshDrawBtn = document.getElementById("refreshDrawBtn");
+  let uploadRecBtn = document.getElementById("uploadRectangle");
+  let drawBtn = document.getElementById("drawButton");
+  let refreshDrawBtn = document.getElementById("refreshDrawBtn");
 
   // Remove the current class
   uploadRecBtn.classList.remove("black-btn");
@@ -415,13 +415,13 @@ function processGeoJSON(geojsonData) {
 
 async function checkInputs() {
   // Get the values of the datePickers
-  var date1Value = $('#datepicker1').val();
-  var date2Value = $('#datepicker2').val();
+  let date1Value = $('#datepicker1').val();
+  let date2Value = $('#datepicker2').val();
 
-  var submitBtn = document.getElementById("submitBtn");
+  let submitBtn = document.getElementById("submitBtn");
 
-  var AoIgiven = false;
-  var bandsGiven = false;
+  let AoIgiven = false;
+  let bandsGiven = false;
 
   // Check if something is drawn
   if (drawnItems.getLayers().length > 0) {
@@ -429,12 +429,12 @@ async function checkInputs() {
   }
 
   // Check if something is uploaded
-  var fileInputValue = document.getElementById('fileInput').value;
+  let fileInputValue = document.getElementById('fileInput').value;
   if (fileInputValue !== '') {
     AoIgiven = true;
   }
   // Check if more than 0 Bands are selected
-  var bandsInputCheck = document.getElementById("bandsPicker").value;
+  let bandsInputCheck = document.getElementById("bandsPicker").value;
   if (bandsInputCheck != "") {
     bandsGiven = true;
   }
@@ -463,12 +463,12 @@ function selectTrainingModel(event, model) {
 }
 async function checkInputsClassifications(){
    // Get the values of the datePickers
-   var date1Value = $('#datepicker1').val();
-   var date2Value = $('#datepicker2').val();
+   let date1Value = $('#datepicker1').val();
+   let date2Value = $('#datepicker2').val();
    
    // Check if an AoI is given
-   var AoIgiven = false;
-   var bandsGiven = false;
+   let AoIgiven = false;
+   let bandsGiven = false;
  
    // Check if something is drawn
    if (drawnItems.getLayers().length > 0) {
@@ -476,12 +476,12 @@ async function checkInputsClassifications(){
    }
  
    // Check if something is uploaded
-   var fileInputValue = document.getElementById('fileInput').value;
+   let fileInputValue = document.getElementById('fileInput').value;
    if (fileInputValue !== '') {
      AoIgiven = true;
    }
    // Check if more than 0 Bands are selected
-   var bandsInputCheck = document.getElementById("bandsPicker").value;
+   let bandsInputCheck = document.getElementById("bandsPicker").value;
    if (bandsInputCheck != ""){
      bandsGiven = true;
    }
@@ -503,12 +503,12 @@ async function createDatacube() {
   startRotation();
   try {
     // Include converted bounds in the satelliteImage request
-    const response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
-    const blob = await response.blob();
+    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
+    let blob = await response.blob();
     console.log("warum")
 
     /*
-    const downloadLink = document.createElement('a');
+    let downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'satelliteImage.tif';
     downloadLink.style.display = 'none';
@@ -517,19 +517,19 @@ async function createDatacube() {
     document.body.removeChild(downloadLink);*/
 
     // read arraybuffer
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => {
-    const arrayBuffer = reader.result;
+    let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
-        const georaster = await parseGeoraster(arrayBuffer);
-        const maxRed = georaster.maxs[2] / 2;
-        const maxGreen = georaster.maxs[1] / 2;
-        const maxBlue = georaster.maxs[0] / 2;
+        let georaster = await parseGeoraster(arrayBuffer);
+        let maxRed = georaster.maxs[2] / 2;
+        let maxGreen = georaster.maxs[1] / 2;
+        let maxBlue = georaster.maxs[0] / 2;
         console.log(maxRed, maxGreen, maxBlue);
 
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+        let overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
 
 
         // available color scales can be found by running console.log(chroma.brewer);
@@ -543,11 +543,11 @@ async function createDatacube() {
           pixelValuesToColorFn: function (pixelValues) {
 
             // scale to 0 - 1 used by chroma
-            var scaledRed = (pixelValues[2]) * (255 / overAllMax);
-            var scaledGreen = (pixelValues[1]) * (255 / overAllMax);
-            var scaledBlue = (pixelValues[0]) * (255 / overAllMax);
+            let scaledRed = (pixelValues[2]) * (255 / overAllMax);
+            let scaledGreen = (pixelValues[1]) * (255 / overAllMax);
+            let scaledBlue = (pixelValues[0]) * (255 / overAllMax);
 
-            var color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
+            let color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
 
             return color;
           },
@@ -581,12 +581,12 @@ async function createClassification() {
   try {
     // Include converted bounds in the satelliteImage request
     console.log(model)
-    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
-    const blob = await response.blob();
+    let response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    let blob = await response.blob();
     console.log("warum")
 
 
-    const downloadLink = document.createElement('a');
+    let downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'satelliteImage.tif';
     downloadLink.style.display = 'none';
@@ -595,15 +595,15 @@ async function createClassification() {
     document.body.removeChild(downloadLink);
 
     // read arraybuffer
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => {
-      const arrayBuffer = reader.result;
+      let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
-        const georaster = await parseGeoraster(arrayBuffer);
+        let georaster = await parseGeoraster(arrayBuffer);
 
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+        let overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
 
 
         // available color scales can be found by running console.log(chroma.brewer);
@@ -615,12 +615,12 @@ async function createClassification() {
 
           pixelValuesToColorFn: function (pixelValues) {
 
-            var channelValue = pixelValues[0]; // Assuming only one channel value for simplicity
+            let channelValue = pixelValues[0]; // Assuming only one channel value for simplicity
 
             // Set default values in case of invalid input
-            var scaledRed = 0.5;
-            var scaledGreen = 0.5;
-            var scaledBlue = 0.5;
+            let scaledRed = 0.5;
+            let scaledGreen = 0.5;
+            let scaledBlue = 0.5;
 
             // Assign colors based on the channel value
             if (channelValue === 1) {
@@ -638,7 +638,7 @@ async function createClassification() {
             }
 
             // Create a chroma color object and convert it to hex
-            var color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
+            let color = chroma.rgb(scaledRed, scaledGreen, scaledBlue).hex();
 
             return color;
           },
@@ -663,18 +663,7 @@ async function createClassification() {
     console.log(error);
   }
 }
-function loadingAnimation() {
-  const dotsElement = document.getElementById('loading-dots');
-  let dots = 0;
 
-  function updateDots() {
-    dots = (dots + 1) % 4;
-    const dotsText = '.'.repeat(dots);
-    dotsElement.textContent = `Loading${dotsText}`;
-  }
-  setInterval(updateDots, 500);
-
-}
 
 function startRotation() {
   let logo = document.getElementById('logo');
@@ -696,7 +685,7 @@ fetch('/getModel')
   .then(response => response.json())
   .then(data => {
     // Get the dropdown menu element
-    const dropdownMenu = $('#trainingModelOptions');
+    let dropdownMenu = $('#trainingModelOptions');
 
     // Clear existing options
     dropdownMenu.empty();
@@ -709,3 +698,34 @@ fetch('/getModel')
     });
   })
   .catch(error => console.error('Error:', error));
+
+  async function getSpecificModel(modelName ) {
+    try {
+      let response = await fetch(`/getSpecificModel/${modelName}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      let data = await response.json();
+      return data;
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching specific model:', error.message);
+    }
+  }
+let legend = L.control({ position: "topleft" });
+
+legend.onAdd = function(map) {
+  let div = L.DomUtil.create("div", "legend");
+  div.innerHTML += "<h4>Legende</h4>";
+  getSpecificModel("TEstz").then(model => {
+    let nameClass = model.class;
+    for(let value in nameClass){
+      div.innerHTML += `<i style="background: #E8E6E0"></i><span>${value}</span><br>`;
+    }
+  let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
+  console.log(keyWithValue2); // This will output: "Siedlung"
+});
+  return div;
+};
+legend.addTo(map);
