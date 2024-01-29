@@ -265,5 +265,32 @@ router.get('/getModel', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// GET endpoint to retrieve data for a specific model by name
+router.get('/getSpecificModel/:modelName', async (req, res) => {
+  try {
+    let client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true }); // mongodb client
+    let dbName = "geosoft2";
+    let collection = client.db(dbName).collection('class');
+
+    // Extract the model name from the request parameters
+    const modelName = req.params.modelName;
+
+    // Find the GeoJSON model by name
+    let geojson = await collection.findOne({ name: modelName });
+
+    await client.close();
+
+    if (geojson) {
+      res.json(geojson);
+    } else {
+      res.status(404).send('Model not found');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Fehler beim Abrufen der Daten');
+  }
+});
+
 module.exports = router;
 

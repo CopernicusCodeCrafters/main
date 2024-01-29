@@ -625,6 +625,7 @@ async function createClassification() {
     console.log(error);
   }
 }
+
 function loadingAnimation() {
   const dotsElement = document.getElementById('loading-dots');
   let dots = 0;
@@ -671,3 +672,21 @@ fetch('/getModel')
     });
   })
   .catch(error => console.error('Error:', error));
+
+  async function getSpecificModel(modelName ) {
+    try {
+      const response = await fetch(`/getSpecificModel/${modelName}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching specific model:', error.message);
+    }
+  }
+  
+  var specificModelName = "TEstz";
+  getSpecificModel(specificModelName);
+  
