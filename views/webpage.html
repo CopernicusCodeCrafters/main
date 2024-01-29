@@ -12,7 +12,6 @@
     <!-- Bootstrap-datepicker CSS -->
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-
     <!-- Bootstrap-datepicker JS -->
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
@@ -29,6 +28,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
     <!--Own stylesheets-->
+    <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/webpageStyles.css">
     <!--Own Script-->
     <script defer src="JS_views/webpageJS.js"></script>
@@ -57,25 +57,25 @@
 <body>
     <header class="mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" id = "logo" width="50" height="50"
-                    class="d-inline-block align-top" alt=""></a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
-                    class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" area-current="page" href="/webpage">Viewer</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" area-current="page"
-                            href="/trainingsdaten">Trainingsdatenverwalten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" area-current="page" href="/impressum">Impressum </a>
-                    </li>
-                </ul>
-            </div>
+                <a class="navbar-brand" href="/"><img src="\pictures\ccc_logo.png" id="logo" width="50" height="50"
+                        class="d-inline-block align-top" alt="CopernicusCodeCrafters Logo"></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                    aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" area-current="page" href="/webpage">Viewer</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" area-current="page"
+                                href="/trainingsdaten">Trainingsdatenverwalten</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" area-current="page" href="/impressum">Impressum </a>
+                        </li>
+                    </ul>
+                </div>
         </nav>
     </header>
 
@@ -86,17 +86,17 @@
                     <div class="ueberschrift">
                         <h2 class="viewer">Viewer</h2>
                         <div id="wave">
-                          <span class="dot"></span>
-                          <span class="dot"></span>
-                          <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
                         </div>
-                      </div>
+                    </div>
                     <div id="map"></div>
                 </div>
             </div>
             <div class="col-lg-3">
                 <div class="card shadow p-3 h-100 bg-white rounded">
-                    <h2 class="card-title">Options</h2><br>
+                    <h2 class="card-title">Options</h2>
                     <!-- Tab structure and navigation-->
                     <ul class="nav nav-tabs" id="optionsTabs">
                         <li class="nav-item">
@@ -121,9 +121,8 @@
                             <div>
                                 <label for="datepicker2">Select an end date:</label>
                                 <input type="text" class="form-control" id="datepicker2">
-                            </div> <br>
+                            </div>
                             <button id="saveDateBtn" class="black-btn" onclick="getSelectedDates()">Save Dates</button>
-                            <br><br>
                             <!--Area of Interest-->
                             <div>
                                 <h5 class="card-title">Select Area of Interest</h5>
@@ -133,10 +132,10 @@
                                 <!-- Button to activate Upload-->
                                 <button id="uploadButton" class="black-btn">Upload</button>
                                 <button id="refreshDrawBtn" class="light-grey-btn" disabled>
-                                    <i class="fa fa-refresh" style="color:white"></i> 
+                                    <i class="fa fa-refresh" style="color:white"></i>
                                 </button>
                                 <input type="file" id="fileInput" accept=".geojson, .gpkg" style="display: none" />
-                            </div> <br>
+                            </div>
 
                             <!-- Add the 'selectpicker' class to your select element -->
                             <h5 class="card-title">Select Bands</h5>
@@ -152,13 +151,10 @@
                             </select>
 
                             <!-- Initialize Bootstrap Select and handle selection changes -->
-                            <br>
-                            <br>
                             <!--Submit button-->
                             <div>
                                 <button id="submitBtn" class="black-btn" onclick="checkInputs()">Submit</button>
-                            </div> 
-                            <br>
+                            </div>
                         </div>
                         <!-- Classification tab -->
                         <div class="tab-pane fade" id="classification">
@@ -169,23 +165,21 @@
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Choose training model
                                 </button>
-                                <div class="dropdown-menu" aria-labelledby="trainingModelDropdown" id="trainingModelOptions">
+                                <div class="dropdown-menu" aria-labelledby="trainingModelDropdown"
+                                    id="trainingModelOptions">
                                     <!-- Add your dropdown options here -->
                                 </div>
                             </div>
-                        
+
                             <!-- Classification Buttons -->
-                            <br>
                             <div>
                                 <h5 class="card-title">Start Classification</h5>
-                                <button class="green-btn" onclick="checkInputsClassifications()">Classify</button>                                
+                                <button class="green-btn" onclick="checkInputsClassifications()">Classify</button>
                             </div>
-                        
-                            <br>
-                        
+                            <!--Download Classification Button-->
                             <div>
                                 <h5 class="card-title">Download Classification</h5>
-                                <button class="black-btn" >Download</button>
+                                <button class="black-btn">Download</button>
                             </div>
                         </div>
                     </div>
