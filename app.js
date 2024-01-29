@@ -7,8 +7,8 @@ var mongodb = require("mongodb");
 var engines = require('consolidate')
 
 
-const url = "mongodb://127.0.0.1:27017"
-//const url = "mongodb://mongo:27017";
+//const url = "mongodb://127.0.0.1:27017"
+const url = "mongodb://mongo:27017";
 let dbName = "geosoft2";
 
 let client = new mongodb.MongoClient(url);
@@ -66,7 +66,7 @@ app.post('/insert-satelliteimage', async (req, res) => {
 
 //Fügt eine GeoJSON zu der Datenbank hinzu
 app.post('/insert-geojson', async (req, res) => {
-  const { geojson } = req.body;
+  const { geojson } = req.body; //hier
   try {
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
@@ -78,6 +78,25 @@ app.post('/insert-geojson', async (req, res) => {
     res.status(500).send('An error occurred');
   }
 });
+
+app.get('/delete-feature', async (req, res) => {
+  const objectId = req.query._id; 
+  console.log(objectId);
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Trainingspolygone');
+    const result = await collection.deleteOne({ _id: new mongodb.ObjectId(objectId) });
+    if (result.deletedCount === 1) {
+      res.status(200).send('Polygon deleted successfully.');
+    } else {
+      res.status(404).send('Polygon not found.');
+    }
+  } catch (error) {
+    console.error("An error occurred deleting object: ", error);
+    res.status(500).send('An error occurred');
+  }
+});
+
 
 //get-Befehl(Stationen),der alle Datenbank-Objekte als Array zurückgibt
 app.get('/getAllPolygons', async (req, res) => {
@@ -127,5 +146,28 @@ app.get('/getGeoJSON', async (req, res) => {
       res.status(500).send('Fehler beim Abrufen der Daten');
   }
 });
+
+async function clearCollectionOnStart() {
+  try {
+    const dbName1 = 'geosoft2';
+    const collectionName1 = 'class';
+    await client.connect();
+    const db = client.db(dbName1);
+    const collection = db.collection(collectionName1);
+
+    // Lösche alle Dokumente aus der Sammlung
+    await collection.deleteMany({});
+
+    console.log('MongoDB collection cleared on server start.');
+
+    await client.close();
+  } catch (error) {
+    console.error('Error clearing MongoDB collection on server start:', error);
+  }
+}
+
+
+//clearCollectionOnStart();
+
 
 module.exports = app;
