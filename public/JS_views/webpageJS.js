@@ -394,6 +394,12 @@ function processGeoJSON(geojsonData) {
   convertedNorth = convertedNorthEast[1];
   convertedEast = convertedNorthEast[0];
 
+
+  south = bbox[1];
+  west = bbox[0];
+  north = bbox[3];
+  east = bbox[2];
+
   console.log('Converted South West (EPSG:3857):', convertedSouthWest);
   console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
@@ -581,6 +587,8 @@ async function createDatacube() {
   stopRotation();
 }
 
+
+
 async function createClassification() {
   console.log("Creating Classification");
   startRotation();
@@ -695,6 +703,47 @@ function stopRotation() {
   let wave = document.getElementById('wave');
   wave.classList.remove('show');
 }
+
+
+document.addEventListener("DOMContentLoaded", async function(){
+  document.getElementById("leastCloudCoverage").addEventListener("click", async function(){
+
+    const lowerLeftLong = west;
+    const lowerLeftLat = south;
+    const upperRightLong = east;
+    const upperRightLat = north;
+    //Transform dates into earth-search compatible
+    const startDate = selectedDates[0] + "T00:00:00.000Z";
+    const endDate = selectedDates[1] + "T23:59:59.999Z";
+
+
+    
+    // Url for request with filter parameters
+    const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    console.log(apiUrl);
+    fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse response body as JSON
+    })
+    .then(data => {
+      // Return formatted date, so it can be used for the openeocubes request again
+      console.log(data);
+      const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
+      const date = new Date(timestamp);
+      const formattedDate = date.toISOString().split('T')[0];
+      console.log(formattedDate);
+      selectedDates[0] = formattedDate;
+      selectedDates[1] = formattedDate;
+    })
+    .catch(error => {
+      // Handle fetch errors here
+      console.error('Fetch error:', error);
+    });
+  })
+})
 
 
 
