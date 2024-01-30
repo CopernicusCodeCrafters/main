@@ -185,10 +185,16 @@ let drawControl = new L.Control.Draw({
   }
 });
 
-let convertedEast = 0;
-let convertedNorth = 0;
-let convertedSouth = 0;
-let convertedWest = 0;
+
+var convertedEast = 0;
+var convertedNorth = 0;
+var convertedSouth = 0;
+var convertedWest = 0;
+var south;
+var west;
+var north;
+var east;
+
 
 
 // Set maximum allowed area in square meters
@@ -213,6 +219,11 @@ document.getElementById('drawButton').addEventListener('click', function () {
     // Extract coordinates from the bounds object
     let southWest = bounds.getSouthWest(); // returns LatLng object
     let northEast = bounds.getNorthEast(); // returns LatLng object
+
+    south = southWest.lat;
+    west = southWest.lng;
+    north = northEast.lat;
+    east = northEast.lng;
 
     // Define the source and destination coordinate systems
     let sourceCRS = 'EPSG:4326';
@@ -386,6 +397,12 @@ function processGeoJSON(geojsonData) {
   convertedWest = convertedSouthWest[0];
   convertedNorth = convertedNorthEast[1];
   convertedEast = convertedNorthEast[0];
+
+
+  south = bbox[1];
+  west = bbox[0];
+  north = bbox[3];
+  east = bbox[2];
 
   console.log('Converted South West (EPSG:3857):', convertedSouthWest);
   console.log('Converted North East (EPSG:3857):', convertedNorthEast);
@@ -581,6 +598,8 @@ async function createDatacube() {
   stopRotation();
 }
 
+
+
 async function createClassification() {
   console.log("Creating Classification");
   startRotation();
@@ -635,7 +654,7 @@ async function createClassification() {
 
       } catch (error) {
         stopRotation();
-        console.log("Error connecting);", error);
+        console.log("Error connecting;", error);
         alert("Error")
       }
     };
@@ -916,6 +935,199 @@ function stopRotation() {
   let wave = document.getElementById('wave');
   wave.classList.remove('show');
 }
+
+
+document.addEventListener("DOMContentLoaded", async function(){
+  document.getElementById("leastCloudCoverage").addEventListener("click", async function(){
+
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();  
+    var AoIgiven = false;
+  
+    // Check if something is drawn
+    if (drawnItems.getLayers().length > 0) {
+      AoIgiven = true;
+    }
+  
+    // Check if something is uploaded
+    var fileInputValue = document.getElementById('fileInput').value;
+    if (fileInputValue !== '') {
+      AoIgiven = true;
+    }
+
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+
+    const lowerLeftLong = west;
+    const lowerLeftLat = south;
+    const upperRightLong = east;
+    const upperRightLat = north;
+
+    //Transform dates into earth-search compatible
+    const startDate = selectedDates[0] + "T00:00:00.000Z";
+    const endDate = selectedDates[1] + "T23:59:59.999Z";
+    
+    // Url for request with filter parameters
+    const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    console.log(apiUrl);
+    fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse response body as JSON
+    })
+    .then(data => {
+      // Return formatted date, so it can be used for the openeocubes request again
+      console.log(data);
+      const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
+      const date = new Date(timestamp);
+      const formattedDate = date.toISOString().split('T')[0];
+      console.log(formattedDate);
+      selectedDates[0] = formattedDate;
+      selectedDates[1] = formattedDate;
+
+
+      const lowCCButton = document.getElementById("leastCloudCoverage");
+      const agg = document.getElementById("aggregate");
+      const select = document.getElementById("selectAvailable");
+      lowCCButton.classList.remove("black-btn");
+      lowCCButton.classList.add("accepted-btn");
+      agg.classList.remove("black-btn");
+      agg.classList.add("light-grey-btn");
+      select.classList.remove("black-btn");
+      select.classList.add("light-grey-btn");
+      
+      lowCCButton.disabled = true;
+      agg.disabled = true;
+      select.disabled = true;
+    })
+    .catch(error => {
+      // Handle fetch errors here
+      console.error('Fetch error:', error);
+    });
+  } else {
+    alert("Please fill in all the values");
+  }
+  });
+
+  document.getElementById("aggregate").addEventListener("click", async function(){
+    const lowCCButton = document.getElementById("leastCloudCoverage");
+    const agg = document.getElementById("aggregate");
+    const select = document.getElementById("selectAvailable");
+    lowCCButton.classList.remove("black-btn");
+    lowCCButton.classList.add("light-grey-btn");
+    agg.classList.remove("black-btn");
+    agg.classList.add("accepted-btn");
+    select.classList.remove("black-btn");
+    select.classList.add("light-grey-btn");
+    
+    lowCCButton.disabled = true;
+    agg.disabled = true;
+    select.disabled = true;
+  });
+
+  document.getElementById("selectAvailable").addEventListener("click", async function(){
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();  
+    var AoIgiven = false;
+  
+    // Check if something is drawn
+    if (drawnItems.getLayers().length > 0) {
+      AoIgiven = true;
+    }
+  
+    // Check if something is uploaded
+    var fileInputValue = document.getElementById('fileInput').value;
+    if (fileInputValue !== '') {
+      AoIgiven = true;
+    }
+
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+
+    const lowerLeftLong = west;
+    const lowerLeftLat = south;
+    const upperRightLong = east;
+    const upperRightLat = north;
+
+    //Transform dates into earth-search compatible
+    const startDate = selectedDates[0] + "T00:00:00.000Z";
+    const endDate = selectedDates[1] + "T23:59:59.999Z";
+    
+    // Url for request with filter parameters
+    const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    console.log(apiUrl);
+    fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse response body as JSON
+    })
+    .then(data => {
+      // Return formatted date, so it can be used for the openeocubes request again
+      console.log(data);
+      document.getElementById("popup").style.display = "block";
+
+      const table = document.createElement("table");
+      const headerRow = table.insertRow();
+      headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
+
+
+        data.features.filter(item => item.properties['eo:cloud_cover'] < 30).forEach(item => {
+        const row = table.insertRow();
+        const timeCell = row.insertCell(0);
+        const cloudCoverCell = row.insertCell(1);
+
+        const date = new Date(item.properties.datetime);
+        const formattedDate = date.toISOString().split('T')[0];
+        
+        timeCell.textContent = formattedDate;
+        cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
+
+        row.addEventListener("click", function() {
+          const previouslySelectedRow = table.querySelector(".selected");
+          if (previouslySelectedRow) {
+            previouslySelectedRow.classList.remove("selected");
+          }
+          // Add selection to the clicked row
+          row.classList.add("selected");
+
+          // Handle item selection here
+          console.log(`Selected: ${formattedDate}`);
+          selectedDates[0] = formattedDate;
+          selectedDates[1] = formattedDate;
+        });
+        document.getElementById("dynamicTable").appendChild(table);
+      });
+
+    })
+    .catch(error => {
+      // Handle fetch errors here
+      console.error('Fetch error:', error);
+    });
+  } else {
+    alert("Please fill in all the values");
+  }
+  });
+  document.getElementById("closePopupBtn").addEventListener("click", function() {
+    document.getElementById("popup").style.display = "none";
+    const lowCCButton = document.getElementById("leastCloudCoverage");
+    const agg = document.getElementById("aggregate");
+    const select = document.getElementById("selectAvailable");
+    lowCCButton.classList.remove("black-btn");
+    lowCCButton.classList.add("light-grey-btn");
+    agg.classList.remove("black-btn");
+    agg.classList.add("light-grey-btn");
+    select.classList.remove("black-btn");
+    select.classList.add("accepted-btn");
+    
+    lowCCButton.disabled = true;
+    agg.disabled = true;
+    select.disabled = true;
+  });
+})
 
 
 

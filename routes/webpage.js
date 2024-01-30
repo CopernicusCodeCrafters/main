@@ -86,7 +86,6 @@ router.get('/satelliteImage', async function (req, res, next) {
  
     );
 
-
     //filter bands
     let datacube_filtered = builder.filter_bands(datacube,bandsArray);
 
@@ -94,7 +93,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     var mean = function(data) {
       return this.mean(data);
     };
-    let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");  
+    let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");
 
     //Compute result 
     let result = builder.save_result(datacube_filtered, "GTiff");    
@@ -113,6 +112,9 @@ router.get('/satelliteImage', async function (req, res, next) {
     res.status(500).json({ error: 'Internal Server Error' }); // Send error response
   }
 });
+
+
+
 
 router.get('/getClassification', async function (req, res, next) {
   try {
