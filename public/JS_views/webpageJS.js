@@ -708,15 +708,32 @@ function stopRotation() {
 document.addEventListener("DOMContentLoaded", async function(){
   document.getElementById("leastCloudCoverage").addEventListener("click", async function(){
 
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();  
+    var AoIgiven = false;
+  
+    // Check if something is drawn
+    if (drawnItems.getLayers().length > 0) {
+      AoIgiven = true;
+    }
+  
+    // Check if something is uploaded
+    var fileInputValue = document.getElementById('fileInput').value;
+    if (fileInputValue !== '') {
+      AoIgiven = true;
+    }
+
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+
     const lowerLeftLong = west;
     const lowerLeftLat = south;
     const upperRightLong = east;
     const upperRightLat = north;
+
     //Transform dates into earth-search compatible
     const startDate = selectedDates[0] + "T00:00:00.000Z";
     const endDate = selectedDates[1] + "T23:59:59.999Z";
-
-
     
     // Url for request with filter parameters
     const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
@@ -737,12 +754,50 @@ document.addEventListener("DOMContentLoaded", async function(){
       console.log(formattedDate);
       selectedDates[0] = formattedDate;
       selectedDates[1] = formattedDate;
+
+
+      const lowCCButton = document.getElementById("leastCloudCoverage");
+      const agg = document.getElementById("aggregate");
+      const select = document.getElementById("selectAvailable");
+      lowCCButton.classList.remove("black-btn");
+      lowCCButton.classList.add("accepted-btn");
+      agg.classList.remove("black-btn");
+      agg.classList.add("light-grey-btn");
+      select.classList.remove("black-btn");
+      select.classList.add("light-grey-btn");
+      
+      lowCCButton.disabled = true;
+      agg.disabled = true;
+      select.disabled = true;
     })
     .catch(error => {
       // Handle fetch errors here
       console.error('Fetch error:', error);
     });
-  })
+  } else {
+    alert("Please fill in all the values");
+  }
+  });
+
+  document.getElementById("aggregate").addEventListener("click", async function(){
+    const lowCCButton = document.getElementById("leastCloudCoverage");
+    const agg = document.getElementById("aggregate");
+    const select = document.getElementById("selectAvailable");
+    lowCCButton.classList.remove("black-btn");
+    lowCCButton.classList.add("light-grey-btn");
+    agg.classList.remove("black-btn");
+    agg.classList.add("accepted-btn");
+    select.classList.remove("black-btn");
+    select.classList.add("light-grey-btn");
+    
+    lowCCButton.disabled = true;
+    agg.disabled = true;
+    select.disabled = true;
+  });
+
+  document.getElementById("selectAvailable").addEventListener("click", async function(){
+    
+  });
 })
 
 
