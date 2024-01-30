@@ -1,12 +1,21 @@
+/*Base font size for rem scalability */
+html {
+  font-size: 16px;
+}
+
+/*Body styles */
+body {
+  margin: 0;
+  padding: 0;
+}
+
 /* Custom styles for the tab pane content */
 .tab-content {
-  padding: 20px;
-  /* Adjust the padding as needed */
+  padding: 1rem;
 }
 
 .tab-pane {
-  margin-top: 10px;
-  /* Adjust the margin as needed */
+  margin-top: 1rem; 
 }
 
 .card-title {
@@ -18,6 +27,7 @@
   border: 2px solid transparent;
   /* Adjust the border width as needed */
 }
+
 
 /* Button for area of interest */
 .black-btn {
@@ -199,6 +209,7 @@
   background-color: #d4edda;
 }
 
+
 .ueberschrift {
   display: flex;
   align-items: center; /* Optional: Align items vertically in the center */
@@ -242,4 +253,99 @@
 }
 #wave.stop {
   display: none;
+}
+
+@keyframes rotate {
+  0% {
+      transform: rotate(0deg);
+  }
+
+  100% {
+      transform: rotate(360deg);
+  }
+}
+
+.rotate {
+  animation: rotate 1s linear infinite;
+}
+/*Setup*/
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+html,
+body,
+#mapid {
+  height: 100%;
+  width: 100%;
+}
+
+/*Legend specific*/
+.legend {
+  padding: 6px 8px;
+  font: 14px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  /*box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);*/
+  /*border-radius: 5px;*/
+  line-height: 24px;
+  color: #555;
+}
+.legend h4 {
+  text-align: center;
+  font-size: 16px;
+  margin: 2px 12px 8px;
+  color: #777;
+}
+
+.legend span {
+  position: relative;
+  bottom: 3px;
+}
+
+.legend i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin: 0 8px 0 0;
+}
+
+.legend i.icon {
+  background-size: 18px;
+  background-color: rgba(255, 255, 255, 1);
+}
+/* mobile devices : */
+@media screen and (max-width: 600px) {
+  #map {
+      height: 100vh;
+      width: 100%;
+
+      border: 5px;
+      margin: 0;
+      padding: 50px;
+
+  }
+}
+
+/*Tablets*/
+@media screen and (min-width: 601px) {
+  #map {
+      height: 80vh;
+      width: 100%;
+
+
+      border: 5px;
+      margin: 0;
+      padding: 0;
+
+  }
+}
+
+@media only screen and (min-width: 992px) {
+
+  #map {
+      border: 3px solid #000000;
+      height: 80vh;
+  }
 }

@@ -62,6 +62,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     let west = req.query.west;
     let north = req.query.north;
     let east = req.query.east;
+    
     console.log(south,west,north,east)
     console.log("Bands:",bandsArray)
     console.log("Date:",dateArray)
@@ -81,6 +82,7 @@ router.get('/satelliteImage', async function (req, res, next) {
       3857,
       dateArray, 
       bandsArray
+      
  
     );
 
@@ -126,6 +128,7 @@ router.get('/getClassification', async function (req, res, next) {
     let north = req.query.north;
     let east = req.query.east;
     let model = req.query.model;
+    
     console.log(south,west,north,east)
     console.log("Bands:",bandsArray)
     console.log("Date:",dateArray)
@@ -144,15 +147,13 @@ router.get('/getClassification', async function (req, res, next) {
       "sentinel-s2-l2a-cogs",
       {west: west, south: south, east: east, north: north},
       3857,
-      dateArray, 
-      bandsArray
- 
+      dateArray
     );
 
 
     //filter bands
-    let datacube_filtered = builder.filter_bands(datacube,bandsArray);
-    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
+    //let datacube_filtered = builder.filter_bands(datacube,bandsArray);
+    let datacube_filled = builder.fill_NAs_cube(datacube);
     //let datacube_agg = builder.aggregate_temporal_period(data = datacube_filled, period = "month");
 
     //Reduce Dimension of Datacube
@@ -200,11 +201,12 @@ router.get('/buildModel', async function (req, res, next) {
         north: convertedNorth},
       3857,
       ["2021-06-01", "2021-06-30"]
+      
     );
 
-    let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
+    //let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
     
-    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
+    let datacube_filled = builder.fill_NAs_cube(datacube);
 
     var mean = function(data) {
       return this.mean(data);
@@ -269,4 +271,31 @@ router.get('/getModel', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// GET endpoint to retrieve data for a specific model by name
+router.get('/getSpecificModel/:modelName', async (req, res) => {
+  try {
+    let client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true }); // mongodb client
+    let dbName = "geosoft2";
+    let collection = client.db(dbName).collection('class');
+
+    // Extract the model name from the request parameters
+    const modelName = req.params.modelName;
+
+    // Find the GeoJSON model by name
+    let geojson = await collection.findOne({ name: modelName });
+
+    await client.close();
+
+    if (geojson) {
+      res.json(geojson);
+    } else {
+      res.status(404).send('Model not found');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Fehler beim Abrufen der Daten');
+  }
+});
+
 module.exports = router;

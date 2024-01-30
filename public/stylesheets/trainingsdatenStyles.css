@@ -2,7 +2,7 @@
 @media screen and (max-width: 600px) {
     #map {
         height: 100vh;
-        width: 50%;
+        width: 100%;
 
         border: 5px;
         margin: 0;
@@ -60,4 +60,85 @@
 
 .full-height-card {
     height: calc(100vh-50px); /* 100% of the viewport height */
+  }
+
+input[type="file"] {
+    font-size: 0;
+}
+
+::file-selector-button {
+    font-size: initial;
+}
+
+
+input:checked+.slider {
+    background-color: #ffffff;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #000000;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.ueberschrift {
+    display: flex;
+    align-items: center; /* Optional: Align items vertically in the center */
+  }
+  
+#wave {
+    display: none;
+    margin-left: auto; 
+    margin-right: 0;
+  }
+  
+  .dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 3px;
+    background: #303131;
+    animation: wave 1.3s linear infinite;
+  
+    &:nth-child(2) {
+      animation-delay: -1.1s;
+    }
+  
+    &:nth-child(3) {
+      animation-delay: -0.9s;
+    }
+  }
+  @keyframes wave {
+    0%, 60%, 100% {
+      transform: initial;
+    }
+  
+    30% {
+      transform: translateY(-15px);
+    }
+  }
+  #wave.show {
+    display: flex; /* Show the wave when the 'show' class is added */
+  }
+  #wave.stop {
+    display: none;
+  }
+  
+  @keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+  
+    100% {
+        transform: rotate(360deg);
+    }
+  }
+  
+  .rotate {
+    animation: rotate 1s linear infinite;
   }
