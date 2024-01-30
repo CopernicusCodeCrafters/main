@@ -796,7 +796,104 @@ document.addEventListener("DOMContentLoaded", async function(){
   });
 
   document.getElementById("selectAvailable").addEventListener("click", async function(){
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();  
+    var AoIgiven = false;
+  
+    // Check if something is drawn
+    if (drawnItems.getLayers().length > 0) {
+      AoIgiven = true;
+    }
+  
+    // Check if something is uploaded
+    var fileInputValue = document.getElementById('fileInput').value;
+    if (fileInputValue !== '') {
+      AoIgiven = true;
+    }
+
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+
+    const lowerLeftLong = west;
+    const lowerLeftLat = south;
+    const upperRightLong = east;
+    const upperRightLat = north;
+
+    //Transform dates into earth-search compatible
+    const startDate = selectedDates[0] + "T00:00:00.000Z";
+    const endDate = selectedDates[1] + "T23:59:59.999Z";
     
+    // Url for request with filter parameters
+    const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    console.log(apiUrl);
+    fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse response body as JSON
+    })
+    .then(data => {
+      // Return formatted date, so it can be used for the openeocubes request again
+      console.log(data);
+      document.getElementById("popup").style.display = "block";
+
+      const table = document.createElement("table");
+      const headerRow = table.insertRow();
+      headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
+
+
+        data.features.filter(item => item.properties['eo:cloud_cover'] < 30).forEach(item => {
+        const row = table.insertRow();
+        const timeCell = row.insertCell(0);
+        const cloudCoverCell = row.insertCell(1);
+
+        const date = new Date(item.properties.datetime);
+        const formattedDate = date.toISOString().split('T')[0];
+        
+        timeCell.textContent = formattedDate;
+        cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
+
+        row.addEventListener("click", function() {
+          const previouslySelectedRow = table.querySelector(".selected");
+          if (previouslySelectedRow) {
+            previouslySelectedRow.classList.remove("selected");
+          }
+          // Add selection to the clicked row
+          row.classList.add("selected");
+
+          // Handle item selection here
+          console.log(`Selected: ${formattedDate}`);
+          selectedDates[0] = formattedDate;
+          selectedDates[1] = formattedDate;
+        });
+        document.getElementById("dynamicTable").appendChild(table);
+      });
+
+    })
+    .catch(error => {
+      // Handle fetch errors here
+      console.error('Fetch error:', error);
+    });
+  } else {
+    alert("Please fill in all the values");
+  }
+  });
+  document.getElementById("closePopupBtn").addEventListener("click", function() {
+    document.getElementById("popup").style.display = "none";
+    const lowCCButton = document.getElementById("leastCloudCoverage");
+    const agg = document.getElementById("aggregate");
+    const select = document.getElementById("selectAvailable");
+    lowCCButton.classList.remove("black-btn");
+    lowCCButton.classList.add("light-grey-btn");
+    agg.classList.remove("black-btn");
+    agg.classList.add("light-grey-btn");
+    select.classList.remove("black-btn");
+    select.classList.add("accepted-btn");
+    
+    lowCCButton.disabled = true;
+    agg.disabled = true;
+    select.disabled = true;
   });
 })
 
