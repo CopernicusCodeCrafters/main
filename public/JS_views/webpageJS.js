@@ -462,6 +462,10 @@ function selectTrainingModel(event, model) {
   document.getElementById("trainingModelDropdown").textContent = model;
 }
 async function checkInputsClassifications(){
+  if(demoVal === true){
+    demo();
+  }
+  else{
    // Get the values of the datePickers
    let date1Value = $('#datepicker1').val();
    let date2Value = $('#datepicker2').val();
@@ -496,6 +500,7 @@ async function checkInputsClassifications(){
    } else {
      alert("Please fill in all the values")
    }
+  }
 }
 
 async function createDatacube() {
@@ -504,7 +509,7 @@ async function createDatacube() {
   
   try {
     // Include converted bounds in the satelliteImage request
-    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
+    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     let blob = await response.blob();
     console.log("warum")
 
@@ -576,13 +581,99 @@ async function createDatacube() {
   stopRotation();
 }
 
-createClassification();
-
 async function createClassification() {
   console.log("Creating Classification");
   startRotation();
-  
   try {
+    console.log(model)
+    // Include converted bounds in the satelliteImage request
+    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    const blob = await response.blob();
+    console.log("warum")
+
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'satelliteImage.tif';
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    // read arraybuffer
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const arrayBuffer = reader.result;
+
+      try {
+        // transform arrayBuffer to georaster
+        const georaster = await parseGeoraster(arrayBuffer);
+
+        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+
+
+        // available color scales can be found by running console.log(chroma.brewer);
+        console.log(georaster)
+
+        let layer = new GeoRasterLayer({
+          georaster: georaster,
+          opacity: 1,
+
+          pixelValuesToColorFn: function (pixelValues) {
+            // Assuming "class" is at index 0 in pixelValues array
+            var classValue = pixelValues[0];
+            // Define colors dynamically based on class values
+            var color = getColorForClass(classValue);
+            return color;
+          },
+          resolution: 512
+        });
+        layer.addTo(map);
+
+        map.fitBounds(layer.getBounds());
+        stopRotation();
+
+      } catch (error) {
+        stopRotation();
+        console.log("Error connecting);", error);
+        alert("Error")
+      }
+    };
+
+    let legend = L.control({ position: "topleft" });
+    legend.onAdd = function(map) {
+      let div = L.DomUtil.create("div", "legend");
+      div.innerHTML += "<h4>Legende</h4>";
+    
+      getSpecificModel(String(model)).then(model => {
+        let nameClass = model.class;
+        console.log("nameClass(keys):",nameClass.keys);
+        console.log("nameClass (values):",nameClass.values)
+        console.log(Object.keys(nameClass))
+    
+        // Loop through class values and get colors using getColorForClass function
+        Object.values(nameClass).forEach(value => {
+          let color = getColorForClass(value);
+          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value]}</span><br>`;
+        });
+    
+        // Example: Find the key for class value 2
+        let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
+        console.log(keyWithValue2); // This will output: "Siedlung"
+      });
+    
+      return div;
+    };
+    
+    legend.addTo(map);
+  } catch (error) {
+    stopRotation();
+    alert(Error)
+    console.log(error);
+  }
+  
+  
+  /*try {
     const localTIFPath = 'pictures/satelliteImage.tif';
     const response = await fetch(localTIFPath);
     const blob = await response.blob();
@@ -595,7 +686,7 @@ async function createClassification() {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-    */
+    
     // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {
@@ -613,7 +704,7 @@ async function createClassification() {
             // Assuming "class" is at index 0 in pixelValues array
             var classValue = pixelValues[0];
 
-// Define colors dynamically based on class values
+            // Define colors dynamically based on class values
             var color = getColorForClass(classValue);
 
             return color;
@@ -625,6 +716,7 @@ async function createClassification() {
         
         layer.addTo(map);
         map.fitBounds(layer.getBounds());
+
         stopRotation();
       } catch (error) {
         stopRotation();
@@ -638,7 +730,129 @@ async function createClassification() {
     stopRotation();
     alert("Error");
     console.log(error);
+  }*/
+}
+
+async function demo(){
+  startRotation();
+  setTimeout(async function() {
+  try {
+    const localTIFPath = 'pictures/satelliteImage.tif';
+    const response = await fetch(localTIFPath);
+    const blob = await response.blob();
+    
+    // read arraybuffer
+    const reader = new FileReader();
+    reader.onload = async () => {
+      let arrayBuffer = reader.result;
+
+      try {
+        const georaster = await parseGeoraster(arrayBuffer);
+console.log(georaster);
+                let layer = new GeoRasterLayer({
+          georaster: georaster,
+          opacity: 1,
+          
+          pixelValuesToColorFn: function (pixelValues) {
+            // Assuming "class" is at index 0 in pixelValues array
+            var classValue = pixelValues[0];
+
+            // Define colors dynamically based on class values
+            var color = getColorForClass(classValue);
+
+            return color;
+
+
+          },
+          resolution: 512
+        });
+        
+        layer.addTo(map);
+        //map.fitBounds(layer.getBounds());
+
+        let legend = L.control({ position: "topleft" });
+        legend.onAdd = function(map) {
+          let div = L.DomUtil.create("div", "legend");
+          div.innerHTML += "<h4>Legende</h4>";
+        
+          getSpecificModel("Test").then(model => {
+            let nameClass = model.class;
+            console.log("nameClass(keys):",nameClass.keys);
+            console.log("nameClass (values):",nameClass.values)
+            console.log(Object.keys(nameClass))
+        
+            // Loop through class values and get colors using getColorForClass function
+            Object.values(nameClass).forEach(value => {
+              let color = getColorForClass(value);
+              div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
+            });
+        
+            // Example: Find the key for class value 2
+            let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
+            console.log(keyWithValue2); // This will output: "Siedlung"
+          });
+        
+          return div;
+        };
+        
+        legend.addTo(map);
+        stopRotation();
+
+      } catch (error) {
+        stopRotation();
+        console.log("Error connecting:", error);
+        alert("Error");
+      }
+    };
+
+    reader.readAsArrayBuffer(blob);
+  } catch (error) {
+    stopRotation();
+    alert("Error");
+    console.log(error);
   }
+  demoVal = false;
+  startRotation();
+  }, 10000);
+}
+
+let demoVal = false;
+
+function simulateUserInput() {
+  demoVal = true;
+  // Simulate date input
+  $('#datepicker1').val('2021-06-01');
+  $('#datepicker2').val('2021-06-15');
+  
+  let saveDateBtn = document.getElementById("saveDateBtn");
+
+    // Remove the current class
+    saveDateBtn.classList.remove("black-btn");
+
+    // Add the new class
+    saveDateBtn.classList.add("accepted-btn");
+
+  const bandsPicker = $('#bandsPicker');
+
+  // Array of indices of bands to be selected (0-indexed)
+  const selectedBandsIndices = [1, 2, 3]; // Bands 2, 3, and 4
+
+  // Loop through the indices and set the selected property for each option
+  selectedBandsIndices.forEach(index => {
+    bandsPicker.find('option').eq(index).prop('selected', true);
+  });
+
+  // Trigger the change event to ensure that the Bootstrap Select is updated
+  bandsPicker.selectpicker('refresh');
+
+  // Assign selected bands to your variable if needed
+  selectedBands = ['B02', 'B03', 'B04']
+
+  const modelName = 'Test';  // Replace with the desired model name
+
+// Trigger a click event on the corresponding dropdown item
+const dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
+dropdownItem.trigger('click');
 }
 
 var randomColors= generateRandomColors();
@@ -688,18 +902,6 @@ function getColorForClass(classValue) {
   return classColors[classValue] || defaultColor;
 }
 
-function loadingAnimation() {
-  const dotsElement = document.getElementById('loading-dots');
-  let dots = 0;
-
-  function updateDots() {
-    dots = (dots + 1) % 4;
-    const dotsText = '.'.repeat(dots);
-    dotsElement.textContent = `Loading${dotsText}`;
-  }
-  setInterval(updateDots, 500);
-
-}
 
 function startRotation() {
   let logo = document.getElementById('logo');
@@ -735,7 +937,7 @@ fetch('/getModel')
   })
   .catch(error => console.error('Error:', error));
 
-  async function getSpecificModel(modelName ) {
+  async function getSpecificModel(modelName) {
     try {
       let response = await fetch(`/getSpecificModel/${modelName}`);
       if (!response.ok) {
@@ -750,31 +952,5 @@ fetch('/getModel')
     }
   }
 
-  let legend = L.control({ position: "topleft" });
-
-  legend.onAdd = function(map) {
-    let div = L.DomUtil.create("div", "legend");
-    div.innerHTML += "<h4>Legende</h4>";
-  
-    getSpecificModel("TEstz").then(model => {
-      let nameClass = model.class;
-      console.log("nameClass(keys):",nameClass.keys);
-      console.log("nameClass (values):",nameClass.values)
-      console.log(Object.keys(nameClass))
-  
-      // Loop through class values and get colors using getColorForClass function
-      Object.values(nameClass).forEach(value => {
-        let color = getColorForClass(value);
-        div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
-      });
-  
-      // Example: Find the key for class value 2
-      let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
-      console.log(keyWithValue2); // This will output: "Siedlung"
-    });
-  
-    return div;
-  };
-  
-  legend.addTo(map);
+ 
   
