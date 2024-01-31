@@ -967,10 +967,20 @@ document.addEventListener("DOMContentLoaded", async function(){
     const startDate = selectedDates[0] + "T00:00:00.000Z";
     const endDate = selectedDates[1] + "T23:59:59.999Z";
     
-    // Url for request with filter parameters
-    const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
-    console.log(apiUrl);
-    fetch(apiUrl)
+    // Url for request with filter parameters for earth seasrch v1
+    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    // console.log(apiUrl);
+    // fetch(apiUrl)
+
+    //URL for earth-search v0 (As openeocubes uses), but dicontinued
+    const datetime= selectedDates[0] + "/" + selectedDates[1];
+    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
+    
+    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+    console.log(httpRequestUrl);
+    
+    fetch(httpRequestUrl)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -1053,12 +1063,23 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     //Transform dates into earth-search compatible
     const startDate = selectedDates[0] + "T00:00:00.000Z";
-    const endDate = selectedDates[1] + "T23:59:59.999Z";
+    const endDate = selectedDates[0] + "T23:59:59.999Z";
     
+    // URL for earth-search v1, id eocubes switches to that one
     // Url for request with filter parameters
-    const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
-    console.log(apiUrl);
-    fetch(apiUrl)
+    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    // console.log(apiUrl);
+    // fetch(apiUrl)
+
+    //URL for earth-search v0 (As openeocubes uses), but dicontinued
+    const datetime= selectedDates[0] + "/" + selectedDates[1];
+    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
+
+    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+    console.log(httpRequestUrl);
+
+    fetch(httpRequestUrl)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
