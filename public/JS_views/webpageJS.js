@@ -215,6 +215,7 @@ document.getElementById('drawButton').addEventListener('click', function () {
     console.log(type)
     console.log(layer)
     let bounds = layer.getBounds();
+    console.log(bounds)
 
     // Extract coordinates from the bounds object
     let southWest = bounds.getSouthWest(); // returns LatLng object
@@ -437,7 +438,7 @@ async function checkInputs() {
 
   let submitBtn = document.getElementById("submitBtn");
 
-  let AoIgiven = false;
+  let AoIgiven = true;
   let bandsGiven = false;
 
   // Check if something is drawn
@@ -756,6 +757,7 @@ async function demo(){
   startRotation();
   setTimeout(async function() {
   try {
+    map.removeLayer(layer1);
     const localTIFPath = 'pictures/satelliteImage.tif';
     const response = await fetch(localTIFPath);
     const blob = await response.blob();
@@ -836,7 +838,7 @@ console.log(georaster);
 }
 
 let demoVal = false;
-
+let layer1;
 function simulateUserInput() {
   demoVal = true;
   // Simulate date input
@@ -850,6 +852,18 @@ function simulateUserInput() {
 
     // Add the new class
     saveDateBtn.classList.add("accepted-btn");
+  
+    let startDate = '2021-06-01';
+    let endDate = '2021-06-15';
+    console.log(startDate)
+      // Format dates as YYYY-MM-DD
+      let formattedStartDate = startDate;
+      let formattedEndDate = endDate;
+  
+      // Store dates in an array
+      selectedDates = [formattedStartDate, formattedEndDate];
+  
+      console.log(selectedDates);
 
   const bandsPicker = $('#bandsPicker');
 
@@ -872,6 +886,90 @@ function simulateUserInput() {
 // Trigger a click event on the corresponding dropdown item
 const dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
 dropdownItem.trigger('click');
+
+
+
+
+// Coordinates for the corners of the rectangle
+var northEast1 = L.latLng(51.954226919876916, 7.6094913482666025);
+var southWest1 = L.latLng(51.937555584581446, 7.577991485595704);
+
+// Create a LatLngBounds object
+let bounds = L.latLngBounds(southWest1, northEast1);
+
+// Add a rectangle to the map
+layer1 = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+
+    bounds = layer1.getBounds();
+    console.log(bounds)
+
+    // Extract coordinates from the bounds object
+    let southWest = bounds.getSouthWest(); // returns LatLng object
+    let northEast = bounds.getNorthEast(); // returns LatLng object
+
+    south = southWest.lat;
+    west = southWest.lng;
+    north = northEast.lat;
+    east = northEast.lng;
+
+    // Define the source and destination coordinate systems
+    let sourceCRS = 'EPSG:4326';
+    let destCRS = 'EPSG:3857';
+
+    // Define the projection transformations
+    proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+    proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+
+    // Perform the coordinate transformation
+    let convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
+    let convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
+
+    //Extract LatLng from converted object
+    convertedSouth = convertedSouthWest[1];
+    convertedWest = convertedSouthWest[0];
+    convertedNorth = convertedNorthEast[1];
+    convertedEast = convertedNorthEast[0];
+
+    console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+    console.log('Converted North East (EPSG:3857):', convertedNorthEast);
+
+    let uploadRecBtn = document.getElementById("uploadButton");
+    let drawBtn = document.getElementById("drawButton");
+    let refreshDrawBtn = document.getElementById("refreshDrawBtn")
+
+    //Remove the current class
+    uploadRecBtn.classList.remove("black-btn");
+    drawBtn.classList.remove("black-btn");
+    refreshDrawBtn.classList.remove("light-grey-btn")
+
+    // Add the new class
+    uploadRecBtn.classList.add("light-grey-btn");
+    drawBtn.classList.add("accepted-btn");
+    refreshDrawBtn.classList.add("black-btn")
+    //Change button text
+    drawBtn.innerHTML = "Drawn";
+
+    //Change disabled functions
+    uploadRecBtn.disabled = true;
+    drawBtn.disabled = true;
+    refreshDrawBtn.disabled = false;
+
+    drawnItems.getLayers().length =1
+
+    map.removeControl(drawControl)
+
+// Optionally, fit the map to the rectangle bounds
+  
+  //map.removeLayer(layer);
+
+
+
+const lowCCButton = document.getElementById("leastCloudCoverage");
+      const agg = document.getElementById("aggregate");
+      const select = document.getElementById("selectAvailable");
+      lowCCButton.classList.remove("black-btn");
+      lowCCButton.classList.add("accepted-btn");
+
 }
 
 var randomColors= generateRandomColors();
