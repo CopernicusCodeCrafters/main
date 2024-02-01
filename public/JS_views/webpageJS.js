@@ -185,10 +185,16 @@ let drawControl = new L.Control.Draw({
   }
 });
 
-let convertedEast = 0;
-let convertedNorth = 0;
-let convertedSouth = 0;
-let convertedWest = 0;
+
+var convertedEast = 0;
+var convertedNorth = 0;
+var convertedSouth = 0;
+var convertedWest = 0;
+var south;
+var west;
+var north;
+var east;
+
 
 
 // Set maximum allowed area in square meters
@@ -209,10 +215,16 @@ document.getElementById('drawButton').addEventListener('click', function () {
     console.log(type)
     console.log(layer)
     let bounds = layer.getBounds();
+    console.log(bounds)
 
     // Extract coordinates from the bounds object
     let southWest = bounds.getSouthWest(); // returns LatLng object
     let northEast = bounds.getNorthEast(); // returns LatLng object
+
+    south = southWest.lat;
+    west = southWest.lng;
+    north = northEast.lat;
+    east = northEast.lng;
 
     // Define the source and destination coordinate systems
     let sourceCRS = 'EPSG:4326';
@@ -387,6 +399,12 @@ function processGeoJSON(geojsonData) {
   convertedNorth = convertedNorthEast[1];
   convertedEast = convertedNorthEast[0];
 
+
+  south = bbox[1];
+  west = bbox[0];
+  north = bbox[3];
+  east = bbox[2];
+
   console.log('Converted South West (EPSG:3857):', convertedSouthWest);
   console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
@@ -420,7 +438,7 @@ async function checkInputs() {
 
   let submitBtn = document.getElementById("submitBtn");
 
-  let AoIgiven = false;
+  let AoIgiven = true;
   let bandsGiven = false;
 
   // Check if something is drawn
@@ -462,6 +480,10 @@ function selectTrainingModel(event, model) {
   document.getElementById("trainingModelDropdown").textContent = model;
 }
 async function checkInputsClassifications(){
+  if(demoVal === true){
+    demo();
+  }
+  else{
    // Get the values of the datePickers
    let date1Value = $('#datepicker1').val();
    let date2Value = $('#datepicker2').val();
@@ -496,6 +518,7 @@ async function checkInputsClassifications(){
    } else {
      alert("Please fill in all the values")
    }
+  }
 }
 
 async function createDatacube() {
@@ -504,7 +527,7 @@ async function createDatacube() {
   
   try {
     // Include converted bounds in the satelliteImage request
-    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
+    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     let blob = await response.blob();
     console.log("warum")
 
@@ -576,13 +599,101 @@ async function createDatacube() {
   stopRotation();
 }
 
-createClassification();
+
 
 async function createClassification() {
   console.log("Creating Classification");
   startRotation();
-  
   try {
+    console.log(model)
+    // Include converted bounds in the satelliteImage request
+    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    const blob = await response.blob();
+    console.log("warum")
+
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'satelliteImage.tif';
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    // read arraybuffer
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const arrayBuffer = reader.result;
+
+      try {
+        // transform arrayBuffer to georaster
+        const georaster = await parseGeoraster(arrayBuffer);
+
+        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+
+
+        // available color scales can be found by running console.log(chroma.brewer);
+        console.log(georaster)
+
+        let layer = new GeoRasterLayer({
+          georaster: georaster,
+          opacity: 1,
+
+          pixelValuesToColorFn: function (pixelValues) {
+            // Assuming "class" is at index 0 in pixelValues array
+            var classValue = pixelValues[0];
+            // Define colors dynamically based on class values
+            var color = getColorForClass(classValue);
+            return color;
+          },
+          resolution: 512
+        });
+        layer.addTo(map);
+
+        map.fitBounds(layer.getBounds());
+        stopRotation();
+
+      } catch (error) {
+        stopRotation();
+        console.log("Error connecting;", error);
+        alert("Error")
+      }
+    };
+
+    let legend = L.control({ position: "topleft" });
+    legend.onAdd = function(map) {
+      let div = L.DomUtil.create("div", "legend");
+      div.innerHTML += "<h4>Legende</h4>";
+    
+      getSpecificModel(String(model)).then(model => {
+        let nameClass = model.class;
+        console.log("nameClass(keys):",nameClass.keys);
+        console.log("nameClass (values):",nameClass.values)
+        console.log(Object.keys(nameClass))
+    
+        // Loop through class values and get colors using getColorForClass function
+        Object.values(nameClass).forEach(value => {
+          let color = getColorForClass(value);
+          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value]}</span><br>`;
+        });
+    
+        // Example: Find the key for class value 2
+        let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
+        console.log(keyWithValue2); // This will output: "Siedlung"
+      });
+    
+      return div;
+    };
+    
+    legend.addTo(map);
+  } catch (error) {
+    stopRotation();
+    alert(Error)
+    console.log(error);
+  }
+  
+  
+  /*try {
     const localTIFPath = 'pictures/satelliteImage.tif';
     const response = await fetch(localTIFPath);
     const blob = await response.blob();
@@ -595,7 +706,7 @@ async function createClassification() {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-    */
+    
     // read arraybuffer
     const reader = new FileReader();
     reader.onload = async () => {
@@ -605,10 +716,10 @@ async function createClassification() {
         const georaster = await parseGeoraster(arrayBuffer);
         console.log(georaster);
 
-        let layer = new GeoRasterLayer({
+                let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
-
+          
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
             var classValue = pixelValues[0];
@@ -617,12 +728,15 @@ async function createClassification() {
             var color = getColorForClass(classValue);
 
             return color;
+
+
           },
           resolution: 512
         });
-
+        
         layer.addTo(map);
         map.fitBounds(layer.getBounds());
+
         stopRotation();
       } catch (error) {
         stopRotation();
@@ -636,7 +750,226 @@ async function createClassification() {
     stopRotation();
     alert("Error");
     console.log(error);
+  }*/
+}
+
+async function demo(){
+  startRotation();
+  setTimeout(async function() {
+  try {
+    map.removeLayer(layer1);
+    const localTIFPath = 'pictures/satelliteImage.tif';
+    const response = await fetch(localTIFPath);
+    const blob = await response.blob();
+    
+    // read arraybuffer
+    const reader = new FileReader();
+    reader.onload = async () => {
+      let arrayBuffer = reader.result;
+
+      try {
+        const georaster = await parseGeoraster(arrayBuffer);
+console.log(georaster);
+                let layer = new GeoRasterLayer({
+          georaster: georaster,
+          opacity: 1,
+          
+          pixelValuesToColorFn: function (pixelValues) {
+            // Assuming "class" is at index 0 in pixelValues array
+            var classValue = pixelValues[0];
+
+            // Define colors dynamically based on class values
+            var color = getColorForClass(classValue);
+
+            return color;
+
+
+          },
+          resolution: 512
+        });
+        
+        layer.addTo(map);
+        //map.fitBounds(layer.getBounds());
+
+        let legend = L.control({ position: "topleft" });
+        legend.onAdd = function(map) {
+          let div = L.DomUtil.create("div", "legend");
+          div.innerHTML += "<h4>Legende</h4>";
+        
+          getSpecificModel("Test").then(model => {
+            let nameClass = model.class;
+            console.log("nameClass(keys):",nameClass.keys);
+            console.log("nameClass (values):",nameClass.values)
+            console.log(Object.keys(nameClass))
+        
+            // Loop through class values and get colors using getColorForClass function
+            Object.values(nameClass).forEach(value => {
+              let color = getColorForClass(value);
+              div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
+            });
+        
+            // Example: Find the key for class value 2
+            let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
+            console.log(keyWithValue2); // This will output: "Siedlung"
+          });
+        
+          return div;
+        };
+        
+        legend.addTo(map);
+        stopRotation();
+
+      } catch (error) {
+        stopRotation();
+        console.log("Error connecting:", error);
+        alert("Error");
+      }
+    };
+
+    reader.readAsArrayBuffer(blob);
+  } catch (error) {
+    stopRotation();
+    alert("Error");
+    console.log(error);
   }
+  demoVal = false;
+  startRotation();
+  }, 10000);
+}
+
+let demoVal = false;
+let layer1;
+function simulateUserInput() {
+  demoVal = true;
+  // Simulate date input
+  $('#datepicker1').val('2021-06-01');
+  $('#datepicker2').val('2021-06-15');
+  
+  let saveDateBtn = document.getElementById("saveDateBtn");
+
+    // Remove the current class
+    saveDateBtn.classList.remove("black-btn");
+
+    // Add the new class
+    saveDateBtn.classList.add("accepted-btn");
+  
+    let startDate = '2021-06-01';
+    let endDate = '2021-06-15';
+    console.log(startDate)
+      // Format dates as YYYY-MM-DD
+      let formattedStartDate = startDate;
+      let formattedEndDate = endDate;
+  
+      // Store dates in an array
+      selectedDates = [formattedStartDate, formattedEndDate];
+  
+      console.log(selectedDates);
+
+  const bandsPicker = $('#bandsPicker');
+
+  // Array of indices of bands to be selected (0-indexed)
+  const selectedBandsIndices = [1, 2, 3]; // Bands 2, 3, and 4
+
+  // Loop through the indices and set the selected property for each option
+  selectedBandsIndices.forEach(index => {
+    bandsPicker.find('option').eq(index).prop('selected', true);
+  });
+
+  // Trigger the change event to ensure that the Bootstrap Select is updated
+  bandsPicker.selectpicker('refresh');
+
+  // Assign selected bands to your variable if needed
+  selectedBands = ['B02', 'B03', 'B04']
+
+  const modelName = 'Test';  // Replace with the desired model name
+
+// Trigger a click event on the corresponding dropdown item
+const dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
+dropdownItem.trigger('click');
+
+
+
+
+// Coordinates for the corners of the rectangle
+var northEast1 = L.latLng(51.954226919876916, 7.6094913482666025);
+var southWest1 = L.latLng(51.937555584581446, 7.577991485595704);
+
+// Create a LatLngBounds object
+let bounds = L.latLngBounds(southWest1, northEast1);
+
+// Add a rectangle to the map
+layer1 = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+
+    bounds = layer1.getBounds();
+    console.log(bounds)
+
+    // Extract coordinates from the bounds object
+    let southWest = bounds.getSouthWest(); // returns LatLng object
+    let northEast = bounds.getNorthEast(); // returns LatLng object
+
+    south = southWest.lat;
+    west = southWest.lng;
+    north = northEast.lat;
+    east = northEast.lng;
+
+    // Define the source and destination coordinate systems
+    let sourceCRS = 'EPSG:4326';
+    let destCRS = 'EPSG:3857';
+
+    // Define the projection transformations
+    proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+    proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+
+    // Perform the coordinate transformation
+    let convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
+    let convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
+
+    //Extract LatLng from converted object
+    convertedSouth = convertedSouthWest[1];
+    convertedWest = convertedSouthWest[0];
+    convertedNorth = convertedNorthEast[1];
+    convertedEast = convertedNorthEast[0];
+
+    console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+    console.log('Converted North East (EPSG:3857):', convertedNorthEast);
+
+    let uploadRecBtn = document.getElementById("uploadButton");
+    let drawBtn = document.getElementById("drawButton");
+    let refreshDrawBtn = document.getElementById("refreshDrawBtn")
+
+    //Remove the current class
+    uploadRecBtn.classList.remove("black-btn");
+    drawBtn.classList.remove("black-btn");
+    refreshDrawBtn.classList.remove("light-grey-btn")
+
+    // Add the new class
+    uploadRecBtn.classList.add("light-grey-btn");
+    drawBtn.classList.add("accepted-btn");
+    refreshDrawBtn.classList.add("black-btn")
+    //Change button text
+    drawBtn.innerHTML = "Drawn";
+
+    //Change disabled functions
+    uploadRecBtn.disabled = true;
+    drawBtn.disabled = true;
+    refreshDrawBtn.disabled = false;
+
+    drawnItems.getLayers().length =1
+
+    map.removeControl(drawControl)
+
+// Optionally, fit the map to the rectangle bounds
+  
+  //map.removeLayer(layer);
+
+
+
+const lowCCButton = document.getElementById("leastCloudCoverage");
+      const agg = document.getElementById("aggregate");
+      const select = document.getElementById("selectAvailable");
+      lowCCButton.classList.remove("black-btn");
+      lowCCButton.classList.add("accepted-btn");
+
 }
 
 var randomColors= generateRandomColors();
@@ -671,7 +1004,6 @@ function generateRandomColors() {
 
 function getColorForClass(classValue) {
   // Define colors dynamically based on class values
-  // You can modify this logic based on your specific class-color mapping
   var classColors = {
     1: randomColors[0],
     2: randomColors[1],
@@ -687,18 +1019,6 @@ function getColorForClass(classValue) {
   return classColors[classValue] || defaultColor;
 }
 
-function loadingAnimation() {
-  const dotsElement = document.getElementById('loading-dots');
-  let dots = 0;
-
-  function updateDots() {
-    dots = (dots + 1) % 4;
-    const dotsText = '.'.repeat(dots);
-    dotsElement.textContent = `Loading${dotsText}`;
-  }
-  setInterval(updateDots, 500);
-
-}
 
 function startRotation() {
   let logo = document.getElementById('logo');
@@ -713,6 +1033,220 @@ function stopRotation() {
   let wave = document.getElementById('wave');
   wave.classList.remove('show');
 }
+
+
+document.addEventListener("DOMContentLoaded", async function(){
+  document.getElementById("leastCloudCoverage").addEventListener("click", async function(){
+
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();  
+    var AoIgiven = false;
+  
+    // Check if something is drawn
+    if (drawnItems.getLayers().length > 0) {
+      AoIgiven = true;
+    }
+  
+    // Check if something is uploaded
+    var fileInputValue = document.getElementById('fileInput').value;
+    if (fileInputValue !== '') {
+      AoIgiven = true;
+    }
+
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+
+    const lowerLeftLong = west;
+    const lowerLeftLat = south;
+    const upperRightLong = east;
+    const upperRightLat = north;
+
+    //Transform dates into earth-search compatible
+    const startDate = selectedDates[0] + "T00:00:00.000Z";
+    const endDate = selectedDates[1] + "T23:59:59.999Z";
+    
+    // Url for request with filter parameters for earth seasrch v1
+    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    // console.log(apiUrl);
+    // fetch(apiUrl)
+
+    //URL for earth-search v0 (As openeocubes uses), but dicontinued
+    const datetime= selectedDates[0] + "/" + selectedDates[1];
+    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
+    
+    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+    console.log(httpRequestUrl);
+    
+    fetch(httpRequestUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse response body as JSON
+    })
+    .then(data => {
+      // Return formatted date, so it can be used for the openeocubes request again
+      console.log(data);
+      const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
+      const date = new Date(timestamp);
+      const formattedDate = date.toISOString().split('T')[0];
+      console.log(formattedDate);
+      selectedDates[0] = formattedDate;
+      selectedDates[1] = formattedDate;
+
+
+      const lowCCButton = document.getElementById("leastCloudCoverage");
+      const agg = document.getElementById("aggregate");
+      const select = document.getElementById("selectAvailable");
+      lowCCButton.classList.remove("black-btn");
+      lowCCButton.classList.add("accepted-btn");
+      agg.classList.remove("black-btn");
+      agg.classList.add("light-grey-btn");
+      select.classList.remove("black-btn");
+      select.classList.add("light-grey-btn");
+      
+      lowCCButton.disabled = true;
+      agg.disabled = true;
+      select.disabled = true;
+    })
+    .catch(error => {
+      // Handle fetch errors here
+      console.error('Fetch error:', error);
+    });
+  } else {
+    alert("Please fill in all the values");
+  }
+  });
+
+  document.getElementById("aggregate").addEventListener("click", async function(){
+    const lowCCButton = document.getElementById("leastCloudCoverage");
+    const agg = document.getElementById("aggregate");
+    const select = document.getElementById("selectAvailable");
+    lowCCButton.classList.remove("black-btn");
+    lowCCButton.classList.add("light-grey-btn");
+    agg.classList.remove("black-btn");
+    agg.classList.add("accepted-btn");
+    select.classList.remove("black-btn");
+    select.classList.add("light-grey-btn");
+    
+    lowCCButton.disabled = true;
+    agg.disabled = true;
+    select.disabled = true;
+  });
+
+  document.getElementById("selectAvailable").addEventListener("click", async function(){
+    var date1Value = $('#datepicker1').val();
+    var date2Value = $('#datepicker2').val();  
+    var AoIgiven = false;
+  
+    // Check if something is drawn
+    if (drawnItems.getLayers().length > 0) {
+      AoIgiven = true;
+    }
+  
+    // Check if something is uploaded
+    var fileInputValue = document.getElementById('fileInput').value;
+    if (fileInputValue !== '') {
+      AoIgiven = true;
+    }
+
+    // Check if both Dateinputs are not empty
+    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+
+    const lowerLeftLong = west;
+    const lowerLeftLat = south;
+    const upperRightLong = east;
+    const upperRightLat = north;
+
+    //Transform dates into earth-search compatible
+    const startDate = selectedDates[0] + "T00:00:00.000Z";
+    const endDate = selectedDates[0] + "T23:59:59.999Z";
+    
+    // URL for earth-search v1, id eocubes switches to that one
+    // Url for request with filter parameters
+    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    // console.log(apiUrl);
+    // fetch(apiUrl)
+
+    //URL for earth-search v0 (As openeocubes uses), but dicontinued
+    const datetime= selectedDates[0] + "/" + selectedDates[1];
+    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
+
+    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+    console.log(httpRequestUrl);
+
+    fetch(httpRequestUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse response body as JSON
+    })
+    .then(data => {
+      // Return formatted date, so it can be used for the openeocubes request again
+      console.log(data);
+      document.getElementById("popup").style.display = "block";
+
+      const table = document.createElement("table");
+      const headerRow = table.insertRow();
+      headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
+
+
+        data.features.filter(item => item.properties['eo:cloud_cover'] < 30).forEach(item => {
+        const row = table.insertRow();
+        const timeCell = row.insertCell(0);
+        const cloudCoverCell = row.insertCell(1);
+
+        const date = new Date(item.properties.datetime);
+        const formattedDate = date.toISOString().split('T')[0];
+        
+        timeCell.textContent = formattedDate;
+        cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
+
+        row.addEventListener("click", function() {
+          const previouslySelectedRow = table.querySelector(".selected");
+          if (previouslySelectedRow) {
+            previouslySelectedRow.classList.remove("selected");
+          }
+          // Add selection to the clicked row
+          row.classList.add("selected");
+
+          // Handle item selection here
+          console.log(`Selected: ${formattedDate}`);
+          selectedDates[0] = formattedDate;
+          selectedDates[1] = formattedDate;
+        });
+        document.getElementById("dynamicTable").appendChild(table);
+      });
+
+    })
+    .catch(error => {
+      // Handle fetch errors here
+      console.error('Fetch error:', error);
+    });
+  } else {
+    alert("Please fill in all the values");
+  }
+  });
+  document.getElementById("closePopupBtn").addEventListener("click", function() {
+    document.getElementById("popup").style.display = "none";
+    const lowCCButton = document.getElementById("leastCloudCoverage");
+    const agg = document.getElementById("aggregate");
+    const select = document.getElementById("selectAvailable");
+    lowCCButton.classList.remove("black-btn");
+    lowCCButton.classList.add("light-grey-btn");
+    agg.classList.remove("black-btn");
+    agg.classList.add("light-grey-btn");
+    select.classList.remove("black-btn");
+    select.classList.add("accepted-btn");
+    
+    lowCCButton.disabled = true;
+    agg.disabled = true;
+    select.disabled = true;
+  });
+})
 
 
 
@@ -734,7 +1268,7 @@ fetch('/getModel')
   })
   .catch(error => console.error('Error:', error));
 
-  async function getSpecificModel(modelName ) {
+  async function getSpecificModel(modelName) {
     try {
       let response = await fetch(`/getSpecificModel/${modelName}`);
       if (!response.ok) {
@@ -748,19 +1282,6 @@ fetch('/getModel')
       console.error('Error fetching specific model:', error.message);
     }
   }
-let legend = L.control({ position: "topleft" });
 
-legend.onAdd = function(map) {
-  let div = L.DomUtil.create("div", "legend");
-  div.innerHTML += "<h4>Legende</h4>";
-  getSpecificModel("TEstz").then(model => {
-    let nameClass = model.class;
-    for(let value in nameClass){
-      div.innerHTML += `<i style="background: #E8E6E0"></i><span>${value}</span><br>`;
-    }
-  let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
-  console.log(keyWithValue2); // This will output: "Siedlung"
-});
-  return div;
-};
-legend.addTo(map);
+ 
+  

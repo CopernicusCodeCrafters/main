@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -52,6 +52,8 @@
     <!--Icon stylesheet for Refreshbutton-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Copernicus Code Crafters</title>
+    <!--CCC browser Icon-->
+    <link rel="icon" type="image/x-icon" href="\pictures\favicon.ico">  
 </head>
 
 <body>
@@ -111,6 +113,8 @@
                     <div class="tab-content">
                         <!--Imagery Tab-->
                         <div class="tab-pane fade show active" id="imagery">
+                            <button id="demoBtn" class="black-btn" onclick="simulateUserInput()">Use Demo Selections</button>
+
                             <!--Datepicker Start date-->
                             <div>
                                 <h5 class="card-title">Choose Time Period</h5>
@@ -136,19 +140,39 @@
                                 </button>
                                 <input type="file" id="fileInput" accept=".geojson, .gpkg" style="display: none" />
                             </div>
+                            
+                            <div>
+                              <h5 class="card-title">Select your Image</h5>
+                              <button id="leastCloudCoverage" class="black-btn">Lowest CC</button>
+                              <button id="aggregate" class="black-btn">Aggregate all</button>
+                              <button id="selectAvailable" class="black-btn">Select one</button>
+                              <div id="popup" class="popup">
+                                <div class="popup-content">
+                                  <span class="close" id="closePopupBtn">&times;</span>
+                                  <div id="dynamicTable"></div>
+                                </div>
+                              </div>
+                              <br />
+                            </div>
+                            <br />
 
-                            <!-- Add the 'selectpicker' class to your select element -->
-                            <h5 class="card-title">Select Bands</h5>
-                            <select id="bandsPicker" class="selectpicker" multiple data-max-options="8">
-                                <option data-subtext="B01">Band 1 - Coastal aerosol</option>
-                                <option data-subtext="B02">Band 2 - Blue</option>
-                                <option data-subtext="B03">Band 3 - Green</option>
-                                <option data-subtext="B04">Band 4 - Red</option>
-                                <option data-subtext="B05">Band 5 - VRE</option>
-                                <option data-subtext="B06">Band 6 - VRE</option>
-                                <option data-subtext="B07">Band 7 - VRE</option>
-                                <option data-subtext="B08">Band 8 - NIR</option>
-                            </select>
+              <!-- Add the 'selectpicker' class to your select element -->
+              <h5 class="card-title">Select Bands</h5>
+              <select
+                id="bandsPicker"
+                class="selectpicker"
+                multiple
+                data-max-options="8"
+              >
+                <option data-subtext="B01">Band 1 - Coastal aerosol</option>
+                <option data-subtext="B02">Band 2 - Blue</option>
+                <option data-subtext="B03">Band 3 - Green</option>
+                <option data-subtext="B04">Band 4 - Red</option>
+                <option data-subtext="B05">Band 5 - VRE</option>
+                <option data-subtext="B06">Band 6 - VRE</option>
+                <option data-subtext="B07">Band 7 - VRE</option>
+                <option data-subtext="B08">Band 8 - NIR</option>
+              </select>
 
                             <!-- Initialize Bootstrap Select and handle selection changes -->
                             <!--Submit button-->
@@ -185,7 +209,29 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Classification tab -->
+            <div class="tab-pane fade" id="classification">
+              <!-- Training model selection -->
+              <div class="dropdown">
+                <h5 class="card-title">Select Training Model</h5>
+                <button
+                  class="dropdown-btn dropdown-toggle"
+                  type="button"
+                  id="trainingModelDropdown"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Choose training model
+                </button>
+                <div
+                  class="dropdown-menu"
+                  aria-labelledby="trainingModelDropdown"
+                  id="trainingModelOptions"
+                >
+                  <!-- Add your dropdown options here -->
+                </div>
+              </div>
             <div class="container-fluid">
                 <footer>
                     <div class="d-flex flex-wrap justify-content-between align-items-center py-1 my-3 border-top">
