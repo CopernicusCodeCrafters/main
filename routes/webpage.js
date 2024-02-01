@@ -199,11 +199,7 @@ router.get('/buildModel', async function (req, res, next) {
         north: convertedNorth},
       3857,
       ["2021-06-01", "2021-06-30"]
-      
     );
-
-    //let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04"]);
-    
     let datacube_filled = builder.fill_NAs_cube(datacube);
 
     var mean = function(data) {
