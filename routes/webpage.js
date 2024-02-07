@@ -10,8 +10,12 @@ const bodyParser = require('body-parser');
 
 let url = "mongodb://127.0.0.1:27017";
 //let url = "mongodb://mongo:27017"; // connection URL
-//let openeo_url = 'http://0.0.0.0:8000'
+
+// set openeourl
+//let openeo_url = 'http://0.0.0.0:8000' - funktioniert nicht 
 let openeo_url = 'http://34.209.215.214:8000'
+
+
 /* GET home page. */
 router.use(bodyParser.json());
 
@@ -149,13 +153,9 @@ router.get('/getClassification', async function (req, res, next) {
       3857,
       dateArray
     );
-
-
-    //filter bands
-    //let datacube_filtered = builder.filter_bands(datacube,bandsArray);
+    // NDVI and fill NAs
+    //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
     let datacube_filled = builder.fill_NAs_cube(datacube);
-    //let datacube_agg = builder.aggregate_temporal_period(data = datacube_filled, period = "month");
-
     //Reduce Dimension of Datacube
     var mean = function(data) {
       return this.mean(data);
@@ -194,6 +194,8 @@ router.get('/buildModel', async function (req, res, next) {
     await connection.authenticateBasic('user', 'password');
     var builder = await connection.buildProcess();
     console.log(convertedWest)
+
+    // datacube init
     var datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
       {west: convertedWest, south: convertedSouth,
@@ -202,6 +204,8 @@ router.get('/buildModel', async function (req, res, next) {
       3857,
       ["2021-06-01", "2021-06-30"]
     );
+      // NDVI and Fill NAs
+    //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
     let datacube_filled = builder.fill_NAs_cube(datacube);
 
     var mean = function(data) {

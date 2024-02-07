@@ -23,18 +23,27 @@ Joaquin Valdez      @jova10
 
 ## Demo and Tutorial
 
+
+
 ### Exploration with "Viewer"
 
 1. Enter starting and ending time
+2. Draw the area of interest
+3. Select bands you would like to see
 
 
 ### Model Creation
 You can create a machine learning model by uploading or drawing training polygons.
 
 After you have created the training polygons you can choose the hyperparamters ntree and mtry.
-You als can give a name to the model. The model will be saved as a .rds file.
+You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
 
 ### Classification
+
+1. Select area of interest 
+2. Enter Start and end date
+3. Select Model , either demo model or your own.
+4. Classify
 
 
 
