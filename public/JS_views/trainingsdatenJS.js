@@ -169,6 +169,33 @@ async function startingPolygonmanager() {
 
 startingPolygonmanager();
 
+// Assume this code is part of your frontend script
+
+// Function to set OpenEO URL
+async function setOpenEoUrl() {
+  try {
+    // Fetch the OpenEO URL from the server
+    const response = await fetch('/webpage/setOpenEoUrl', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'success') {
+      console.log('OpenEO URL set successfully:', data.message);
+    } else {
+      console.error('Error setting OpenEO URL:', data.message);
+    }
+  } catch (error) {
+    console.error('Error setting OpenEO URL:', error.message);
+  }
+}
+
+// Call the function to set OpenEO URL when the webpage is visited
+setOpenEoUrl();
 
 // Input File is processed and shown in the Leaflet Map
 async function handleFile(event) {
@@ -317,6 +344,7 @@ map.on(L.Draw.Event.CREATED, async function (event) {
   drawnItems.addLayer(layer);
 
   await addGeoJSONtoDB(geojson);
+  location.reload();
 });
 
 
@@ -547,7 +575,7 @@ async function buildModel() {
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
+    let response = await fetch(`/webpage/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
     if (response.ok) {
       fetch('/saveModel', {
         method: 'POST',

@@ -4,6 +4,34 @@ let selectedDates = [];
 let selectedBands = [];
 let model = '';
 
+// Assume this code is part of your frontend script
+
+// Function to set OpenEO URL
+async function setOpenEoUrl() {
+  try {
+    // Fetch the OpenEO URL from the server
+    const response = await fetch('/webpage/setOpenEoUrl', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'success') {
+      console.log('OpenEO URL set successfully:', data.message);
+    } else {
+      console.error('Error setting OpenEO URL:', data.message);
+    }
+  } catch (error) {
+    console.error('Error setting OpenEO URL:', error.message);
+  }
+}
+
+// Call the function to set OpenEO URL when the webpage is visited
+setOpenEoUrl();
+
 $(document).ready(function () {
   let today = new Date();
   let minDate = new Date(2015, 0, 1); // Minimum date: January 1, 2015
@@ -22,7 +50,7 @@ $(document).ready(function () {
     autoclose: true,
     todayHighlight: true,
     startDate: today, // Start datepicker2 from today
-    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 30) // Set end date 2 weeks after today
+    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 365) // Set end date 2 weeks after today
   });
 });
 
@@ -30,7 +58,7 @@ $(document).ready(function () {
 $('#datepicker1').on('changeDate', function (e) {
   // Calculate two weeks later
   let endDate = new Date(e.date);
-  endDate.setDate(endDate.getDate() + 30); // 14 days to allow for a 14-day span
+  endDate.setDate(endDate.getDate() + 365); // 14 days to allow for a 14-day span
 
   // Set the new startDate for the second datepicker
   $('#datepicker2').datepicker('setStartDate', e.date);
@@ -527,7 +555,7 @@ async function createDatacube() {
   
   try {
     // Include converted bounds in the satelliteImage request
-    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    let response = await fetch(`/webpage/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     let blob = await response.blob();
     console.log("warum")
 
@@ -607,7 +635,7 @@ async function createClassification() {
   try {
     console.log(model)
     // Include converted bounds in the satelliteImage request
-    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    const response = await fetch(`/webpage/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     const blob = await response.blob();
     console.log("warum")
 
@@ -1194,7 +1222,7 @@ document.addEventListener("DOMContentLoaded", async function(){
       headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
 
 
-        data.features.filter(item => item.properties['eo:cloud_cover'] < 30).forEach(item => {
+        data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] > 0).forEach(item => {
         const row = table.insertRow();
         const timeCell = row.insertCell(0);
         const cloudCoverCell = row.insertCell(1);
@@ -1250,7 +1278,7 @@ document.addEventListener("DOMContentLoaded", async function(){
 
 
 
-fetch('/getModel')
+fetch('/webpage/getModel')
   .then(response => response.json())
   .then(data => {
     // Get the dropdown menu element
@@ -1282,6 +1310,7 @@ fetch('/getModel')
       console.error('Error fetching specific model:', error.message);
     }
   }
+
 
  
   

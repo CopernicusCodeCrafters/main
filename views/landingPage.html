@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CCC-Classifier</title>
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!--OpenEo-->
+    <script src="https://cdn.jsdelivr.net/npm/oidc-client@1/lib/oidc-client.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@openeo/js-client@2/openeo.min.js"></script>
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        .vh-100 {
+            height: 50vh; /* Viewport-Höhe: 50% */
+        }
+        .d-flex {
+            display: flex;
+            flex-direction: column; /* Richtung der Hauptachse (vertikal) */
+            justify-content: center; /* Zentriert Inhalt vertikal */
+        }
+        .align-items-center {
+            align-items: center; /* Zentriert Inhalt horizontal */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="ueberschrift text-center d-flex flex-column align-items-center">
+        <img src="\pictures\ccc_logo.png" width="50" height="50" class="d-inline-block align-top" alt="">
+        <h1 class="text-center">CCC-Classifier</h1>
+    </div>
+    <form id="urlForm"> <!-- Added id to the form for script reference -->
+        <div class="form-group">
+            <label for="urlInput">Enter your CCC OpenEO Cubes URL</label>
+            <input type="url" class="form-control" id="urlInput" placeholder="https://example.com">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <p id="feedback"></p> <!-- Added a paragraph element for feedback -->
+</div>
+    <script>
+        document.getElementById('urlForm').onsubmit = function(event) {
+            event.preventDefault(); // Prevent the form from submitting in the traditional way
+            var url = document.getElementById('urlInput').value;
+
+            if (!url) {
+                document.getElementById('feedback').textContent = 'Please enter an OpenEO URL.';
+                return;
+            }
+
+            document.getElementById('feedback').textContent = 'Processing your OpenEO URL...';
+
+            // Check if entered URL is valid
+            OpenEO.connect(url)
+                .then(function(con) {
+                    console.log("Connection successful");
+                    document.getElementById('feedback').textContent = 'Valid OpenEO URL!';
+                    saveUrlToBackend(url);
+
+                })
+                .catch(function(error) {
+                    console.error("Connection error:", error);
+                    document.getElementById('feedback').textContent = 'Invalid OpenEO URL. Please check and try again.';
+                });
+
+            console.log('Submitted URL:', url);
+        };
+
+        function saveUrlToBackend(url) {
+            console.log(typeof(url),url)
+            fetch(`/save-url`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.getElementById('feedback').textContent = data.message;
+                    //window.location.href = '/webpage';
+
+                })
+                .catch(error => {
+                    console.error('Error saving URL:', error);
+                    document.getElementById('feedback').textContent = 'Error saving URL. Please try again.';
+                });
+            }
+    </script>
+</body>
+</html>

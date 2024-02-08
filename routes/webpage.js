@@ -13,7 +13,7 @@ let url = "mongodb://127.0.0.1:27017";
 
 // set openeourl
 //let openeo_url = 'http://0.0.0.0:8000' - funktioniert nicht 
-let openeo_url = 'http://34.209.215.214:8000'
+let openeo_url = ''
 
 
 /* GET home page. */
@@ -54,6 +54,30 @@ router.post("/newstation", function (req, res, next) {
 //   res.render("add_notification", { title: "Addition Completed", newpoi: poi });
 // }
 
+router.post('/setOpenEoUrl', async (req, res) => {
+  try {
+    const fetchedUrl = await getUrlFromBackend();
+    openeo_url = fetchedUrl;
+    console.log('Set OpenEO URL:', openeo_url);
+    // Further application logic with the retrieved OpenEO URL
+} catch (error) {
+    console.error('Error setting OpenEO URL:', error);
+    // Handle the error as needed
+}
+});
+
+async function getUrlFromBackend() {
+  try {
+    const response = await fetch('/get-url');
+    const urlopeneo = await response.text();
+  } catch (error) {
+    console.error('Error getting OpenEO URL:', error);
+    throw error;
+  }
+}
+
+// Call the function to get the OpenEO URL
+
 // Function to retrieve a RGB Tiff image from OpenEo
 router.get('/satelliteImage', async function (req, res, next) {
   try {
@@ -72,6 +96,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     console.log("Date:",dateArray)
     
     // Connect to the OpenEO server and authenticate
+    console.log(openeo_url)
     let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
 
@@ -297,5 +322,6 @@ router.get('/getSpecificModel/:modelName', async (req, res) => {
     res.status(500).send('Fehler beim Abrufen der Daten');
   }
 });
+
 
 module.exports = router;

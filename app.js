@@ -27,6 +27,7 @@ connectToMongo();
 var indexRouter = require("./routes/webpage");
 var impressumRouter = require("./routes/impressum")
 var trainingsdatenRouter  =require("./routes/trainingsdaten")
+var landingPageRouter = require("./routes/landingPage")
 
 var app = express();
 app.use(express.json())
@@ -44,24 +45,27 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
+app.use("/", landingPageRouter);
 app.use("/webpage", indexRouter);
 app.use("/impressum", impressumRouter)
 app.use("/trainingsdaten",trainingsdatenRouter)
 
-//Fügt eine geotiff zu der Datenbank hinzu
-app.post('/insert-satelliteimage', async (req, res) => {
-  const { geotiff } = req.body;
-  try {
-    const db = client.db(dbName);
-    const collection = db.collection('satellite image');
-    const result = await collection.insertOne(geotiff);
-    console.log('Satellite image inserted successfully:', result.insertedId);
-    res.send('Satellite image inserted successfully');
-  } catch (error) {
-    console.error('An error occurred:', error);
-    res.status(500).send('An error occurred');
-  }
+let openEoUrl = '';
+
+// Save OpenEo Url
+app.post('/save-url', (req, res) => {
+  openEoUrl = req.body.url; // Assuming the URL is sent in the request body
+
+  // Log the received data
+  console.log(typeof(openEoUrl), openEoUrl);
+
+  // Send a response to the client
+  res.json({ status: 'success', message: 'URL saved successfully' });
+});
+
+// Retrieve the current OpenEo URL
+app.get('/get-url', (req, res) => {
+  res.send(openEoUrl);
 });
 
 //Fügt eine GeoJSON zu der Datenbank hinzu
@@ -146,5 +150,4 @@ app.get('/getGeoJSON', async (req, res) => {
       res.status(500).send('Fehler beim Abrufen der Daten');
   }
 });
-
 module.exports = app;
