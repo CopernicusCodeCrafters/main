@@ -18,10 +18,11 @@ Joaquin Valdez      @jova10
     On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance.
 3. docker-compose up --build
 
-4. Enter your AWS adress or "localhost" in the browser to connect to the backend.
+4. Enter your AWS adress in the adress field to connect to the backend.
 
 
 ## Demo and Tutorial
+There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 
 
@@ -37,6 +38,9 @@ You can create a machine learning model by uploading or drawing training polygon
 
 After you have created the training polygons you can choose the hyperparamters ntree and mtry.
 You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
+## Upload of training polygons
+It its important that training polygons which are uploaded have a column/attribute "classification" and a column/attribute "object_id".
+Otherwise the application wont process the polygons correctly.
 
 ### Classification
 
