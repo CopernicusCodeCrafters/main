@@ -152,9 +152,11 @@ router.get('/getClassification', async function (req, res, next) {
       3857,
       dateArray
     );
+
+    let datacube_filtered = builder.filter_bands(datacube,["B01","B02","B03","B04","B08","B011"])
     // NDVI and fill NAs
     //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
-    let datacube_filled = builder.fill_NAs_cube(datacube);
+    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
     //Reduce Dimension of Datacube
     var mean = function(data) {
       return this.mean(data);
@@ -203,9 +205,11 @@ router.get('/buildModel', async function (req, res, next) {
       3857,
       ["2021-06-01", "2021-06-30"]
     );
+
+    let datacube_filtered = builder.filter_bands(datacube,["B01","B02","B03","B04","B08","B011"])
       // NDVI and Fill NAs
     //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
-    let datacube_filled = builder.fill_NAs_cube(datacube);
+    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
 
     var mean = function(data) {
       return this.mean(data);
