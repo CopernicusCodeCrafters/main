@@ -126,7 +126,6 @@ router.get('/getClassification', async function (req, res, next) {
 
     // Passed variables
     let dateArray = req.query.date.split(',');
-    let bandsArray = req.query.bands.split(',');
     let south = req.query.south;
     let west = req.query.west;
     let north = req.query.north;
@@ -134,7 +133,7 @@ router.get('/getClassification', async function (req, res, next) {
     let model = req.query.model;
     
     console.log(south,west,north,east)
-    console.log("Bands:",bandsArray)
+    
     console.log("Date:",dateArray)
     console.log("Model:",model)
     
