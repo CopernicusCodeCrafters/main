@@ -42,7 +42,7 @@ services:
             - '8081:8081'
 
     ccceocubes_con:
-        image: kwundram/ccceocubes:b4
+        image: kwundram/ccceocubes:b5
         environment:
         - AWSHOST=34.209.215.214
         - TZ=Etc/UTC

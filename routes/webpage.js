@@ -91,7 +91,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     );
 
     //filter bands
-    let datacube_filtered = builder.filter_bands(datacube,bandsArray);
+    //let datacube_filtered = builder.filter_bands(datacube,bandsArray);
 
     //Reduce Dimension of Datacube
     var mean = function(data) {
