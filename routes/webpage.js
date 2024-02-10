@@ -67,7 +67,7 @@ router.post('/setOpenEoUrl', async (req, res) => {
 
 async function getUrlFromBackend() {
   try {
-    const response = await fetch('http://localhost:3000/get-url');
+    const response = await fetch(`http://localhost:3000/get-url`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -133,7 +133,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");
 
     //Compute result 
-    let result = builder.save_result(datacube_filtered, "GTiff");    
+    let result = builder.save_result(datacube_reduced, "GTiff");    
     let response = await connection.computeResult(result);
 
 
@@ -156,7 +156,6 @@ router.get('/satelliteImage', async function (req, res, next) {
 router.get('/getClassification', async function (req, res, next) {
   try {
     console.log('Processing satellite image...'); // Indicate the code is running up to this point
-
     // Passed variables
     let dateArray = req.query.date.split(',');
     let bandsArray = req.query.bands.split(',');
