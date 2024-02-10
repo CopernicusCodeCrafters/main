@@ -65,7 +65,7 @@ app.post('/save-url', (req, res) => {
 
 // Retrieve the current OpenEo URL
 app.get('/get-url', (req, res) => {
-  res.send(openEoUrl);
+  res.json({url: openEoUrl});
 });
 
 //Fügt eine GeoJSON zu der Datenbank hinzu

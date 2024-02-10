@@ -62,14 +62,22 @@ router.post('/setOpenEoUrl', async (req, res) => {
     // Further application logic with the retrieved OpenEO URL
 } catch (error) {
     console.error('Error setting OpenEO URL:', error);
-    // Handle the error as needed
 }
 });
 
 async function getUrlFromBackend() {
   try {
-    const response = await fetch('/get-url');
-    const urlopeneo = await response.text();
+    const response = await fetch('http://localhost:3000/get-url');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    try {
+      const urlopeneo = await response.json();
+      return urlopeneo.url;
+    } catch (e) {
+      console.error('Error parsing JSON:', e);
+      throw e; // Re-throw to handle this error specifically
+    }
   } catch (error) {
     console.error('Error getting OpenEO URL:', error);
     throw error;
