@@ -97,7 +97,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     var mean = function(data) {
       return this.mean(data);
     };
-    let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");
+    let datacube_reduced = builder.reduce_dimension(datacube, mean, dimension = "t");
 
     //Compute result 
     let result = builder.save_result(datacube_reduced, "GTiff");    
