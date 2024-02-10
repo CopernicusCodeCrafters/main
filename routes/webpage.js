@@ -100,7 +100,7 @@ router.get('/satelliteImage', async function (req, res, next) {
     let datacube_reduced = builder.reduce_dimension(datacube_filtered, mean, dimension = "t");
 
     //Compute result 
-    let result = builder.save_result(datacube_filtered, "GTiff");    
+    let result = builder.save_result(datacube_reduced, "GTiff");    
     let response = await connection.computeResult(result);
 
 
