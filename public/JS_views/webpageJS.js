@@ -608,9 +608,9 @@ async function createClassification() {
     console.log(model)
     // Include converted bounds in the satelliteImage request
     const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    console.log("response:",response)
     const blob = await response.blob();
-    console.log("warum")
-
+    console.log("blob:",blob)
 
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
@@ -621,23 +621,19 @@ async function createClassification() {
     document.body.removeChild(downloadLink);
 
     // read arraybuffer
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => {
-      const arrayBuffer = reader.result;
+    let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
-
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
-
-
-        // available color scales can be found by running console.log(chroma.brewer);
-        console.log(georaster)
+        console.log("Georaster:",georaster);
 
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
+          zIndex:15,
 
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
@@ -659,6 +655,8 @@ async function createClassification() {
         alert("Error")
       }
     };
+    reader.readAsArrayBuffer(blob);
+
 
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function(map) {
@@ -674,7 +672,7 @@ async function createClassification() {
         // Loop through class values and get colors using getColorForClass function
         Object.values(nameClass).forEach(value => {
           let color = getColorForClass(value);
-          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value]}</span><br>`;
+          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
         });
     
         // Example: Find the key for class value 2

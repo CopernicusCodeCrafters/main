@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 
 
 
-//let url = "mongodb://127.0.0.1:27017";
-let url = "mongodb://mongo:27017"; // connection URL
+let url = "mongodb://127.0.0.1:27017";
+//let url = "mongodb://mongo:27017"; // connection URL
 
 // set openeourl
 //let openeo_url = 'http://0.0.0.0:8000' - funktioniert nicht 
