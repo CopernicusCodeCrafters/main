@@ -607,10 +607,10 @@ async function createClassification() {
   try {
     console.log(model)
     // Include converted bounds in the satelliteImage request
-    /*const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    console.log("response:",response)
     const blob = await response.blob();
-    console.log("warum")
-
+    console.log("blob:",blob)
 
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
@@ -621,23 +621,19 @@ async function createClassification() {
     document.body.removeChild(downloadLink);
 
     // read arraybuffer
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => {
-      const arrayBuffer = reader.result;
+    let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
-
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
-
-
-        // available color scales can be found by running console.log(chroma.brewer);
-        console.log(georaster)
+        console.log("Georaster:",georaster);
 
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
+          zIndex:15,
 
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
@@ -658,7 +654,9 @@ async function createClassification() {
         console.log("Error connecting;", error);
         alert("Error")
       }
-    };*/
+    };
+    reader.readAsArrayBuffer(blob);
+
 
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function(map) {
@@ -674,7 +672,7 @@ async function createClassification() {
         // Loop through class values and get colors using getColorForClass function
         Object.values(nameClass).forEach(value => {
           let color = getColorForClass(value);
-          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value]}</span><br>`;
+          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
         });
     
         // Example: Find the key for class value 2
@@ -692,65 +690,6 @@ async function createClassification() {
     console.log(error);
   }
   
-  
-  /*try {
-    const localTIFPath = 'pictures/satelliteImage.tif';
-    const response = await fetch(localTIFPath);
-    const blob = await response.blob();
-
-    /*
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    
-    // read arraybuffer
-    const reader = new FileReader();
-    reader.onload = async () => {
-      let arrayBuffer = reader.result;
-
-      try {
-        const georaster = await parseGeoraster(arrayBuffer);
-        console.log(georaster);
-
-                let layer = new GeoRasterLayer({
-          georaster: georaster,
-          opacity: 1,
-          
-          pixelValuesToColorFn: function (pixelValues) {
-            // Assuming "class" is at index 0 in pixelValues array
-            var classValue = pixelValues[0];
-
-            // Define colors dynamically based on class values
-            var color = getColorForClass(classValue);
-
-            return color;
-
-
-          },
-          resolution: 512
-        });
-        
-        layer.addTo(map);
-        map.fitBounds(layer.getBounds());
-
-        stopRotation();
-      } catch (error) {
-        stopRotation();
-        console.log("Error connecting:", error);
-        alert("Error");
-      }
-    };
-
-    reader.readAsArrayBuffer(blob);
-  } catch (error) {
-    stopRotation();
-    alert("Error");
-    console.log(error);
-  }*/
 }
 
 async function demo(){
