@@ -22,7 +22,7 @@ $(document).ready(function () {
     autoclose: true,
     todayHighlight: true,
     startDate: today, // Start datepicker2 from today
-    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 30) // Set end date 2 weeks after today
+    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 365) // Set end date 
   });
 });
 
@@ -30,7 +30,7 @@ $(document).ready(function () {
 $('#datepicker1').on('changeDate', function (e) {
   // Calculate two weeks later
   let endDate = new Date(e.date);
-  endDate.setDate(endDate.getDate() + 30); // 14 days to allow for a 14-day span
+  endDate.setDate(endDate.getDate() + 365); // 14 days to allow for a 14-day span
 
   // Set the new startDate for the second datepicker
   $('#datepicker2').datepicker('setStartDate', e.date);
@@ -607,7 +607,7 @@ async function createClassification() {
   try {
     console.log(model)
     // Include converted bounds in the satelliteImage request
-    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    /*const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     const blob = await response.blob();
     console.log("warum")
 
@@ -658,7 +658,7 @@ async function createClassification() {
         console.log("Error connecting;", error);
         alert("Error")
       }
-    };
+    };*/
 
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function(map) {
