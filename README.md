@@ -35,14 +35,18 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 4. "Aggregate all" will reduce the time series to the mean of the band values. By default only images with a cloudcover lower than 10 % will be used. But you can change the cloud cover value.
 5. you can also select a specific image with "select one" or get the image with the lowest Cloudcover with "lowest CC"
 
+6. At the end you have to use "Submit"
+
 
 ### Model Creation
 
 1. You can create a machine learning model by uploading or drawing training polygons.
 
-2. After you have created the training polygons you can choose the hyperparamters ntree and mtry.
+2. It is important that Features get object Ids that are ascending and they should not have gaps. If you have 17 Features the ids should be : [1...17]
 
-3. You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
+3. After you have created the training polygons you can choose the hyperparamters ntree and mtry.
+
+4. You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
 
 ## Upload of training polygons
 

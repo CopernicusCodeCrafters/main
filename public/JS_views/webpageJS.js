@@ -691,66 +691,6 @@ async function createClassification() {
     alert(Error)
     console.log(error);
   }
-  
-  
-  /*try {
-    const localTIFPath = 'pictures/satelliteImage.tif';
-    const response = await fetch(localTIFPath);
-    const blob = await response.blob();
-
-    /*
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    
-    // read arraybuffer
-    const reader = new FileReader();
-    reader.onload = async () => {
-      let arrayBuffer = reader.result;
-
-      try {
-        const georaster = await parseGeoraster(arrayBuffer);
-        console.log(georaster);
-
-                let layer = new GeoRasterLayer({
-          georaster: georaster,
-          opacity: 1,
-          
-          pixelValuesToColorFn: function (pixelValues) {
-            // Assuming "class" is at index 0 in pixelValues array
-            var classValue = pixelValues[0];
-
-            // Define colors dynamically based on class values
-            var color = getColorForClass(classValue);
-
-            return color;
-
-
-          },
-          resolution: 512
-        });
-        
-        layer.addTo(map);
-        map.fitBounds(layer.getBounds());
-
-        stopRotation();
-      } catch (error) {
-        stopRotation();
-        console.log("Error connecting:", error);
-        alert("Error");
-      }
-    };
-
-    reader.readAsArrayBuffer(blob);
-  } catch (error) {
-    stopRotation();
-    alert("Error");
-    console.log(error);
-  }*/
 }
 
 async function demo(){

@@ -15,6 +15,7 @@ services:
         environment:
             WAIT_HOSTS: mongodb://127.0.0.1:27017/
             MONGODB_URI: mongodb://127.0.0.1:27017/
+            OPENEO_URI : http://ccceocubes_con:8000
             
       
 

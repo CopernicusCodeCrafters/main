@@ -13,8 +13,8 @@ let url = "mongodb://mongo:27017"; // connection URL
 
 // set openeourl
 //let openeo_url = 'http://0.0.0.0:8000' - funktioniert nicht 
-let openeo_url = 'http://34.209.215.214:8000'
-
+//let openeo_url = 'http://34.209.215.214:8000'
+let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
 
 /* GET home page. */
 router.use(bodyParser.json());
@@ -89,9 +89,6 @@ router.get('/satelliteImage', async function (req, res, next) {
       
  
     );
-
-    //filter bands
-    //let datacube_filtered = builder.filter_bands(datacube,bandsArray);
 
     //Reduce Dimension of Datacube
     var mean = function(data) {
