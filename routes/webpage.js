@@ -152,7 +152,7 @@ router.get('/getClassification', async function (req, res, next) {
       3857,
       dateArray
     );
-
+      // filter bands to bands with 10 or 20 resolution
     let datacube_filtered = builder.filter_bands(datacube,["B02","B03","B04","B05","B06","B07","B08","B11","B12"])
     // NDVI and fill NAs
     //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
@@ -161,8 +161,10 @@ router.get('/getClassification', async function (req, res, next) {
     var mean = function(data) {
       return this.mean(data);
     };
+    // reduce time dimension
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
 
+    // classify cube  with given model
     let datacube_classified = builder.cube_classify(data = datacube_reduced, model = String(model))
     //Compute result 
     let result = builder.save_result(datacube_classified, "GTiff");    
@@ -205,7 +207,7 @@ router.get('/buildModel', async function (req, res, next) {
       3857,
       ["2021-06-01", "2021-06-30"]
     );
-
+        // filter bands to bands with 10 or 20 resolution
     let datacube_filtered = builder.filter_bands(datacube,["B02","B03","B04","B05","B06","B07","B08","B11","B12"])
       // NDVI and Fill NAs
     //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
@@ -215,6 +217,7 @@ router.get('/buildModel', async function (req, res, next) {
       return this.mean(data);
     };
 
+    // reduce data cube - time dimension
     let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
     
     // data, nt, mt und name müssen übergeben werden
@@ -229,6 +232,7 @@ router.get('/buildModel', async function (req, res, next) {
   
 });
 classNames = [];
+// POST endpoint saveModel
 router.post('/saveModel', async (req, res) => {
   try{
     let receivedData = req.body.classIDs;
