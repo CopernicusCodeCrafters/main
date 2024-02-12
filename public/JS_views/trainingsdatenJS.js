@@ -1,4 +1,4 @@
-const cons = require("consolidate");
+//const cons = require("consolidate");
 
 //Add Leaflet Map 
 var map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
@@ -584,7 +584,6 @@ async function buildModel() {
       name: name,
       class: classificationMapping
     };
-  
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
