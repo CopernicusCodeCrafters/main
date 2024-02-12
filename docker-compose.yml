@@ -33,17 +33,17 @@ services:
         
         
     
-    mong-express:
-        image: mongo-express
-        restart: always
+    # mong-express:
+    #     image: mongo-express
+    #     restart: always
         
-        depends_on:
-            - mongodb
-        ports: 
-            - '8081:8081'
+    #     depends_on:
+    #         - mongodb
+    #     ports: 
+    #         - '8081:8081'
 
     ccceocubes_con:
-        image: kwundram/ccceocubes:b9
+        image: kwundram/ccceocubes:b
         environment:
         - AWSHOST=34.209.215.214
         - TZ=Etc/UTC
