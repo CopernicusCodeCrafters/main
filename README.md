@@ -48,6 +48,8 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 4. You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
 
+5. After a while a message will be displayed ("DONE"). If not, an error has occured.
+
 ## Upload of training polygons
 
 It its important that training polygons which are uploaded have a column/attribute "classification" and a column/attribute "object_id".
