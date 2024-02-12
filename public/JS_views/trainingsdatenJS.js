@@ -595,7 +595,7 @@ async function buildModel() {
     classID = {
       name: name,
       class: classificationMapping
-    }
+    };
   } catch(error){
     console.log(error)
   }
