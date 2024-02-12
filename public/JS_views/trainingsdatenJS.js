@@ -505,15 +505,9 @@ let featureCollection;
 // function to create a ml model in the openeobackend
 async function buildModel() {
   startRotation();
-  let response;
-  try{
-    response =  await fetch("/getAllPolygons");
-  } catch(error){
-    console.log(error)
-  }
-   
+  let response =  await fetch("/getAllPolygons");
+  
   let geoJSONData;
-
   try {
     geoJSONData = await response.json();
   } catch (error) {
@@ -525,7 +519,7 @@ async function buildModel() {
     featureCollection = {
       "type": "FeatureCollection",
       "features": geoJSONData
-    }
+    };
   } catch (error) {
     console.log(error)
     console.log("Error in backend: set FeatureCollection")
