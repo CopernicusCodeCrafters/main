@@ -40,7 +40,7 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 ### Model Creation
 
-1. You can create a machine learning model by uploading or drawing training polygons.
+1. You can create a machine learning model by uploading or drawing training polygons. After Drawing you can set names, ids and classification.
 
 2. It is important that Features get object Ids that are ascending and they should not have gaps. If you have 17 Features the ids should be : [1...17]
 
@@ -48,7 +48,7 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 4. You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
 
-5. After a while a message will be displayed ("DONE"). If not, an error has occured.
+5. After a while a message will be displayed ("DONE"). If not, an error has occured. In that case try it with less polygons.
 
 ## Upload of training polygons
 
@@ -61,6 +61,8 @@ Otherwise the application wont process the polygons correctly.
 2. Enter Start and end date
 3. Select Model , either demo model or your own.
 4. Classify
+
+If you get a result immediately and the tif file has a size of 33 kB , that means that the file is damaged and the classification did not work. Please reload the page and try again.
 
 
 
