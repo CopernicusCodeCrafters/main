@@ -54,10 +54,11 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 It its important that training polygons which are uploaded have a column/attribute "classification" and a column/attribute "object_id".
 Otherwise the application wont process the polygons correctly.
+In the folder "DemoDaten" you will find training polygons.
 
 ### Classification
 
-1. Select area of interest 
+1. Select area of interest.
 2. Enter Start and end date
 3. Select Model , either demo model or your own.
 4. Classify
