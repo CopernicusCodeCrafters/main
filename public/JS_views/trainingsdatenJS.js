@@ -1,3 +1,4 @@
+const cons = require("consolidate");
 
 //Add Leaflet Map 
 var map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
@@ -532,7 +533,14 @@ async function buildModel() {
 
 
   let { featureCollection: updatedFeatureCollection, classificationMapping } = exchangeClassifier(featureCollection);
-  let geoJSONDataString = JSON.stringify(updatedFeatureCollection);
+  let geoJSONDataString;
+
+  try{
+    geoJSONDataString= JSON.stringify(updatedFeatureCollection);
+  } catch(error){
+    console.log(error)
+  }
+  
 
 
   let bbox;
@@ -555,14 +563,26 @@ async function buildModel() {
   }
   
 
-  let convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
-  let convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
-
-  //Extract LatLng from converted object
+  let convertedSouthWest;
+  let convertedNorthEast; 
+  try{
+    convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+    convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+  } catch(error){
+    console.log(error)
+  }
+   
+  
+  try{
+    //Extract LatLng from converted object
   convertedSouth = convertedSouthWest[1];
   convertedWest = convertedSouthWest[0];
   convertedNorth = convertedNorthEast[1];
   convertedEast = convertedNorthEast[0];
+  } catch(error){
+    console.log(error)
+  }
+  
 
 
   // Get values from input fields
@@ -570,10 +590,16 @@ async function buildModel() {
   let mt = document.getElementById('mtInput').value;
   let name = document.getElementById('nameInput').value;
 
-  let classID = {
-    name: name,
-    class: classificationMapping
+  let classID;
+  try{
+    classID = {
+      name: name,
+      class: classificationMapping
+    }
+  } catch(error){
+    console.log(error)
   }
+   
 
   try {
     // Call the /buildModel endpoint with the needed data
