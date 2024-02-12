@@ -512,7 +512,6 @@ async function buildModel() {
     geoJSONData = await response.json();
   } catch (error) {
     console.log(error)
-    console.log("Error in backend: await response.json")
   }
 
   try {
@@ -522,18 +521,12 @@ async function buildModel() {
     };
   } catch (error) {
     console.log(error)
-    console.log("Error in backend: set FeatureCollection")
   }
 
 
   let { featureCollection: updatedFeatureCollection, classificationMapping } = exchangeClassifier(featureCollection);
-  let geoJSONDataString;
-
-  try{
-    geoJSONDataString= JSON.stringify(updatedFeatureCollection);
-  } catch(error){
-    console.log(error)
-  }
+  let geoJSONDataString= JSON.stringify(updatedFeatureCollection);
+  
   
   let bbox;
   try{
@@ -592,8 +585,6 @@ async function buildModel() {
       class: classificationMapping
     };
   
-   
-
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
