@@ -23,6 +23,78 @@ var baseLayers = {
 // Add layer control to the map
 L.control.layers(baseLayers).addTo(map);
 
+//Initialize Datepicker
+$(document).ready(function () {
+  let today = new Date();
+  let minDate = new Date(2015, 0, 1); // Minimum date: January 1, 2015
+
+
+  $('#datepicker1').datepicker({
+    format: 'yyyy-mm-dd',
+    autoclose: true,
+    todayHighlight: true,
+    startDate: minDate,
+    endDate: today // Restrict datepicker1 to today
+  });
+
+  $('#datepicker2').datepicker({
+    format: 'yyyy-mm-dd',
+    autoclose: true,
+    todayHighlight: true,
+    startDate: today, // Start datepicker2 from today
+    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 365) // Set end date 
+  });
+});
+
+// Event listener for the change event on datepicker1
+$('#datepicker1').on('changeDate', function (e) {
+  // Calculate two weeks later
+  let endDate = new Date(e.date);
+  endDate.setDate(endDate.getDate() + 365); // 14 days to allow for a 14-day span
+
+  // Set the new startDate for the second datepicker
+  $('#datepicker2').datepicker('setStartDate', e.date);
+
+  // Set the new endDate for the second datepicker
+  $('#datepicker2').datepicker('setEndDate', endDate);
+});
+
+function getSelectedDates() {
+  let startDate = $('#datepicker1').datepicker('getDate');
+  let endDate = $('#datepicker2').datepicker('getDate');
+
+  if (startDate && endDate) {
+    // Format dates as YYYY-MM-DD
+    let formattedStartDate = formatDate(startDate);
+    let formattedEndDate = formatDate(endDate);
+
+    // Store dates in an array
+    selectedDates = [formattedStartDate, formattedEndDate];
+
+    console.log(selectedDates);
+
+    let saveDateBtn = document.getElementById("saveDateBtn");
+
+    // Remove the current class
+    saveDateBtn.classList.remove("black-btn");
+
+    // Add the new class
+    saveDateBtn.classList.add("accepted-btn");
+
+    // Change button text
+    saveDateBtn.innerHTML = "Date saved";
+    document.getElementById("datepicker1").disabled = true;
+    document.getElementById("datepicker2").disabled = true;
+    saveDateBtn.disabled = true;
+  } else {
+    alert('Please select both start and end dates.');
+  }
+}
+
+// Function to format date using Bootstrap-datepicker's format
+function formatDate(date) {
+  return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+}
 
 var selectedFeature = null;
 //Funktion, welche onload alle Trainingypolygone hinzufügt
@@ -547,7 +619,7 @@ async function buildModel() {
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}`);
+    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&selectedDates=${selectedDates}`);
     if (response.ok) {
       fetch('/saveModel', {
         method: 'POST',

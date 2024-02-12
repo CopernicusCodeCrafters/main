@@ -195,11 +195,6 @@ var west;
 var north;
 var east;
 
-
-
-// Set maximum allowed area in square meters
-let maxAllowedArea = 20000;
-
 // Event listener for the button "Activate Draw"
 document.getElementById('drawButton').addEventListener('click', function () {
   // Remove the existing drawn shape before adding a new one
@@ -792,8 +787,6 @@ function simulateUserInput() {
     // Add the new class
     saveDateBtn.classList.add("accepted-btn");
   
-    let startDate = '2021-06-01';
-    let endDate = '2021-06-15';
     console.log(startDate)
       // Format dates as YYYY-MM-DD
       let formattedStartDate = startDate;
