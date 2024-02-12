@@ -541,8 +541,6 @@ async function buildModel() {
     console.log(error)
   }
   
-
-
   let bbox;
   try{
     bbox = turf.bbox(featureCollection);
@@ -569,10 +567,14 @@ async function buildModel() {
     convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
     convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
   } catch(error){
-    console.log(error)
+    console.log(error);
   }
    
-  
+  let convertedSouth;
+  let convertedWest;
+  let convertedNorth;
+  let convertedEast;
+
   try{
     //Extract LatLng from converted object
   convertedSouth = convertedSouthWest[1];
@@ -580,7 +582,7 @@ async function buildModel() {
   convertedNorth = convertedNorthEast[1];
   convertedEast = convertedNorthEast[0];
   } catch(error){
-    console.log(error)
+    console.log(error);
   }
   
 
@@ -590,15 +592,12 @@ async function buildModel() {
   let mt = document.getElementById('mtInput').value;
   let name = document.getElementById('nameInput').value;
 
-  let classID;
-  try{
-    classID = {
+ 
+  let classID = {
       name: name,
       class: classificationMapping
     };
-  } catch(error){
-    console.log(error)
-  }
+  
    
 
   try {
@@ -627,7 +626,7 @@ async function buildModel() {
     stopRotation();
   } catch (error) {
     stopRotation();
-    alert('Error in building model')
+    alert('Error in building model');
     console.error('Error:', error.message);
   }
   stopRotation();
