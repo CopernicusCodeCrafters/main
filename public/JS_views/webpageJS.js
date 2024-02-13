@@ -51,6 +51,7 @@ function getSelectedDates() {
     // Store dates in an array
     selectedDates = [formattedStartDate, formattedEndDate];
 
+
     console.log(selectedDates);
 
     let saveDateBtn = document.getElementById("saveDateBtn");
@@ -988,12 +989,15 @@ document.addEventListener("DOMContentLoaded", async function () {
   const agg = document.getElementById("aggregate");
   const select = document.getElementById("selectAvailable");
   const refreshButton = document.getElementById("refreshImageBtn");
-  var rememberDates = [];
+  var startingTime;
+  var endTime;
 
   document.getElementById("leastCloudCoverage").addEventListener("click", async function () {
 
+    startingTime = selectedDates[0];
+    endTime = selectedDates[1];
+
     const httpRequestUrl = checkInputsForEarthSearch();
-    rememberDates = selectedDates;
     console.log(httpRequestUrl);
 
     fetch(httpRequestUrl)
@@ -1005,7 +1009,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       })
       .then(data => {
         const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
-        console.log(validImages);
         if (validImages.length === 0) {
           alert("There are no valid images available! Select another time period or change the AOI")
         } else {
@@ -1040,10 +1043,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Handle fetch errors here
         console.error('Fetch error:', error);
       });
-
   });
 
   document.getElementById("aggregate").addEventListener("click", async function () {
+
+    startingTime = selectedDates[0];
+    endTime = selectedDates[1];
 
     const httpRequestUrl = checkInputsForEarthSearch();
     console.log(httpRequestUrl);
@@ -1062,8 +1067,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (validImages.length === 0) {
           alert("There are no valid images available! Select another time period or change the AOI")
         } else {
-
-          rememberDates = selectedDates;
 
           lowCCButton.classList.remove("black-btn");
           lowCCButton.classList.add("light-grey-btn");
@@ -1086,6 +1089,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   document.getElementById("selectAvailable").addEventListener("click", async function () {
+
+    startingTime = selectedDates[0];
+    endTime = selectedDates[1];
+
     const httpRequestUrl = checkInputsForEarthSearch();
     console.log(httpRequestUrl);
 
@@ -1105,7 +1112,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           alert("There are no valid images available! Select another time period or change the AOI")
         } else {
           console.log(data);
-          rememberDates = selectedDates;
           document.getElementById("popup").style.display = "block";
 
           const table = document.createElement("table");
@@ -1169,7 +1175,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   document.getElementById("refreshImageBtn").addEventListener("click", function () {
 
-    selectedDates = rememberDates;
+    selectedDates[0] = startingTime;
+    selectedDates[1] = endTime;
     console.log(selectedDates);
 
     lowCCButton.classList.remove("accepted-btn");
