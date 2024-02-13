@@ -591,17 +591,17 @@ async function createClassification() {
   startRotation();
   try {
     console.log(model)
-    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
-    const blob = await response.blob();
+    let response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    let blob = await response.blob();
     
     //Download Classification 
-    const downloadButton = document.getElementById('downloadButton');
+    let downloadButton = document.getElementById('downloadButton');
     downloadButton.removeAttribute('disabled');
     downloadButton.classList.remove('light-grey-btn');
     downloadButton.classList.add('black-btn');
 
     document.getElementById('downloadButton').addEventListener('click', function() {
-      const downloadLink = document.createElement('a');
+      let downloadLink = document.createElement('a');
       downloadLink.href = URL.createObjectURL(blob);
       downloadLink.download = 'satelliteImage.tif';
       downloadLink.style.display = 'none';
@@ -611,15 +611,15 @@ async function createClassification() {
     });
 
     // read arraybuffer
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => {
-      const arrayBuffer = reader.result;
+      let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
-        const georaster = await parseGeoraster(arrayBuffer);
+        let georaster = await parseGeoraster(arrayBuffer);
 
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+        let overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
 
 
         // available color scales can be found by running console.log(chroma.brewer);
@@ -711,10 +711,10 @@ function simulateUserInput() {
     selectedDates = [formattedStartDate, formattedEndDate];
   
     
-  const bandsPicker = $('#bandsPicker');
+  let bandsPicker = $('#bandsPicker');
 
   // Array of indices of bands to be selected (0-indexed)
-  const selectedBandsIndices = [1, 2, 3]; // Bands 2, 3, and 4
+  let selectedBandsIndices = [1, 2, 3]; // Bands 2, 3, and 4
 
   // Loop through the indices and set the selected property for each option
   selectedBandsIndices.forEach(index => {
@@ -727,10 +727,10 @@ function simulateUserInput() {
   // Assign selected bands to your variable if needed
   selectedBands = ['B02', 'B03', 'B04']
 
-  const modelName = 'Test';  // Replace with the desired model name
+  let modelName = 'Test';  // Replace with the desired model name
 
 // Trigger a click event on the corresponding dropdown item
-const dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
+let dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
 dropdownItem.trigger('click');
 
 
@@ -810,9 +810,9 @@ layer1 = L.rectangle(bounds, {color: "red", weight: 3, fill : false}).addTo(map)
 
 
 
-const lowCCButton = document.getElementById("leastCloudCoverage");
-      const agg = document.getElementById("aggregate");
-      const select = document.getElementById("selectAvailable");
+let lowCCButton = document.getElementById("leastCloudCoverage");
+      let agg = document.getElementById("aggregate");
+      let select = document.getElementById("selectAvailable");
       lowCCButton.classList.remove("black-btn");
       lowCCButton.classList.add("accepted-btn");
 
@@ -820,11 +820,11 @@ const lowCCButton = document.getElementById("leastCloudCoverage");
 
 var randomColors= generateRandomColors();
 function generateRandomColors() {
-  const colors = [];
+  let colors = [];
 
   // Funktion, um eine zufällige Farbe zu generieren
   function getRandomColor() {
-    const letters = '0123456789ABCDEF';
+    let letters = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
@@ -902,26 +902,26 @@ document.addEventListener("DOMContentLoaded", async function(){
     // Check if both Dateinputs are not empty
     if (date1Value !== '' && date2Value !== '' && AoIgiven) {
 
-    const lowerLeftLong = west;
-    const lowerLeftLat = south;
-    const upperRightLong = east;
-    const upperRightLat = north;
+    let lowerLeftLong = west;
+    let lowerLeftLat = south;
+    let upperRightLong = east;
+    let upperRightLat = north;
 
     //Transform dates into earth-search compatible
-    const startDate = selectedDates[0] + "T00:00:00.000Z";
-    const endDate = selectedDates[1] + "T23:59:59.999Z";
+    let startDate = selectedDates[0] + "T00:00:00.000Z";
+    let endDate = selectedDates[1] + "T23:59:59.999Z";
     
     // Url for request with filter parameters for earth seasrch v1
-    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    // let apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
     // console.log(apiUrl);
     // fetch(apiUrl)
 
     //URL for earth-search v0 (As openeocubes uses), but dicontinued
-    const datetime= selectedDates[0] + "/" + selectedDates[1];
-    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
-    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
+    let datetime= selectedDates[0] + "/" + selectedDates[1];
+    let bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    let apiUrl = "https://earth-search.aws.element84.com/v0/search";
     
-    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+    let httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
     console.log(httpRequestUrl);
     
     fetch(httpRequestUrl)
@@ -934,17 +934,17 @@ document.addEventListener("DOMContentLoaded", async function(){
     .then(data => {
       // Return formatted date, so it can be used for the openeocubes request again
       console.log(data);
-      const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
-      const date = new Date(timestamp);
-      const formattedDate = date.toISOString().split('T')[0];
+      let timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
+      let date = new Date(timestamp);
+      let formattedDate = date.toISOString().split('T')[0];
       console.log(formattedDate);
       selectedDates[0] = formattedDate;
       selectedDates[1] = formattedDate;
 
 
-      const lowCCButton = document.getElementById("leastCloudCoverage");
-      const agg = document.getElementById("aggregate");
-      const select = document.getElementById("selectAvailable");
+      let lowCCButton = document.getElementById("leastCloudCoverage");
+      let agg = document.getElementById("aggregate");
+      let select = document.getElementById("selectAvailable");
       lowCCButton.classList.remove("black-btn");
       lowCCButton.classList.add("accepted-btn");
       agg.classList.remove("black-btn");
@@ -966,9 +966,9 @@ document.addEventListener("DOMContentLoaded", async function(){
   });
 
   document.getElementById("aggregate").addEventListener("click", async function(){
-    const lowCCButton = document.getElementById("leastCloudCoverage");
-    const agg = document.getElementById("aggregate");
-    const select = document.getElementById("selectAvailable");
+    let lowCCButton = document.getElementById("leastCloudCoverage");
+    let agg = document.getElementById("aggregate");
+    let select = document.getElementById("selectAvailable");
     lowCCButton.classList.remove("black-btn");
     lowCCButton.classList.add("light-grey-btn");
     agg.classList.remove("black-btn");
@@ -1000,27 +1000,27 @@ document.addEventListener("DOMContentLoaded", async function(){
     // Check if both Dateinputs are not empty
     if (date1Value !== '' && date2Value !== '' && AoIgiven) {
 
-    const lowerLeftLong = west;
-    const lowerLeftLat = south;
-    const upperRightLong = east;
-    const upperRightLat = north;
+    let lowerLeftLong = west;
+    let lowerLeftLat = south;
+    let upperRightLong = east;
+    let upperRightLat = north;
 
     //Transform dates into earth-search compatible
-    const startDate = selectedDates[0] + "T00:00:00.000Z";
-    const endDate = selectedDates[0] + "T23:59:59.999Z";
+    let startDate = selectedDates[0] + "T00:00:00.000Z";
+    let endDate = selectedDates[0] + "T23:59:59.999Z";
     
     // URL for earth-search v1, id eocubes switches to that one
     // Url for request with filter parameters
-    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    // let apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
     // console.log(apiUrl);
     // fetch(apiUrl)
 
     //URL for earth-search v0 (As openeocubes uses), but dicontinued
-    const datetime= selectedDates[0] + "/" + selectedDates[1];
-    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
-    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
+    let datetime= selectedDates[0] + "/" + selectedDates[1];
+    let bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    let apiUrl = "https://earth-search.aws.element84.com/v0/search";
 
-    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+    let httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
     console.log(httpRequestUrl);
 
     fetch(httpRequestUrl)
@@ -1035,24 +1035,24 @@ document.addEventListener("DOMContentLoaded", async function(){
       console.log(data);
       document.getElementById("popup").style.display = "block";
 
-      const table = document.createElement("table");
-      const headerRow = table.insertRow();
+      let table = document.createElement("table");
+      let headerRow = table.insertRow();
       headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
 
 
         data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0).forEach(item => {
-        const row = table.insertRow();
-        const timeCell = row.insertCell(0);
-        const cloudCoverCell = row.insertCell(1);
+        let row = table.insertRow();
+        let timeCell = row.insertCell(0);
+        let cloudCoverCell = row.insertCell(1);
 
-        const date = new Date(item.properties.datetime);
-        const formattedDate = date.toISOString().split('T')[0];
+        let date = new Date(item.properties.datetime);
+        let formattedDate = date.toISOString().split('T')[0];
         
         timeCell.textContent = formattedDate;
         cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
 
         row.addEventListener("click", function() {
-          const previouslySelectedRow = table.querySelector(".selected");
+          let previouslySelectedRow = table.querySelector(".selected");
           if (previouslySelectedRow) {
             previouslySelectedRow.classList.remove("selected");
           }
@@ -1078,9 +1078,9 @@ document.addEventListener("DOMContentLoaded", async function(){
   });
   document.getElementById("closePopupBtn").addEventListener("click", function() {
     document.getElementById("popup").style.display = "none";
-    const lowCCButton = document.getElementById("leastCloudCoverage");
-    const agg = document.getElementById("aggregate");
-    const select = document.getElementById("selectAvailable");
+    let lowCCButton = document.getElementById("leastCloudCoverage");
+    let agg = document.getElementById("aggregate");
+    let select = document.getElementById("selectAvailable");
     lowCCButton.classList.remove("black-btn");
     lowCCButton.classList.add("light-grey-btn");
     agg.classList.remove("black-btn");
