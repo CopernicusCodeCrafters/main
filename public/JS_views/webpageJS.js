@@ -855,6 +855,10 @@ function getColorForClass(classValue) {
     2: randomColors[1],
     3: randomColors[2],
     4: randomColors[3],
+    5: randomColors[4],
+    6: randomColors[5],
+    7: randomColors[6],
+    8: randomColors[7],
     // Add more class-color mappings as needed
   };
 
