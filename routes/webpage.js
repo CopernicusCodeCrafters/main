@@ -12,8 +12,8 @@ let bodyParser = require('body-parser');
 //let url = "mongodb://127.0.0.1:27017";
 //let url = "mongodb://mongo:27017"; // connection URL
 let url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
-let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
-//let openeo_url = "http://34.209.215.214:8000/"
+//let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
+let openeo_url = "http://34.209.215.214:8000/"
 console.log("OPENEO URL : ",openeo_url)
 
 /* GET home page. */
@@ -229,7 +229,8 @@ router.post('/buildModel', async function (req, res, next) {
     let result = builder.save_result(model, 'RDS');
     let response = await connection.computeResult(result);
 
-    response.status(200)
+    res.status(200).json({message: 'Model built successfully.' });
+
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error in model building process' }); // Send error response
   }
