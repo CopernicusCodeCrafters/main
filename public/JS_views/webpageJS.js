@@ -195,6 +195,11 @@ var west;
 var north;
 var east;
 
+
+
+// Set maximum allowed area in square meters
+let maxAllowedArea = 20000;
+
 // Event listener for the button "Activate Draw"
 document.getElementById('drawButton').addEventListener('click', function () {
   // Remove the existing drawn shape before adding a new one
@@ -475,10 +480,6 @@ function selectTrainingModel(event, model) {
   document.getElementById("trainingModelDropdown").textContent = model;
 }
 async function checkInputsClassifications(){
-  if(demoVal === true){
-    demo();
-  }
-  else{
    // Get the values of the datePickers
    let date1Value = $('#datepicker1').val();
    let date2Value = $('#datepicker2').val();
@@ -513,7 +514,6 @@ async function checkInputsClassifications(){
    } else {
      alert("Please fill in all the values")
    }
-  }
 }
 
 async function createDatacube() {
@@ -522,7 +522,7 @@ async function createDatacube() {
   
   try {
     // Include converted bounds in the satelliteImage request
-    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
     let blob = await response.blob();
     console.log("warum")
 
@@ -601,11 +601,10 @@ async function createClassification() {
   startRotation();
   try {
     console.log(model)
-    // Include converted bounds in the satelliteImage request
     const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
-    console.log("response:",response)
     const blob = await response.blob();
-    console.log("blob:",blob)
+    console.log("warum")
+
 
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
@@ -616,19 +615,23 @@ async function createClassification() {
     document.body.removeChild(downloadLink);
 
     // read arraybuffer
-    let reader = new FileReader();
+    const reader = new FileReader();
     reader.onload = async () => {
-    let arrayBuffer = reader.result;
+      const arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
-        console.log("Georaster:",georaster);
+
+        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+
+
+        // available color scales can be found by running console.log(chroma.brewer);
+        console.log(georaster)
 
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
-          zIndex:15,
 
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
@@ -649,9 +652,8 @@ async function createClassification() {
         console.log("Error connecting;", error);
         alert("Error")
       }
+      stopRotation();
     };
-    reader.readAsArrayBuffer(blob);
-
 
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function(map) {
@@ -660,22 +662,17 @@ async function createClassification() {
     
       getSpecificModel(String(model)).then(model => {
         let nameClass = model.class;
-        console.log("nameClass(keys):",nameClass.keys);
-        console.log("nameClass (values):",nameClass.values)
-        console.log(Object.keys(nameClass))
+        console.log("nameClass (keys):", Object.keys(nameClass));
+        console.log("nameClass (values):", Object.values(nameClass));
     
-        // Loop through class values and get colors using getColorForClass function
-        Object.values(nameClass).forEach(value => {
-          let color = getColorForClass(value);
-          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
+        // Correctly loop through class entries and get colors
+        Object.entries(nameClass).forEach(([key, value]) => {
+          let color = getColorForClass(value); // Make sure this function uses value correctly
+          div.innerHTML += `<i style="background: ${color}"></i><span>${key}</span><br>`;
         });
-    
-        // Example: Find the key for class value 2
-        let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
-        console.log(keyWithValue2); // This will output: "Siedlung"
       });
     
-      return div;
+      return div; // Make sure this is outside the async call if the div needs to be immediately returned
     };
     
     legend.addTo(map);
@@ -684,17 +681,21 @@ async function createClassification() {
     alert(Error)
     console.log(error);
   }
-
-}
-
-async function demo(){
-  startRotation();
-  setTimeout(async function() {
-  try {
-    map.removeLayer(layer1);
+  
+  
+  /*try {
     const localTIFPath = 'pictures/satelliteImage.tif';
     const response = await fetch(localTIFPath);
     const blob = await response.blob();
+
+    /*
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'satelliteImage.tif';
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
     
     // read arraybuffer
     const reader = new FileReader();
@@ -703,7 +704,8 @@ async function demo(){
 
       try {
         const georaster = await parseGeoraster(arrayBuffer);
-console.log(georaster);
+        console.log(georaster);
+
                 let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
@@ -723,36 +725,9 @@ console.log(georaster);
         });
         
         layer.addTo(map);
-        //map.fitBounds(layer.getBounds());
+        map.fitBounds(layer.getBounds());
 
-        let legend = L.control({ position: "topleft" });
-        legend.onAdd = function(map) {
-          let div = L.DomUtil.create("div", "legend");
-          div.innerHTML += "<h4>Legende</h4>";
-        
-          getSpecificModel("Test").then(model => {
-            let nameClass = model.class;
-            console.log("nameClass(keys):",nameClass.keys);
-            console.log("nameClass (values):",nameClass.values)
-            console.log(Object.keys(nameClass))
-        
-            // Loop through class values and get colors using getColorForClass function
-            Object.values(nameClass).forEach(value => {
-              let color = getColorForClass(value);
-              div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
-            });
-        
-            // Example: Find the key for class value 2
-            let keyWithValue2 = Object.keys(model.class).find(key => model.class[key] === 2);
-            console.log(keyWithValue2); // This will output: "Siedlung"
-          });
-        
-          return div;
-        };
-        
-        legend.addTo(map);
         stopRotation();
-
       } catch (error) {
         stopRotation();
         console.log("Error connecting:", error);
@@ -765,16 +740,11 @@ console.log(georaster);
     stopRotation();
     alert("Error");
     console.log(error);
-  }
-  demoVal = false;
-  startRotation();
-  }, 10000);
+  }*/
 }
 
-let demoVal = false;
 let layer1;
 function simulateUserInput() {
-  demoVal = true;
   // Simulate date input
   $('#datepicker1').val('2021-06-01');
   $('#datepicker2').val('2021-06-15');
@@ -787,6 +757,8 @@ function simulateUserInput() {
     // Add the new class
     saveDateBtn.classList.add("accepted-btn");
   
+    let startDate = '2021-06-01';
+    let endDate = '2021-06-15';
     console.log(startDate)
       // Format dates as YYYY-MM-DD
       let formattedStartDate = startDate;
@@ -1126,7 +1098,7 @@ document.addEventListener("DOMContentLoaded", async function(){
       headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
 
 
-        data.features.filter(item => item.properties['eo:cloud_cover'] < 30).forEach(item => {
+        data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0).forEach(item => {
         const row = table.insertRow();
         const timeCell = row.insertCell(0);
         const cloudCoverCell = row.insertCell(1);

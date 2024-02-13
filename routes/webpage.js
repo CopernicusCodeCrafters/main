@@ -15,8 +15,8 @@ const url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
 
 // set openeourl
 //let openeo_url = 'http://0.0.0.0:8000' - funktioniert nicht 
-//let openeo_url = 'http://34.209.215.214:8000'
-let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
+let openeo_url = 'http://34.209.215.214:8000'
+//let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
 
 /* GET home page. */
 router.use(bodyParser.json());

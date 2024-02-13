@@ -26,6 +26,7 @@ async function connectToMongo() {
 
 connectToMongo();
 
+
 //Routes
 var indexRouter = require("./routes/webpage");
 var impressumRouter = require("./routes/impressum")
@@ -109,7 +110,6 @@ app.get('/getAllPolygons', async (req, res) => {
 
     const geojsonArray = await collection.find().toArray();
     res.json(geojsonArray);
-    
   } catch (error) {
     console.error(error);
     res.status(500).send('Fehler beim Abrufen der Daten');
@@ -133,22 +133,35 @@ app.use(function (err, req, res, next) {
 });
 
 
-
-app.get('/getGeoJSON', async (req, res) => {
+async function clearCollectionOnStart() {
   try {
-      await client.connect();
-      let db = client.db(dbName);
-      let collection = db.collection('Stationen');
+    const dbName1 = 'geosoft2';
+    const collectionName1 = 'class';
+    await client.connect();
+    const db = client.db(dbName1);
+    const collection = db.collection(collectionName1);
 
-      let geojson = await collection.findOne(); 
-      
-      client.close();
+    // Lösche alle Dokumente aus der Sammlung
+    await collection.deleteMany({});
 
-      res.json(geojson); 
+    console.log('MongoDB collection cleared on server start.');
+    let demo = {
+      "name": "CCC_DemoModell",
+      "class": {
+        "Wasser": 1,
+        "Wald": 2,
+        "Wiese": 3,
+        "Urban": 4
+      }
+    }
+    await collection.insertOne(demo);
+
+    await client.close();
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Fehler beim Abrufen der Daten');
+    console.error('Error clearing MongoDB collection on server start:', error);
   }
-});
+}
 
+
+clearCollectionOnStart();
 module.exports = app;
