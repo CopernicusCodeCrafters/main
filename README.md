@@ -35,26 +35,35 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 4. "Aggregate all" will reduce the time series to the mean of the band values. By default only images with a cloudcover lower than 10 % will be used. But you can change the cloud cover value.
 5. you can also select a specific image with "select one" or get the image with the lowest Cloudcover with "lowest CC"
 
+6. At the end you have to use "Submit"
+
 
 ### Model Creation
 
-1. You can create a machine learning model by uploading or drawing training polygons.
+1. You can create a machine learning model by uploading or drawing training polygons. After Drawing you can set names, ids and classification.
 
-2. After you have created the training polygons you can choose the hyperparamters ntree and mtry.
+2. It is important that Features get object Ids that are ascending and they should not have gaps. If you have 17 Features the ids should be : [1...17]
 
-3. You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
+3. After you have created the training polygons you can choose the hyperparamters ntree and mtry.
+
+4. You als can give a name to the model. The model will be saved as a .rds file in  docker folder /var/openeo/workspace
+
+5. After a while a message will be displayed ("DONE"). If not, an error has occured. In that case try it with less polygons.
 
 ## Upload of training polygons
 
 It its important that training polygons which are uploaded have a column/attribute "classification" and a column/attribute "object_id".
 Otherwise the application wont process the polygons correctly.
+In the folder "DemoDaten" you will find training polygons.
 
 ### Classification
 
-1. Select area of interest 
+1. Select area of interest.
 2. Enter Start and end date
 3. Select Model , either demo model or your own.
 4. Classify
+
+If you get a result immediately and the tif file has a size of 33 kB , that means that the file is damaged and the classification did not work. Please reload the page and try again.
 
 
 

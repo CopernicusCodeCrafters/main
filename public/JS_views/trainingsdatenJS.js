@@ -1,3 +1,4 @@
+//const cons = require("consolidate");
 
 //Add Leaflet Map 
 var map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
@@ -145,14 +146,14 @@ async function startingPolygonmanager() {
             //Delete Function
             const deleteButton = document.createElement("button");
             deleteButton.innerHTML = "Delete";
-            deleteButton.onclick = function() {
+            deleteButton.onclick = function () {
               console.log("start deleting");
               console.log(feature);
               deleteFeaturefromMapAndDB(feature);
             }
             div.appendChild(deleteButton);
             div.appendChild(document.createElement("br"));
-            
+
             // Save edit button
             const submitEditButton = document.createElement("button");
             submitEditButton.innerHTML = "Submit Edit";
@@ -167,18 +168,18 @@ async function startingPolygonmanager() {
 
             //When a feature is edited its new coordinates get saved
             var newCoordinates;
-            layer.on('edit', function(e){
+            layer.on('edit', function (e) {
               newCoordinates = e.target.getLatLngs()[0];
               console.log("New coordinates:", newCoordinates);
-            }) 
+            })
 
             //When a polygon is clicked it gets editable and can be uploaded
-            layer.on('click', function(e){
-              if(selectedFeature){
-                  selectedFeature.editing.disable();
+            layer.on('click', function (e) {
+              if (selectedFeature) {
+                selectedFeature.editing.disable();
               }
 
-              submitEditButton.onclick = function(){
+              submitEditButton.onclick = function () {
                 selectedFeature.editing.disable();
                 var object_id = selectedFeature.feature.properties.object_id;
                 var name = selectedFeature.feature.properties.name;
@@ -187,16 +188,16 @@ async function startingPolygonmanager() {
                 // User can input different values if he wants to              
                 do {
                   object_id = prompt("Change 'object_id' if necessary:", object_id);
-                } while (!object_id.trim());                          
+                } while (!object_id.trim());
                 do {
                   name = prompt("Change 'name' if necessary:", name);
                 } while (!name.trim());
                 do {
                   classification = prompt("Change 'classification' if necessary:", classification);
                 } while (!classification.trim());
-              
+
                 let newCoords = [];
-                for (let i = 0; i < newCoordinates.length; i++){
+                for (let i = 0; i < newCoordinates.length; i++) {
                   newCoords[i] = [];
                   newCoords[i][0] = newCoordinates[i].lng;
                   newCoords[i][1] = newCoordinates[i].lat;
@@ -211,17 +212,17 @@ async function startingPolygonmanager() {
                     classification,
                   },
                   geometry: {
-                    type : "Polygon",
-                    coordinates: [ newCoords ]
+                    type: "Polygon",
+                    coordinates: [newCoords]
                   }
                 };
                 updateFeatureinDB(feature, newFeature);
               }
 
               selectedFeature = e.target;
-              selectedFeature.editing.enable();            
+              selectedFeature.editing.enable();
 
-              stopEditButton.onclick = function(){
+              stopEditButton.onclick = function () {
                 selectedFeature.editing.disable();
               }
             });
@@ -436,31 +437,31 @@ let download = document.getElementById("save-Button1");
 
 download.addEventListener("click", async () => {
   try {
-      // Extract GeoJSON from featureGroup
-      let response = await fetch("/getAllPolygons");
-      let geoJSONData = await response.json();
+    // Extract GeoJSON from featureGroup
+    let response = await fetch("/getAllPolygons");
+    let geoJSONData = await response.json();
 
-      let featureCollection = {
-          "type": "FeatureCollection",
-          "features": geoJSONData
-      };
+    let featureCollection = {
+      "type": "FeatureCollection",
+      "features": geoJSONData
+    };
 
-      if (featureCollection.features.length === 0) {
-          alert("No features in GeoJSON data");
-          return;
-      }
+    if (featureCollection.features.length === 0) {
+      alert("No features in GeoJSON data");
+      return;
+    }
 
-      let blob = new Blob([JSON.stringify(featureCollection)], { type: "application/json" });
+    let blob = new Blob([JSON.stringify(featureCollection)], { type: "application/json" });
 
-      let downloadLink = document.createElement("a");
-      downloadLink.href = URL.createObjectURL(blob);
-      downloadLink.download = "trainingsdaten.geojson";
+    let downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = "trainingsdaten.geojson";
 
-      downloadLink.click();
+    downloadLink.click();
 
-      URL.revokeObjectURL(downloadLink.href);
+    URL.revokeObjectURL(downloadLink.href);
   } catch (error) {
-      console.error("Error downloading GeoJSON:", error);
+    console.error("Error downloading GeoJSON:", error);
   }
 });
 
@@ -503,7 +504,7 @@ async function deleteFeaturefromMapAndDB(feature) {
 }
 
 //Function to modify a polygon and update properties
-async function updateFeatureinDB(oldFeature, newFeature){
+async function updateFeatureinDB(oldFeature, newFeature) {
   await addGeoJSONtoDB(newFeature);
   deleteFeaturefromMapAndDB(oldFeature);
 }
@@ -540,82 +541,137 @@ function exchangeClassifier(featureCollection) {
     let features = featureCollection.features;
     let classifications = new Set();
 
-  features.forEach((element) => {
+    features.forEach((element) => {
       if (element.properties && element.properties.classification) {
-          classifications.add(element.properties.classification);
+        classifications.add(element.properties.classification);
       }
-  });
+    });
 
-  // Convert the Set to an array
-  let uniqueClassificationsArray = Array.from(classifications);
+    // Convert the Set to an array
+    let uniqueClassificationsArray = Array.from(classifications);
+
 
   let classificationMapping = {};
   let numberCounter = 0;
 
-  uniqueClassificationsArray.forEach((classification) => {
+
+    uniqueClassificationsArray.forEach((classification) => {
       classificationMapping[classification] = numberCounter;
       numberCounter++;
-  });
+    });
 
-  // replace classifications with numbers
-  features.forEach((element) => {
+    // replace classifications with numbers
+    features.forEach((element) => {
       if (element.properties && element.properties.classification) {
-          element.properties.classification = classificationMapping[element.properties.classification];
+        element.properties.classification = classificationMapping[element.properties.classification];
       }
-  });
+    });
 
-  // Output the updated featureCollection
-  console.log(classificationMapping)
-  return {featureCollection , classificationMapping};
+    // Output the updated featureCollection
+    console.log(classificationMapping)
+    return { featureCollection, classificationMapping };
   } catch (error) {
-      console.log("Error: ", error);
-      alert ("error");
+    console.log("Error: ", error);
+    alert("error");
   }
 }
 let featureCollection;
 // function to create a ml model in the openeobackend
 async function buildModel() {
   startRotation();
-  let response = await fetch("/getAllPolygons");
-  let geoJSONData = await response.json();
-  featureCollection = {
-    "type" : "FeatureCollection",
-    "features" : geoJSONData
+  let response =  await fetch("/getAllPolygons");
+  
+  let geoJSONData;
+  try {
+    geoJSONData = await response.json();
+    console.log("fetched geojson:")
+    console.log(geoJSONData)
+    console.log(geoJSONData[0].type==="FeatureCollection")
+  } catch (error) {
+    console.log(error)
   }
 
+  try {
+    if(geoJSONData[0].type === "FeatureCollection"){
+      featureCollection =geoJSONData[0];
+
+      } else {
+        featureCollection = {
+          type: "FeatureCollection",
+          features: geoJSONData
+      }
+    }
+    //featureCollection = geoJSONData;
+    console.log("after inserting")
+    console.log(featureCollection)
+  } catch (error) {
+    console.log(error)
+  }
   let { featureCollection: updatedFeatureCollection, classificationMapping } = exchangeClassifier(featureCollection);
-  let geoJSONDataString = JSON.stringify(updatedFeatureCollection);
 
+  console.log("After exchangeClassifier:")
+  console.log(updatedFeatureCollection)
+  //let nonames =updatedFeatureCollection.features[0].features.map(u => ({geometry: u.geometry,type: u.type,_id: u._id,properties:{classification: u.properties.classification,object_id:u.properties.object_id}}));
+  //console.log(nonames)
+  let geoJSONDataString= JSON.stringify(updatedFeatureCollection).trim();
   
-  let bbox = turf.bbox(featureCollection);
-   // Define the source and destination coordinate systems
-   let sourceCRS = 'EPSG:4326';
-   let destCRS = 'EPSG:3857';
-
-   // Define the projection transformations
-   proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
-   proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
-
-   let convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
-   let convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
-
-   //Extract LatLng from converted object
-   convertedSouth = convertedSouthWest[1];
-   convertedWest = convertedSouthWest[0];
-   convertedNorth = convertedNorthEast[1];
-   convertedEast = convertedNorthEast[0];
-
   
+  let bbox;
+  try{
+    bbox = turf.bbox(featureCollection);
+  } catch(error){
+    console.log(error)
+  }
+   
+  // Define the source and destination coordinate systems
+  let sourceCRS = 'EPSG:4326';
+  let destCRS = 'EPSG:3857';
+
+  // Define the projection transformations
+  try{
+    proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+    proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+  } catch(error){
+    console.log(error)
+  }
+  
+
+  let convertedSouthWest;
+  let convertedNorthEast; 
+  try{
+    convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
+    convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
+  } catch(error){
+    console.log(error);
+  }
+   
+  let convertedSouth;
+  let convertedWest;
+  let convertedNorth;
+  let convertedEast;
+
+  try{
+    //Extract LatLng from converted object
+  convertedSouth = convertedSouthWest[1];
+  convertedWest = convertedSouthWest[0];
+  convertedNorth = convertedNorthEast[1];
+  convertedEast = convertedNorthEast[0];
+  } catch(error){
+    console.log(error);
+  }
+  
+
+
   // Get values from input fields
   let nt = document.getElementById('ntInput').value;
   let mt = document.getElementById('mtInput').value;
   let name = document.getElementById('nameInput').value;
 
+ 
   let classID = {
-    name : name,
-    class : classificationMapping
-  }
-
+      name: name,
+      class: classificationMapping
+    };
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
@@ -631,7 +687,8 @@ async function buildModel() {
         .then(response => response.json())
         .then(data => {
           console.log('Data saved:', data);
-          alert("Done");})
+          alert("Done");
+        })
         .catch(error => console.error('Error saving data:', error));
     } else {
       stopRotation();
@@ -641,7 +698,7 @@ async function buildModel() {
     stopRotation();
   } catch (error) {
     stopRotation();
-    alert('Error')
+    alert('Error in building model');
     console.error('Error:', error.message);
   }
   stopRotation();

@@ -13,15 +13,16 @@ services:
             - mongodb    
             
         environment:
-            WAIT_HOSTS: mongodb://127.0.0.1:27017/
-            MONGODB_URI: mongodb://127.0.0.1:27017/
+            WAIT_HOSTS: mongodb://mongodb:27017/
+            MONGODB_URI: mongodb://mongodb:27017/
+            OPENEO_URI : http://ccceocubes_con:8000
             
       
 
     mongodb:
         image: mongo
         restart: always
-        container_name: mongo
+        container_name: mongodb
         ports:
             - "27017:27017"
         volumes:
@@ -32,17 +33,17 @@ services:
         
         
     
-    mong-express:
-        image: mongo-express
-        restart: always
+    # mong-express:
+    #     image: mongo-express
+    #     restart: always
         
-        depends_on:
-            - mongodb
-        ports: 
-            - '8081:8081'
+    #     depends_on:
+    #         - mongodb
+    #     ports: 
+    #         - '8081:8081'
 
     ccceocubes_con:
-        image: kwundram/ccceocubes:b7
+        image: kwundram/ccceocubes:b9
         environment:
         - AWSHOST=34.209.215.214
         - TZ=Etc/UTC
@@ -50,5 +51,7 @@ services:
         ports:
             - "8000:8000"
         restart: always
-    
+volumes:
+    mongo-init:
+    mongo-volume:
     

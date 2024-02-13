@@ -684,7 +684,7 @@ async function createClassification() {
     alert(Error)
     console.log(error);
   }
-  
+
 }
 
 async function demo(){

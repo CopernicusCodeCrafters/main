@@ -8,13 +8,15 @@ const bodyParser = require('body-parser');
 
 
 
-let url = "mongodb://127.0.0.1:27017";
+
+//let url = "mongodb://127.0.0.1:27017";
 //let url = "mongodb://mongo:27017"; // connection URL
+const url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
 
 // set openeourl
 //let openeo_url = 'http://0.0.0.0:8000' - funktioniert nicht 
-let openeo_url = 'http://34.209.215.214:8000'
-
+//let openeo_url = 'http://34.209.215.214:8000'
+let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
 
 /* GET home page. */
 router.use(bodyParser.json());
@@ -89,9 +91,6 @@ router.get('/satelliteImage', async function (req, res, next) {
       
  
     );
-
-    //filter bands
-    //let datacube_filtered = builder.filter_bands(datacube,bandsArray);
 
     //Reduce Dimension of Datacube
     var mean = function(data) {
@@ -227,7 +226,7 @@ router.get('/buildModel', async function (req, res, next) {
     let response = await connection.computeResult(result);
     res.status(200).send("Model build");
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+    res.status(500).json({ error: 'Internal Server Error in model building process' }); // Send error response
   }
   
 });

@@ -7,8 +7,11 @@ var mongodb = require("mongodb");
 var engines = require('consolidate')
 
 
-const url = "mongodb://127.0.0.1:27017"
+
+//const url = "mongodb://127.0.0.1:27017"
 //const url = "mongodb://mongo:27017";
+const url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
+
 let dbName = "geosoft2";
 
 let client = new mongodb.MongoClient(url);
@@ -106,6 +109,7 @@ app.get('/getAllPolygons', async (req, res) => {
 
     const geojsonArray = await collection.find().toArray();
     res.json(geojsonArray);
+    
   } catch (error) {
     console.error(error);
     res.status(500).send('Fehler beim Abrufen der Daten');
