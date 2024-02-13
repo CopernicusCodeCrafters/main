@@ -19,9 +19,11 @@ Joaquin Valdez      @jova10
     On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance.
 3. docker-compose up --build
 
+4. Enter your AWS adress in the adress field to connect to the backend.
+
+
 ## Demo and Tutorial
-There is a built machine learning ( random forest) model called "CCC_DemoModell".
-With a small area the classification takes around 3 min.
+There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 
 
