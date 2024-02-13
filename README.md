@@ -14,16 +14,15 @@ Joaquin Valdez      @jova10
 
 1. git clone git@github.com:CopernicusCodeCrafters/main.git
 
-2. set environment variable "AWSHOST" to your AWS-IPv4-adress in docker-compose.yml (AWSHOST = AWS-IPv4-adress)
-    if you are running the application on your local machine, set AWSHOST=ccceocubes_con  .
-    On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance.
+2. set environment variable "AWSHOST" of  the "ccceocubes_con"  service to your AWS-IPv4-adress in docker-compose.yml (AWSHOST = AWS-IPv4-adress).
+if you are running the application on your local machine, set AWSHOST=ccceocubes_con  .
+On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance and it is highly recommended.
 3. docker-compose up --build
-
-4. Enter your AWS adress in the adress field to connect to the backend.
 
 
 ## Demo and Tutorial
-There is a built machine learning ( random forest) model called "DemoCCC2024"
+There is a built machine learning ( random forest) model called "CCC_DemoModell".
+With a small area the classification takes around 3 min.
 
 
 
@@ -34,10 +33,10 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 2. Draw the area of interest
 3. Select bands you would like to see
 4. "Aggregate all" will reduce the time series to the mean of the band values. By default only images with a cloudcover lower than 10 % will be used. But you can change the cloud cover value.
-5. you can also select a specific image with "select one" or get the image with the lowest Cloudcover with "lowest CC"
+5. you can also select a specific image with "select one" or get the image with the lowest Cloudcover with "lowest CC".
+If you are using "select one" chosse one of the images in the list and close with "x" in the top right corner
 
 6. At the end you have to use "Submit"
-
 
 ### Model Creation
 
@@ -51,7 +50,7 @@ There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 5. After a while a message will be displayed ("DONE"). If not, an error has occured. In that case try it with less polygons.
 
-## Upload of training polygons
+#### Upload of training polygons
 
 It its important that training polygons which are uploaded have a column/attribute "classification" and a column/attribute "object_id".
 Otherwise the application wont process the polygons correctly.
@@ -59,13 +58,9 @@ In the folder "DemoDaten" you will find training polygons.
 
 ### Classification
 
-1. Select area of interest.
+1. Select area of interest (in the Imagery page).
 2. Enter Start and end date
 3. Select Model , either demo model or your own.
 4. Classify
 
 If you get a result immediately and the tif file has a size of 33 kB , that means that the file is damaged and the classification did not work. Please reload the page and try again.
-
-
-
-
