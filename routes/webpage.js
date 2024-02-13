@@ -178,7 +178,7 @@ router.get('/getClassification', async function (req, res, next) {
   } catch (error) {
     console.error('Error:', error);
     alert("")
-    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+    res.status(500).json({ error: 'Internal Server Error in get Classification' }); // Send error response
   }
 });
 
@@ -256,7 +256,7 @@ router.post('/saveModel', async (req, res) => {
   res.json({ message: 'Data saved successfully on the server.' });
 } catch (error) {
   console.error('Error:', error);
-  res.status(500).json({ error: 'Internal Server Error' });
+  res.status(500).json({ error: 'Internal Server Error in save Model' });
 }
 });
 
@@ -280,7 +280,7 @@ router.get('/getModel', async (req, res) => {
     res.json(documentsArray);
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error in get Model' });
   }
 });
 
