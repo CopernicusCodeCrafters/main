@@ -551,8 +551,8 @@ function exchangeClassifier(featureCollection) {
     let uniqueClassificationsArray = Array.from(classifications);
 
 
-  let classificationMapping = {};
-  let numberCounter = 0;
+    let classificationMapping = {};
+    let numberCounter = 0;
 
 
     uniqueClassificationsArray.forEach((classification) => {
@@ -579,26 +579,26 @@ let featureCollection;
 // function to create a ml model in the openeobackend
 async function buildModel() {
   startRotation();
-  let response =  await fetch("/getAllPolygons");
-  
+  let response = await fetch("/getAllPolygons");
+
   let geoJSONData;
   try {
     geoJSONData = await response.json();
     console.log("fetched geojson:")
     console.log(geoJSONData)
-    console.log(geoJSONData[0].type==="FeatureCollection")
+    console.log(geoJSONData[0].type === "FeatureCollection")
   } catch (error) {
     console.log(error)
   }
 
   try {
-    if(geoJSONData[0].type === "FeatureCollection"){
-      featureCollection =geoJSONData[0];
+    if (geoJSONData[0].type === "FeatureCollection") {
+      featureCollection = geoJSONData[0];
 
-      } else {
-        featureCollection = {
-          type: "FeatureCollection",
-          features: geoJSONData
+    } else {
+      featureCollection = {
+        type: "FeatureCollection",
+        features: geoJSONData
       }
     }
     //featureCollection = geoJSONData;
@@ -613,53 +613,59 @@ async function buildModel() {
   console.log(updatedFeatureCollection)
   //let nonames =updatedFeatureCollection.features[0].features.map(u => ({geometry: u.geometry,type: u.type,_id: u._id,properties:{classification: u.properties.classification,object_id:u.properties.object_id}}));
   //console.log(nonames)
-  let geoJSONDataString= JSON.stringify(updatedFeatureCollection).trim();
-  
-  
+  let geoJSONDataString = JSON.stringify(updatedFeatureCollection).trim();
+
+
   let bbox;
-  try{
+  try {
+    console.log(featureCollection);
     bbox = turf.bbox(featureCollection);
-  } catch(error){
+  } catch (error) {
     console.log(error)
   }
-   
+
+  south = bbox[0];
+  west = bbox[1];
+  north = bbox[2];
+  east = bbox[3];
+
   // Define the source and destination coordinate systems
   let sourceCRS = 'EPSG:4326';
   let destCRS = 'EPSG:3857';
 
   // Define the projection transformations
-  try{
+  try {
     proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
     proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
-  } catch(error){
+  } catch (error) {
     console.log(error)
   }
-  
+
 
   let convertedSouthWest;
-  let convertedNorthEast; 
-  try{
+  let convertedNorthEast;
+  try {
     convertedSouthWest = proj4(sourceCRS, destCRS, [bbox[0], bbox[1]]);
     convertedNorthEast = proj4(sourceCRS, destCRS, [bbox[2], bbox[3]]);
-  } catch(error){
+  } catch (error) {
     console.log(error);
   }
-   
+
   let convertedSouth;
   let convertedWest;
   let convertedNorth;
   let convertedEast;
 
-  try{
+  try {
     //Extract LatLng from converted object
-  convertedSouth = convertedSouthWest[1];
-  convertedWest = convertedSouthWest[0];
-  convertedNorth = convertedNorthEast[1];
-  convertedEast = convertedNorthEast[0];
-  } catch(error){
+    convertedSouth = convertedSouthWest[1];
+    convertedWest = convertedSouthWest[0];
+    convertedNorth = convertedNorthEast[1];
+    convertedEast = convertedNorthEast[0];
+  } catch (error) {
     console.log(error);
   }
-  
+
 
 
   // Get values from input fields
@@ -667,11 +673,11 @@ async function buildModel() {
   let mt = document.getElementById('mtInput').value;
   let name = document.getElementById('nameInput').value;
 
- 
+
   let classID = {
-      name: name,
-      class: classificationMapping
-    };
+    name: name,
+    class: classificationMapping
+  };
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
@@ -702,6 +708,391 @@ async function buildModel() {
     console.error('Error:', error.message);
   }
   stopRotation();
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+  const lowCCButton = document.getElementById("leastCloudCoverage");
+  const agg = document.getElementById("aggregate");
+  const select = document.getElementById("selectAvailable");
+  const refreshButton = document.getElementById("refreshImageBtn");
+  var startingTime;
+  var endTime;
+
+  document.getElementById("leastCloudCoverage").addEventListener("click", async function () {
+
+    let response = await fetch("/getAllPolygons");
+    let featureCollections;
+    let geoJSONData;
+    try {
+      geoJSONData = await response.json();
+      console.log("fetched geojson:")
+      console.log(geoJSONData)
+      console.log(geoJSONData[0].type === "FeatureCollection")
+    } catch (error) {
+      console.log(error)
+    }
+
+    try {
+      if (geoJSONData[0].type === "FeatureCollection") {
+        featureCollections = geoJSONData[0];
+
+      } else {
+        featureCollections = {
+          type: "FeatureCollection",
+          features: geoJSONData
+        }
+      }
+      //featureCollection = geoJSONData;
+      console.log("after inserting")
+      console.log(featureCollections)
+    } catch (error) {
+      console.log(error)
+    }
+
+    let bbox;
+    try {
+      bbox = turf.bbox(featureCollections);
+    } catch (error) {
+      console.log(error)
+    }
+
+    south = bbox[0];
+    west = bbox[1];
+    north = bbox[2];
+    east = bbox[3];
+
+    startingTime = selectedDatesTD[0];
+    endTime = selectedDatesTD[1];
+
+    const httpRequestUrl = checkInputsForEarthSearch();
+    console.log(httpRequestUrl);
+
+    fetch(httpRequestUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse response body as JSON
+      })
+      .then(data => {
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        if (validImages.length === 0) {
+          alert("There are no valid images available! Select another time period or change the AOI")
+        } else {
+          // Return formatted date, so it can be used for the openeocubes request again
+          console.log(data);
+          const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
+          const date = new Date(timestamp);
+          const formattedDate = date.toISOString().split('T')[0];
+          console.log(formattedDate);
+          selectedDatesTD[0] = formattedDate;
+          selectedDatesTD[1] = formattedDate;
+
+          lowCCButton.classList.remove("black-btn");
+          lowCCButton.classList.add("accepted-btn");
+
+          agg.classList.remove("black-btn");
+          agg.classList.add("light-grey-btn");
+
+          select.classList.remove("black-btn");
+          select.classList.add("light-grey-btn");
+
+          refreshButton.classList.remove("light-grey-btn");
+          refreshButton.classList.add("black-btn");
+
+          lowCCButton.disabled = true;
+          agg.disabled = true;
+          select.disabled = true;
+          refreshButton.disabled = false;
+        }
+      })
+      .catch(error => {
+        // Handle fetch errors here
+        console.error('Fetch error:', error);
+      });
+  });
+
+  document.getElementById("aggregate").addEventListener("click", async function () {
+
+    let response = await fetch("/getAllPolygons");
+    let featureCollections;
+    let geoJSONData;
+    try {
+      geoJSONData = await response.json();
+      console.log("fetched geojson:")
+      console.log(geoJSONData)
+      console.log(geoJSONData[0].type === "FeatureCollection")
+    } catch (error) {
+      console.log(error)
+    }
+
+    try {
+      if (geoJSONData[0].type === "FeatureCollection") {
+        featureCollections = geoJSONData[0];
+
+      } else {
+        featureCollections = {
+          type: "FeatureCollection",
+          features: geoJSONData
+        }
+      }
+      //featureCollection = geoJSONData;
+      console.log("after inserting")
+      console.log(featureCollections)
+    } catch (error) {
+      console.log(error)
+    }
+
+    let bbox;
+    try {
+      bbox = turf.bbox(featureCollections);
+    } catch (error) {
+      console.log(error)
+    }
+
+    south = bbox[0];
+    west = bbox[1];
+    north = bbox[2];
+    east = bbox[3];
+
+    startingTime = selectedDatesTD[0];
+    endTime = selectedDatesTD[1];
+
+    const httpRequestUrl = checkInputsForEarthSearch();
+    console.log(httpRequestUrl);
+
+    fetch(httpRequestUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse response body as JSON
+      })
+      .then(data => {
+        // Return formatted date, so it can be used for the openeocubes request again
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        console.log(validImages);
+        if (validImages.length === 0) {
+          alert("There are no valid images available! Select another time period or change the AOI")
+        } else {
+
+          lowCCButton.classList.remove("black-btn");
+          lowCCButton.classList.add("light-grey-btn");
+
+          agg.classList.remove("black-btn");
+          agg.classList.add("accepted-btn");
+
+          select.classList.remove("black-btn");
+          select.classList.add("light-grey-btn");
+
+          refreshButton.classList.remove("light-grey-btn");
+          refreshButton.classList.add("black-btn");
+
+          lowCCButton.disabled = true;
+          agg.disabled = true;
+          select.disabled = true;
+          refreshButton.disabled = false;
+        }
+      });
+  });
+
+  document.getElementById("selectAvailable").addEventListener("click", async function () {
+
+    let response = await fetch("/getAllPolygons");
+    let featureCollections;
+    let geoJSONData;
+    try {
+      geoJSONData = await response.json();
+      console.log("fetched geojson:")
+      console.log(geoJSONData)
+      console.log(geoJSONData[0].type === "FeatureCollection")
+    } catch (error) {
+      console.log(error)
+    }
+
+    try {
+      if (geoJSONData[0].type === "FeatureCollection") {
+        featureCollections = geoJSONData[0];
+
+      } else {
+        featureCollections = {
+          type: "FeatureCollection",
+          features: geoJSONData
+        }
+      }
+      //featureCollection = geoJSONData;
+      console.log("after inserting")
+      console.log(featureCollections)
+    } catch (error) {
+      console.log(error)
+    }
+
+    let bbox;
+    try {
+      bbox = turf.bbox(featureCollections);
+    } catch (error) {
+      console.log(error)
+    }
+
+    south = bbox[0];
+    west = bbox[1];
+    north = bbox[2];
+    east = bbox[3];
+
+    startingTime = selectedDatesTD[0];
+    endTime = selectedDatesTD[1];
+
+    const httpRequestUrl = checkInputsForEarthSearch();
+    console.log(httpRequestUrl);
+
+    fetch(httpRequestUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse response body as JSON
+      })
+      .then(data => {
+        // Return formatted date, so it can be used for the openeocubes request again
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        console.log(validImages);
+
+        if (validImages.length === 0) {
+          alert("There are no valid images available! Select another time period or change the AOI")
+        } else {
+          console.log(data);
+          document.getElementById("popup").style.display = "block";
+
+          const table = document.createElement("table");
+          const headerRow = table.insertRow();
+          headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
+
+
+          data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0).forEach(item => {
+            const row = table.insertRow();
+            const timeCell = row.insertCell(0);
+            const cloudCoverCell = row.insertCell(1);
+
+            const date = new Date(item.properties.datetime);
+            const formattedDate = date.toISOString().split('T')[0];
+
+            timeCell.textContent = formattedDate;
+            cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
+
+            row.addEventListener("click", function () {
+              const previouslySelectedRow = table.querySelector(".selected");
+              if (previouslySelectedRow) {
+                previouslySelectedRow.classList.remove("selected");
+              }
+              // Add selection to the clicked row
+              row.classList.add("selected");
+
+              // Handle item selection here
+              console.log(`Selected: ${formattedDate}`);
+              selectedDatesTD[0] = formattedDate;
+              selectedDatesTD[1] = formattedDate;
+            });
+            document.getElementById("dynamicTable").appendChild(table);
+          });
+        }
+      })
+      .catch(error => {
+        // Handle fetch errors here
+        console.error('Fetch error:', error);
+      });
+  });
+  document.getElementById("closePopupBtn").addEventListener("click", function () {
+    document.getElementById("popup").style.display = "none";
+
+    lowCCButton.classList.remove("black-btn");
+    lowCCButton.classList.add("light-grey-btn");
+
+    agg.classList.remove("black-btn");
+    agg.classList.add("light-grey-btn");
+
+    select.classList.remove("black-btn");
+    select.classList.add("accepted-btn");
+
+    refreshButton.classList.remove("light-grey-btn");
+    refreshButton.classList.add("black-btn");
+
+    lowCCButton.disabled = true;
+    agg.disabled = true;
+    select.disabled = true;
+    refreshButton.disabled = false;
+  });
+
+  document.getElementById("refreshImageBtn").addEventListener("click", function () {
+
+    selectedDatesTD[0] = startingTime;
+    selectedDatesTD[1] = endTime;
+    console.log(selectedDatesTD);
+
+    lowCCButton.classList.remove("accepted-btn");
+    lowCCButton.classList.remove("light-grey-btn");
+    lowCCButton.classList.add("black-btn");
+
+    agg.classList.remove("accepted-btn");
+    agg.classList.remove("light-grey-btn");
+    agg.classList.add("black-btn");
+
+    select.classList.remove("light-grey-btn");
+    select.classList.remove("accepted-btn");
+    select.classList.add("black-btn");
+
+    refreshButton.classList.remove("black-btn");
+    refreshButton.classList.add("light-grey-btn");
+
+    refreshButton.disabled = true;
+    lowCCButton.disabled = false;
+    agg.disabled = false;
+    select.disabled = false;
+  })
+})
+
+
+function checkInputsForEarthSearch() {
+  var date1Value = $('#datepicker1').val();
+  var date2Value = $('#datepicker2').val();
+  // var AoIgiven = false;
+
+  // // Check if something is drawn
+  // if (drawnItems.getLayers().length > 0) {
+  //   AoIgiven = true;
+  // }
+
+  // // Check if something is uploaded
+  // var fileInputValue = document.getElementById('fileInput').value;
+  // if (fileInputValue !== '') {
+  //   AoIgiven = true;
+  // }
+
+  // Check if both Dateinputs are not empty
+  if (date1Value !== '' && date2Value !== '') {
+
+    const lowerLeftLong = west;
+    const lowerLeftLat = south;
+    const upperRightLong = east;
+    const upperRightLat = north;
+
+    // Url for request with filter parameters for earth search v1
+    // Transform dates into earth-search v1 compatible
+    // const startDate = selectedDates[0] + "T00:00:00.000Z";
+    // const endDate = selectedDates[1] + "T23:59:59.999Z";
+    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
+    // console.log(apiUrl);
+    // fetch(apiUrl)
+
+    //URL for earth-search v0 (As openeocubes uses), but discontinued
+    const datetime = selectedDatesTD[0] + "/" + selectedDatesTD[1];
+    const bbox = [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
+
+    return `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+  } else {
+    alert("Please fill in all the values");
+  }
 }
 
 function startRotation() {

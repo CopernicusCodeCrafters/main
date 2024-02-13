@@ -16,6 +16,8 @@
     <!-- Bootstrap-datepicker JS -->
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <!--Icon stylesheet for Refreshbutton-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!--Leaflet-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -105,6 +107,23 @@
                         <input type="text" class="form-control" id="datepicker2TD">
                     </div>
                     <button id="saveDateBtn" class="black-btn" onclick="getTrainingDates()">Save Dates</button>
+
+                    <div>
+                        <h5 class="card-title">Select your Image</h5>
+                        <button id="leastCloudCoverage" class="black-btn">Lowest CC</button>
+                        <button id="aggregate" class="black-btn">Aggregate all</button>
+                        <button id="selectAvailable" class="black-btn">Select one</button>
+                        <button id="refreshImageBtn" class="light-grey-btn" disabled>
+                          <i class="fa fa-refresh" style="color:white"></i>
+                        </button>
+                        <div id="popup" class="popup">
+                          <div class="popup-content">
+                            <span class="close" id="closePopupBtn">&times;</span>
+                            <div id="dynamicTable"></div>
+                          </div>
+                        </div>
+                        <br />
+                      </div>
 
 
                     <!-- Hyperparameter Selection-->
