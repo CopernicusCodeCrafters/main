@@ -652,7 +652,9 @@ async function createClassification() {
       }
       stopRotation();
     };
+    reader.readAsArrayBuffer(blob);
 
+    
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function(map) {
       let div = L.DomUtil.create("div", "legend");
