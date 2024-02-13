@@ -105,6 +105,7 @@ app.get('/delete-feature', async (req, res) => {
 //get-Befehl(Stationen),der alle Datenbank-Objekte als Array zurückgibt
 app.get('/getAllPolygons', async (req, res) => {
   try {
+    await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('Trainingspolygone');
 
