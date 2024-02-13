@@ -13,15 +13,16 @@ Joaquin Valdez      @jova10
 ## How to use CCC-eocubes
 
 1. git clone git@github.com:CopernicusCodeCrafters/main.git
-
-2. set environment variable "AWSHOST" to your AWS-IPv4-adress in docker-compose.yml (AWSHOST = AWS-IPv4-adress)
-    if you are running the application on your local machine, set AWSHOST =127.0.0.1  .
+2. set environment variable "AWSHOST" to your AWS-IPv4-adress in docker-compose.yml
+    if you are running the application on your local machine, leave "AWSHOST" empty .
     On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance.
 3. docker-compose up --build
 
+4. Enter your AWS adress in the adress field to connect to the backend.
+
+
 ## Demo and Tutorial
-There is a built machine learning ( random forest) model called "CCC_DemoModell".
-With a small area the classification takes around 3 min.
+There is a built machine learning ( random forest) model called "DemoCCC2024"
 
 
 
