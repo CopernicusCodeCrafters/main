@@ -224,7 +224,7 @@ router.get('/buildModel', async function (req, res, next) {
     let response = await connection.computeResult(result);
     res.status(200).send("Model build");
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+    res.status(500).json({ error: 'Internal Server Error in model building process' }); // Send error response
   }
   
 });

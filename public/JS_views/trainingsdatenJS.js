@@ -510,22 +510,36 @@ async function buildModel() {
   let geoJSONData;
   try {
     geoJSONData = await response.json();
+    console.log("fetched geojson:")
+    console.log(geoJSONData)
+    console.log(geoJSONData[0].type==="FeatureCollection")
   } catch (error) {
     console.log(error)
   }
 
   try {
-    featureCollection = {
-      "type": "FeatureCollection",
-      "features": geoJSONData
-    };
+    if(geoJSONData[0].type === "FeatureCollection"){
+      featureCollection =geoJSONData[0];
+
+      } else {
+        featureCollection = {
+          type: "FeatureCollection",
+          features: geoJSONData
+      }
+    }
+    //featureCollection = geoJSONData;
+    console.log("after inserting")
+    console.log(featureCollection)
   } catch (error) {
     console.log(error)
   }
-
-
   let { featureCollection: updatedFeatureCollection, classificationMapping } = exchangeClassifier(featureCollection);
-  let geoJSONDataString= JSON.stringify(updatedFeatureCollection);
+
+  console.log("After exchangeClassifier:")
+  console.log(updatedFeatureCollection)
+  //let nonames =updatedFeatureCollection.features[0].features.map(u => ({geometry: u.geometry,type: u.type,_id: u._id,properties:{classification: u.properties.classification,object_id:u.properties.object_id}}));
+  //console.log(nonames)
+  let geoJSONDataString= JSON.stringify(updatedFeatureCollection).trim();
   
   
   let bbox;
