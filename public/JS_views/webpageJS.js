@@ -628,6 +628,8 @@ async function createClassification() {
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
+          zIndex:15,
+
 
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
@@ -650,7 +652,9 @@ async function createClassification() {
       }
       stopRotation();
     };
+    reader.readAsArrayBuffer(blob);
 
+    
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function(map) {
       let div = L.DomUtil.create("div", "legend");
