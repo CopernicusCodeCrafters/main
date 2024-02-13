@@ -184,59 +184,57 @@ router.get('/getClassification', async function (req, res, next) {
 
 let rdsModels = [];
 // Method to build a Model 
-router.get('/buildModel', async function (req, res, next) {
+router.post('/buildModel', async function (req, res, next) {
   try {
-    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast} = req.query;
-    console.log(geoJSONData)
-    let TDDates = req.query.trainingDates.split(',');
-
+    const { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast, trainingDates } = req.body;
+    console.log(name)
+    //let geoJSON = JSON.parse(geoJSONData);
+    //const TDDates = trainingDates.split(',');
     console.log('Processing model...'); // Indicate the code is running up to this point
     // Connect to the OpenEO server
-    let connection = await OpenEO.connect(openeo_url);
+    const connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
-    var builder = await connection.buildProcess();
-    console.log(convertedWest)
+    const builder = await connection.buildProcess();
+    console.log(convertedWest);
 
     // datacube init
-    var datacube = builder.load_collection(
+    const datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
-      {west: convertedWest, south: convertedSouth,
+      {
+        west: convertedWest,
+        south: convertedSouth,
         east: convertedEast,
-        north: convertedNorth},
+        north: convertedNorth
+      },
       3857,
-      TDDates
+      trainingDates
     );
-
+      
     // filter bands to bands with 10 or 20 resolution
-    let datacube_filtered = builder.filter_bands(datacube,["B02","B03","B04","B05","B06","B07","B08","B11","B12"])
+    const datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B11", "B12"]);
     
     // NDVI and Fill NAs
     // let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
-    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
+    const datacube_filled = builder.fill_NAs_cube(datacube_filtered);
 
-    var mean = function(data) {
+    const mean = function (data) {
       return this.mean(data);
     };
 
     // reduce data cube - time dimension
-    let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
-    
+    const datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");
+
     // data, nt, mt und name müssen übergeben werden
-    let model = builder.train_model_ml(data = datacube_reduced, samples = geoJSONData, parseInt(nt), parseInt(mt), String(name), save = true);
+    const model = builder.train_model_ml(data = datacube_reduced, samples = geoJSONData, parseInt(nt), parseInt(mt), String(name), save = true);
+    const result = builder.save_result(model, 'RDS');
+    const response = await connection.computeResult(result);
 
-    let result = builder.save_result(model,'RDS'); 
-    let response = await connection.computeResult(result);
-
-    // Set headers for response
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', 'attachment; filename=model.rds');
-
-    // Send the RDS as response
-    response.data.pipe(res);
+    response.status(200)
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error in model building process' }); // Send error response
   }
 });
+
 
 classNames = [];
 // POST endpoint saveModel
