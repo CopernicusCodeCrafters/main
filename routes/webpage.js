@@ -206,10 +206,12 @@ router.get('/buildModel', async function (req, res, next) {
       3857,
       TDDates
     );
-        // filter bands to bands with 10 or 20 resolution
+
+    // filter bands to bands with 10 or 20 resolution
     let datacube_filtered = builder.filter_bands(datacube,["B02","B03","B04","B05","B06","B07","B08","B11","B12"])
-      // NDVI and Fill NAs
-    //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
+    
+    // NDVI and Fill NAs
+    // let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
     let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
 
     var mean = function(data) {
@@ -224,12 +226,18 @@ router.get('/buildModel', async function (req, res, next) {
 
     let result = builder.save_result(model,'RDS'); 
     let response = await connection.computeResult(result);
-    res.status(200).send("Model build");
+
+    // Set headers for response
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', 'attachment; filename=model.rds');
+
+    // Send the RDS as response
+    response.data.pipe(res);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error in model building process' }); // Send error response
   }
-  
 });
+
 classNames = [];
 // POST endpoint saveModel
 router.post('/saveModel', async (req, res) => {
