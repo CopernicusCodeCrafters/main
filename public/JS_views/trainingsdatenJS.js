@@ -30,7 +30,7 @@ $(document).ready(function () {
   let minDate = new Date(2015, 0, 1); // Minimum date: January 1, 2015
 
 
-  $('#datepicker1').datepicker({
+  $('#datepicker1TD').datepicker({
     format: 'yyyy-mm-dd',
     autoclose: true,
     todayHighlight: true,
@@ -38,7 +38,7 @@ $(document).ready(function () {
     endDate: today // Restrict datepicker1 to today
   });
 
-  $('#datepicker2').datepicker({
+  $('#datepicker2TD').datepicker({
     format: 'yyyy-mm-dd',
     autoclose: true,
     todayHighlight: true,
@@ -48,31 +48,31 @@ $(document).ready(function () {
 });
 
 // Event listener for the change event on datepicker1
-$('#datepicker1').on('changeDate', function (e) {
+$('#datepicker1TD').on('changeDate', function (e) {
   // Calculate two weeks later
   let endDate = new Date(e.date);
   endDate.setDate(endDate.getDate() + 365); // 14 days to allow for a 14-day span
 
   // Set the new startDate for the second datepicker
-  $('#datepicker2').datepicker('setStartDate', e.date);
+  $('#datepicker2TD').datepicker('setStartDate', e.date);
 
   // Set the new endDate for the second datepicker
-  $('#datepicker2').datepicker('setEndDate', endDate);
+  $('#datepicker2TD').datepicker('setEndDate', endDate);
 });
 
-function getSelectedDates() {
-  let startDate = $('#datepicker1').datepicker('getDate');
-  let endDate = $('#datepicker2').datepicker('getDate');
+function getTrainingDates() {
+  let startDateTD = $('#datepicker1TD').datepicker('getDate');
+  let endDateTD = $('#datepicker2TD').datepicker('getDate');
 
-  if (startDate && endDate) {
+  if (startDateTD && endDateTD) {
     // Format dates as YYYY-MM-DD
-    let formattedStartDate = formatDate(startDate);
-    let formattedEndDate = formatDate(endDate);
+    let formattedStartDateTD = formatDate(startDateTD);
+    let formattedEndDateTD = formatDate(endDateTD);
 
     // Store dates in an array
-    selectedDates = [formattedStartDate, formattedEndDate];
+    selectedDatesTD = [formattedStartDateTD, formattedEndDateTD];
 
-    console.log(selectedDates);
+    console.log(selectedDatesTD);
 
     let saveDateBtn = document.getElementById("saveDateBtn");
 
@@ -84,8 +84,8 @@ function getSelectedDates() {
 
     // Change button text
     saveDateBtn.innerHTML = "Date saved";
-    document.getElementById("datepicker1").disabled = true;
-    document.getElementById("datepicker2").disabled = true;
+    document.getElementById("datepicker1TD").disabled = true;
+    document.getElementById("datepicker2TD").disabled = true;
     saveDateBtn.disabled = true;
   } else {
     alert('Please select both start and end dates.');
@@ -675,7 +675,7 @@ async function buildModel() {
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&selectedDates=${selectedDates}`);
+    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&trainingDates=${selectedDatesTD}`);
     if (response.ok) {
       fetch('/saveModel', {
         method: 'POST',

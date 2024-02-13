@@ -184,7 +184,7 @@ let rdsModels = [];
 // Method to build a Model 
 router.get('/buildModel', async function (req, res, next) {
   try {
-    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast, selectedDates} = req.query;
+    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast, trainingDates} = req.query;
     console.log(geoJSONData)
 
     console.log('Processing model...'); // Indicate the code is running up to this point
@@ -201,7 +201,7 @@ router.get('/buildModel', async function (req, res, next) {
         east: convertedEast,
         north: convertedNorth},
       3857,
-      [selectedDates[0], selectedDates[1]]
+      [trainingDates[0], trainingDates[1]]
     );
         // filter bands to bands with 10 or 20 resolution
     let datacube_filtered = builder.filter_bands(datacube,["B02","B03","B04","B05","B06","B07","B08","B11","B12"])
