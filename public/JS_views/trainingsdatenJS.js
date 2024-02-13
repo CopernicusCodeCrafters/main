@@ -726,9 +726,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     let geoJSONData;
     try {
       geoJSONData = await response.json();
-      console.log("fetched geojson:")
-      console.log(geoJSONData)
-      console.log(geoJSONData[0].type === "FeatureCollection")
     } catch (error) {
       console.log(error)
     }
@@ -743,9 +740,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           features: geoJSONData
         }
       }
-      //featureCollection = geoJSONData;
-      console.log("after inserting")
-      console.log(featureCollections)
     } catch (error) {
       console.log(error)
     }
@@ -820,9 +814,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     let geoJSONData;
     try {
       geoJSONData = await response.json();
-      console.log("fetched geojson:")
-      console.log(geoJSONData)
-      console.log(geoJSONData[0].type === "FeatureCollection")
     } catch (error) {
       console.log(error)
     }
@@ -830,16 +821,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
       if (geoJSONData[0].type === "FeatureCollection") {
         featureCollections = geoJSONData[0];
-
       } else {
         featureCollections = {
           type: "FeatureCollection",
           features: geoJSONData
         }
       }
-      //featureCollection = geoJSONData;
-      console.log("after inserting")
-      console.log(featureCollections)
     } catch (error) {
       console.log(error)
     }
@@ -902,11 +889,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     let response = await fetch("/getAllPolygons");
     let featureCollections;
     let geoJSONData;
+
     try {
       geoJSONData = await response.json();
-      console.log("fetched geojson:")
-      console.log(geoJSONData)
-      console.log(geoJSONData[0].type === "FeatureCollection")
     } catch (error) {
       console.log(error)
     }
@@ -921,9 +906,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           features: geoJSONData
         }
       }
-      //featureCollection = geoJSONData;
-      console.log("after inserting")
-      console.log(featureCollections)
     } catch (error) {
       console.log(error)
     }
