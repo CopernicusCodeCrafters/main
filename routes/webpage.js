@@ -177,6 +177,7 @@ router.get('/getClassification', async function (req, res, next) {
 
   } catch (error) {
     console.error('Error:', error);
+    alert("")
     res.status(500).json({ error: 'Internal Server Error' }); // Send error response
   }
 });
