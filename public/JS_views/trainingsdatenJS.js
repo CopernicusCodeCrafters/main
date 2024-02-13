@@ -60,19 +60,19 @@ $('#datepicker1').on('changeDate', function (e) {
   $('#datepicker2').datepicker('setEndDate', endDate);
 });
 
-function getSelectedDates() {
-  let startDate = $('#datepicker1').datepicker('getDate');
-  let endDate = $('#datepicker2').datepicker('getDate');
+function getTrainingDates() {
+  let startDateTD = $('#datepicker1').datepicker('getDate');
+  let endDateTD = $('#datepicker2').datepicker('getDate');
 
   if (startDate && endDate) {
     // Format dates as YYYY-MM-DD
-    let formattedStartDate = formatDate(startDate);
-    let formattedEndDate = formatDate(endDate);
+    let formattedStartDateTD = formatDate(startDateTD);
+    let formattedEndDateTD = formatDate(endDateTD);
 
     // Store dates in an array
-    selectedDates = [formattedStartDate, formattedEndDate];
+    selectedDatesTD = [formattedStartDateTD, formattedEndDateTD];
 
-    console.log(selectedDates);
+    console.log(selectedDatesTD);
 
     let saveDateBtn = document.getElementById("saveDateBtn");
 
@@ -675,7 +675,7 @@ async function buildModel() {
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&selectedDates=${selectedDates}`);
+    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&trainingDates=${selectedDatesTD}`);
     if (response.ok) {
       fetch('/saveModel', {
         method: 'POST',
