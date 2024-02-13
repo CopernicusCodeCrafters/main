@@ -675,7 +675,28 @@ async function buildModel() {
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    let RDSresponse = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&trainingDates=${selectedDatesTD}`);
+    //let RDSresponse = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&trainingDates=${selectedDatesTD}`);
+    const requestBody = {
+      nt: nt,
+      mt: mt,
+      name: name,
+      geoJSONData: geoJSONDataString,
+      convertedSouth: convertedSouth,
+      convertedWest: convertedWest,
+      convertedNorth: convertedNorth,
+      convertedEast: convertedEast,
+      trainingDates: selectedDatesTD,
+    };
+    console.log(geoJSONData)
+    
+    const RDSresponse = await fetch('/buildModel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+    
     if (RDSresponse.ok) {
       fetch('/saveModel', {
         method: 'POST',
@@ -692,17 +713,6 @@ async function buildModel() {
         .catch(error => console.error('Error saving data:', error));
 
 
-        const downloadButton = document.getElementById('downloadButton');
-        downloadButton.removeAttribute('disabled');
-        downloadButton.classList.remove('light-grey-btn');
-        downloadButton.classList.add('black-btn');
-
-        downloadButton.addEventListener('click', function() {
-          const downloadLink = document.createElement('a');
-          downloadLink.href = URL.createObjectURL(new Blob([RDSresponse], { type: 'application/octet-stream' }));
-          downloadLink.download = 'model.rds';
-        });
-        console.log(RDSresponse)
     } else {
       stopRotation();
       console.error('Error in the first fetch:', response.statusText);
