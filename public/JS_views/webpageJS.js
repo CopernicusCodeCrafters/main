@@ -22,7 +22,7 @@ $(document).ready(function () {
     autoclose: true,
     todayHighlight: true,
     startDate: today, // Start datepicker2 from today
-    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 30) // Set end date 2 weeks after today
+    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 365) // Set end date 
   });
 });
 
@@ -30,7 +30,7 @@ $(document).ready(function () {
 $('#datepicker1').on('changeDate', function (e) {
   // Calculate two weeks later
   let endDate = new Date(e.date);
-  endDate.setDate(endDate.getDate() + 30); // 14 days to allow for a 14-day span
+  endDate.setDate(endDate.getDate() + 365); // 14 days to allow for a 14-day span
 
   // Set the new startDate for the second datepicker
   $('#datepicker2').datepicker('setStartDate', e.date);
@@ -194,11 +194,6 @@ var south;
 var west;
 var north;
 var east;
-
-
-
-// Set maximum allowed area in square meters
-let maxAllowedArea = 20000;
 
 // Event listener for the button "Activate Draw"
 document.getElementById('drawButton').addEventListener('click', function () {
@@ -608,9 +603,9 @@ async function createClassification() {
     console.log(model)
     // Include converted bounds in the satelliteImage request
     const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    console.log("response:",response)
     const blob = await response.blob();
-    console.log("warum")
-
+    console.log("blob:",blob)
 
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
@@ -621,23 +616,19 @@ async function createClassification() {
     document.body.removeChild(downloadLink);
 
     // read arraybuffer
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => {
-      const arrayBuffer = reader.result;
+    let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
         const georaster = await parseGeoraster(arrayBuffer);
-
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
-
-
-        // available color scales can be found by running console.log(chroma.brewer);
-        console.log(georaster)
+        console.log("Georaster:",georaster);
 
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
+          zIndex:15,
 
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
@@ -659,6 +650,8 @@ async function createClassification() {
         alert("Error")
       }
     };
+    reader.readAsArrayBuffer(blob);
+
 
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function(map) {
@@ -674,7 +667,7 @@ async function createClassification() {
         // Loop through class values and get colors using getColorForClass function
         Object.values(nameClass).forEach(value => {
           let color = getColorForClass(value);
-          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value]}</span><br>`;
+          div.innerHTML += `<i style="background: ${color}"></i><span>${Object.keys(nameClass)[value-1]}</span><br>`;
         });
     
         // Example: Find the key for class value 2
@@ -691,6 +684,7 @@ async function createClassification() {
     alert(Error)
     console.log(error);
   }
+
 }
 
 async function demo(){
@@ -793,8 +787,6 @@ function simulateUserInput() {
     // Add the new class
     saveDateBtn.classList.add("accepted-btn");
   
-    let startDate = '2021-06-01';
-    let endDate = '2021-06-15';
     console.log(startDate)
       // Format dates as YYYY-MM-DD
       let formattedStartDate = startDate;
