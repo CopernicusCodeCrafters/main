@@ -8,9 +8,9 @@ var engines = require('consolidate')
 
 
 
-//const url = "mongodb://127.0.0.1:27017"
-//const url = "mongodb://mongo:27017";
-const url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
+//let url = "mongodb://127.0.0.1:27017"
+//let url = "mongodb://mongo:27017";
+let url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
 
 let dbName = "geosoft2";
 
@@ -55,11 +55,11 @@ app.use("/trainingsdaten",trainingsdatenRouter)
 
 //Fügt eine geotiff zu der Datenbank hinzu
 app.post('/insert-satelliteimage', async (req, res) => {
-  const { geotiff } = req.body;
+  let { geotiff } = req.body;
   try {
-    const db = client.db(dbName);
-    const collection = db.collection('satellite image');
-    const result = await collection.insertOne(geotiff);
+    let db = client.db(dbName);
+    let collection = db.collection('satellite image');
+    let result = await collection.insertOne(geotiff);
     console.log('Satellite image inserted successfully:', result.insertedId);
     res.send('Satellite image inserted successfully');
   } catch (error) {
@@ -70,11 +70,11 @@ app.post('/insert-satelliteimage', async (req, res) => {
 
 //Fügt eine GeoJSON zu der Datenbank hinzu
 app.post('/insert-geojson', async (req, res) => {
-  const { geojson } = req.body; //hier
+  let { geojson } = req.body; //hier
   try {
-    const db = client.db(dbName);
-    const collection = db.collection('Trainingspolygone');
-    const result = await collection.insertOne(geojson);
+    let db = client.db(dbName);
+    let collection = db.collection('Trainingspolygone');
+    let result = await collection.insertOne(geojson);
     console.log('GeoJSON data inserted successfully:', result.insertedId);
     res.send('GeoJSON data inserted successfully');
   } catch (error) {
@@ -84,12 +84,12 @@ app.post('/insert-geojson', async (req, res) => {
 });
 
 app.get('/delete-feature', async (req, res) => {
-  const objectId = req.query._id; 
+  let objectId = req.query._id; 
   console.log(objectId);
   try {
-    const db = client.db(dbName);
-    const collection = db.collection('Trainingspolygone');
-    const result = await collection.deleteOne({ _id: new mongodb.ObjectId(objectId) });
+    let db = client.db(dbName);
+    let collection = db.collection('Trainingspolygone');
+    let result = await collection.deleteOne({ _id: new mongodb.ObjectId(objectId) });
     if (result.deletedCount === 1) {
       res.status(200).send('Polygon deleted successfully.');
     } else {
@@ -106,10 +106,10 @@ app.get('/delete-feature', async (req, res) => {
 app.get('/getAllPolygons', async (req, res) => {
   try {
     await client.connect();
-    const db = client.db(dbName);
-    const collection = db.collection('Trainingspolygone');
+    let db = client.db(dbName);
+    let collection = db.collection('Trainingspolygone');
 
-    const geojsonArray = await collection.find().toArray();
+    let geojsonArray = await collection.find().toArray();
     res.json(geojsonArray);
   } catch (error) {
     console.error(error);
@@ -136,11 +136,11 @@ app.use(function (err, req, res, next) {
 
 async function clearCollectionOnStart() {
   try {
-    const dbName1 = 'geosoft2';
-    const collectionName1 = 'class';
+    let dbName1 = 'geosoft2';
+    let collectionName1 = 'class';
     await client.connect();
-    const db = client.db(dbName1);
-    const collection = db.collection(collectionName1);
+    let db = client.db(dbName1);
+    let collection = db.collection(collectionName1);
 
     // Lösche alle Dokumente aus der Sammlung
     await collection.deleteMany({});

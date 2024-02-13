@@ -1,25 +1,25 @@
 var express = require("express");
 var router = express.Router();
 var mongodb = require("mongodb");
-const { MongoClient } = require("mongodb");
-const GeoPackageAPI = require('@ngageoint/geopackage');
-const geopackage = new GeoPackageAPI.GeoPackage();
+let { MongoClient } = require("mongodb");
+let GeoPackageAPI = require('@ngageoint/geopackage');
+let geopackage = new GeoPackageAPI.GeoPackage();
 
 
 
-//const url = "mongodb://127.0.0.1:27017";                  
-//const url = "mongodb://mongo:27017"; // connection URL
-const url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
+//let url = "mongodb://127.0.0.1:27017";                  
+//let url = "mongodb://mongo:27017"; // connection URL
+let url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
 
 
-const client = new MongoClient(url); // mongodb client
-const dbName = "mydatabase"; // database name
-const collectionName = "newpois"; // collection name    
+let client = new MongoClient(url); // mongodb client
+let dbName = "mydatabase"; // database name
+let collectionName = "newpois"; // collection name    
 console.log("test");
 
 /* GET home page. */
 router.get("/", async (req, res, next) => {
-    const db = client.db(dbName);
+    let db = client.db(dbName);
     let collection = await db.collection(collectionName);
     let docs = await collection.find({}).limit(50).toArray();
 
@@ -48,9 +48,9 @@ async function addNewPOItoDB(client, dbName, collectionName, poi, res) {
 
     console.log("Connected successfully to server");
 
-    const db = client.db(dbName);
+    let db = client.db(dbName);
 
-    const collection = db.collection(collectionName);
+    let collection = db.collection(collectionName);
 
     collection.insertOne(poi); // see https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertOne/
     console.log("New poi inserted in the database");

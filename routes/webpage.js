@@ -4,14 +4,14 @@ var mongodb = require("mongodb");
 let { MongoClient } = require("mongodb");
 let { OpenEO, FileTypes, Capabilities } = require('@openeo/js-client'); 
 let { format } = require("morgan");
-const bodyParser = require('body-parser');
+let bodyParser = require('body-parser');
 
 
 
 
 //let url = "mongodb://127.0.0.1:27017";
 //let url = "mongodb://mongo:27017"; // connection URL
-const url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
+let url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
 let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
 //let openeo_url = "http://34.209.215.214:8000/"
 console.log("OPENEO URL : ",openeo_url)
@@ -186,19 +186,19 @@ let rdsModels = [];
 // Method to build a Model 
 router.post('/buildModel', async function (req, res, next) {
   try {
-    const { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast, trainingDates } = req.body;
+    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast, trainingDates } = req.body;
     console.log(name)
     //let geoJSON = JSON.parse(geoJSONData);
-    //const TDDates = trainingDates.split(',');
+    //let TDDates = trainingDates.split(',');
     console.log('Processing model...'); // Indicate the code is running up to this point
     // Connect to the OpenEO server
-    const connection = await OpenEO.connect(openeo_url);
+    let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
-    const builder = await connection.buildProcess();
+    let builder = await connection.buildProcess();
     console.log(convertedWest);
 
     // datacube init
-    const datacube = builder.load_collection(
+    let datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
       {
         west: convertedWest,
@@ -211,23 +211,23 @@ router.post('/buildModel', async function (req, res, next) {
     );
       
     // filter bands to bands with 10 or 20 resolution
-    const datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B11", "B12"]);
+    let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B11", "B12"]);
     
     // NDVI and Fill NAs
     // let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
-    const datacube_filled = builder.fill_NAs_cube(datacube_filtered);
+    let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
 
-    const mean = function (data) {
+    let mean = function (data) {
       return this.mean(data);
     };
 
     // reduce data cube - time dimension
-    const datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");
+    let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");
 
     // data, nt, mt und name müssen übergeben werden
-    const model = builder.train_model_ml(data = datacube_reduced, samples = geoJSONData, parseInt(nt), parseInt(mt), String(name), save = true);
-    const result = builder.save_result(model, 'RDS');
-    const response = await connection.computeResult(result);
+    let model = builder.train_model_ml(data = datacube_reduced, samples = geoJSONData, parseInt(nt), parseInt(mt), String(name), save = true);
+    let result = builder.save_result(model, 'RDS');
+    let response = await connection.computeResult(result);
 
     response.status(200)
   } catch (error) {
@@ -270,10 +270,10 @@ router.get('/getModel', async (req, res) => {
     let collection = db.collection(collectionName);
 
     // Fetch all documents from the collection
-    const cursor = collection.find({});
+    let cursor = collection.find({});
     
     // Convert the cursor to an array
-    const documentsArray = await cursor.toArray();
+    let documentsArray = await cursor.toArray();
 
     await client.close();
 
@@ -292,7 +292,7 @@ router.get('/getSpecificModel/:modelName', async (req, res) => {
     let collection = client.db(dbName).collection('class');
 
     // Extract the model name from the request parameters
-    const modelName = req.params.modelName;
+    let modelName = req.params.modelName;
 
     // Find the GeoJSON model by name
     let geojson = await collection.findOne({ name: modelName });
