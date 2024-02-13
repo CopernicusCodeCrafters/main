@@ -379,7 +379,7 @@ function processGeoJSON(geojsonData) {
   //Using Turf.js to create bounding box for OpenEO Request
   let bbox = turf.bbox(geojsonData);
   let bboxPolygon = turf.bboxPolygon(bbox);
-    L.geoJSON(geojsonData).addTo(map);
+  L.geoJSON(geojsonData).addTo(map);
   L.geoJSON(bboxPolygon).addTo(map);
 
   // Define the source and destination coordinate systems
@@ -479,47 +479,47 @@ function selectTrainingModel(event, model) {
   event.preventDefault();
   document.getElementById("trainingModelDropdown").textContent = model;
 }
-async function checkInputsClassifications(){
-   // Get the values of the datePickers
-   let date1Value = $('#datepicker1').val();
-   let date2Value = $('#datepicker2').val();
-   
-   // Check if an AoI is given
-   let AoIgiven = false;
-   let bandsGiven = false;
- 
-   // Check if something is drawn
-   if (drawnItems.getLayers().length > 0) {
-     AoIgiven = true;
-   }
- 
-   // Check if something is uploaded
-   let fileInputValue = document.getElementById('fileInput').value;
-   if (fileInputValue !== '') {
-     AoIgiven = true;
-   }
-   // Check if more than 0 Bands are selected
-   let bandsInputCheck = document.getElementById("bandsPicker").value;
-   if (bandsInputCheck != ""){
-     bandsGiven = true;
-   }
-   let input = document.getElementById('trainingModelDropdown');
-   model = input.textContent;
-   console.log("Model:", model)
+async function checkInputsClassifications() {
+  // Get the values of the datePickers
+  let date1Value = $('#datepicker1').val();
+  let date2Value = $('#datepicker2').val();
 
-   // Check if both Dateinputs are not empty . bandsgiven deleted
-   if (date1Value !== '' && date2Value !== '' && AoIgiven  && model != '') {
-     // when date Inputs full call createDatacube()
-     await createClassification();
-   } else {
-     alert("Please fill in all the values")
-   }
+  // Check if an AoI is given
+  let AoIgiven = false;
+  let bandsGiven = false;
+
+  // Check if something is drawn
+  if (drawnItems.getLayers().length > 0) {
+    AoIgiven = true;
+  }
+
+  // Check if something is uploaded
+  let fileInputValue = document.getElementById('fileInput').value;
+  if (fileInputValue !== '') {
+    AoIgiven = true;
+  }
+  // Check if more than 0 Bands are selected
+  let bandsInputCheck = document.getElementById("bandsPicker").value;
+  if (bandsInputCheck != "") {
+    bandsGiven = true;
+  }
+  let input = document.getElementById('trainingModelDropdown');
+  model = input.textContent;
+  console.log("Model:", model)
+
+  // Check if both Dateinputs are not empty . bandsgiven deleted
+  if (date1Value !== '' && date2Value !== '' && AoIgiven && model != '') {
+    // when date Inputs full call createDatacube()
+    await createClassification();
+  } else {
+    alert("Please fill in all the values")
+  }
 }
 
 async function createDatacube() {
   console.log("Creating Image");
   startRotation();
-  
+
   try {
     // Include converted bounds in the satelliteImage request
     let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
@@ -538,7 +538,7 @@ async function createDatacube() {
     // read arraybuffer
     let reader = new FileReader();
     reader.onload = async () => {
-    let arrayBuffer = reader.result;
+      let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
@@ -573,7 +573,7 @@ async function createDatacube() {
           resolution: 512
         });
         layer.addTo(map);
-        
+
         map.fitBounds(layer.getBounds());
         stopRotation();
 
@@ -656,33 +656,33 @@ async function createClassification() {
     };
 
     let legend = L.control({ position: "topleft" });
-    legend.onAdd = function(map) {
+    legend.onAdd = function (map) {
       let div = L.DomUtil.create("div", "legend");
       div.innerHTML += "<h4>Legende</h4>";
-    
+
       getSpecificModel(String(model)).then(model => {
         let nameClass = model.class;
         console.log("nameClass (keys):", Object.keys(nameClass));
         console.log("nameClass (values):", Object.values(nameClass));
-    
+
         // Correctly loop through class entries and get colors
         Object.entries(nameClass).forEach(([key, value]) => {
           let color = getColorForClass(value); // Make sure this function uses value correctly
           div.innerHTML += `<i style="background: ${color}"></i><span>${key}</span><br>`;
         });
       });
-    
+
       return div; // Make sure this is outside the async call if the div needs to be immediately returned
     };
-    
+
     legend.addTo(map);
   } catch (error) {
     stopRotation();
     alert(Error)
     console.log(error);
   }
-  
-  
+
+
   /*try {
     const localTIFPath = 'pictures/satelliteImage.tif';
     const response = await fetch(localTIFPath);
@@ -748,26 +748,26 @@ function simulateUserInput() {
   // Simulate date input
   $('#datepicker1').val('2021-06-01');
   $('#datepicker2').val('2021-06-15');
-  
+
   let saveDateBtn = document.getElementById("saveDateBtn");
 
-    // Remove the current class
-    saveDateBtn.classList.remove("black-btn");
+  // Remove the current class
+  saveDateBtn.classList.remove("black-btn");
 
-    // Add the new class
-    saveDateBtn.classList.add("accepted-btn");
-  
-    let startDate = '2021-06-01';
-    let endDate = '2021-06-15';
-    console.log(startDate)
-      // Format dates as YYYY-MM-DD
-      let formattedStartDate = startDate;
-      let formattedEndDate = endDate;
-  
-      // Store dates in an array
-      selectedDates = [formattedStartDate, formattedEndDate];
-  
-      console.log(selectedDates);
+  // Add the new class
+  saveDateBtn.classList.add("accepted-btn");
+
+  let startDate = '2021-06-01';
+  let endDate = '2021-06-15';
+  console.log(startDate)
+  // Format dates as YYYY-MM-DD
+  let formattedStartDate = startDate;
+  let formattedEndDate = endDate;
+
+  // Store dates in an array
+  selectedDates = [formattedStartDate, formattedEndDate];
+
+  console.log(selectedDates);
 
   const bandsPicker = $('#bandsPicker');
 
@@ -787,96 +787,96 @@ function simulateUserInput() {
 
   const modelName = 'Test';  // Replace with the desired model name
 
-// Trigger a click event on the corresponding dropdown item
-const dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
-dropdownItem.trigger('click');
+  // Trigger a click event on the corresponding dropdown item
+  const dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
+  dropdownItem.trigger('click');
 
 
 
 
-// Coordinates for the corners of the rectangle
-var northEast1 = L.latLng(51.954226919876916, 7.6094913482666025);
-var southWest1 = L.latLng(51.937555584581446, 7.577991485595704);
+  // Coordinates for the corners of the rectangle
+  var northEast1 = L.latLng(51.954226919876916, 7.6094913482666025);
+  var southWest1 = L.latLng(51.937555584581446, 7.577991485595704);
 
-// Create a LatLngBounds object
-let bounds = L.latLngBounds(southWest1, northEast1);
+  // Create a LatLngBounds object
+  let bounds = L.latLngBounds(southWest1, northEast1);
 
-// Add a rectangle to the map
-layer1 = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+  // Add a rectangle to the map
+  layer1 = L.rectangle(bounds, { color: "#ff7800", weight: 1 }).addTo(map);
 
-    bounds = layer1.getBounds();
-    console.log(bounds)
+  bounds = layer1.getBounds();
+  console.log(bounds)
 
-    // Extract coordinates from the bounds object
-    let southWest = bounds.getSouthWest(); // returns LatLng object
-    let northEast = bounds.getNorthEast(); // returns LatLng object
+  // Extract coordinates from the bounds object
+  let southWest = bounds.getSouthWest(); // returns LatLng object
+  let northEast = bounds.getNorthEast(); // returns LatLng object
 
-    south = southWest.lat;
-    west = southWest.lng;
-    north = northEast.lat;
-    east = northEast.lng;
+  south = southWest.lat;
+  west = southWest.lng;
+  north = northEast.lat;
+  east = northEast.lng;
 
-    // Define the source and destination coordinate systems
-    let sourceCRS = 'EPSG:4326';
-    let destCRS = 'EPSG:3857';
+  // Define the source and destination coordinate systems
+  let sourceCRS = 'EPSG:4326';
+  let destCRS = 'EPSG:3857';
 
-    // Define the projection transformations
-    proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
-    proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
+  // Define the projection transformations
+  proj4.defs(sourceCRS, '+proj=longlat +datum=WGS84 +no_defs');
+  proj4.defs(destCRS, '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');
 
-    // Perform the coordinate transformation
-    let convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
-    let convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
+  // Perform the coordinate transformation
+  let convertedSouthWest = proj4(sourceCRS, destCRS, [southWest.lng, southWest.lat]);
+  let convertedNorthEast = proj4(sourceCRS, destCRS, [northEast.lng, northEast.lat]);
 
-    //Extract LatLng from converted object
-    convertedSouth = convertedSouthWest[1];
-    convertedWest = convertedSouthWest[0];
-    convertedNorth = convertedNorthEast[1];
-    convertedEast = convertedNorthEast[0];
+  //Extract LatLng from converted object
+  convertedSouth = convertedSouthWest[1];
+  convertedWest = convertedSouthWest[0];
+  convertedNorth = convertedNorthEast[1];
+  convertedEast = convertedNorthEast[0];
 
-    console.log('Converted South West (EPSG:3857):', convertedSouthWest);
-    console.log('Converted North East (EPSG:3857):', convertedNorthEast);
+  console.log('Converted South West (EPSG:3857):', convertedSouthWest);
+  console.log('Converted North East (EPSG:3857):', convertedNorthEast);
 
-    let uploadRecBtn = document.getElementById("uploadButton");
-    let drawBtn = document.getElementById("drawButton");
-    let refreshDrawBtn = document.getElementById("refreshDrawBtn")
+  let uploadRecBtn = document.getElementById("uploadButton");
+  let drawBtn = document.getElementById("drawButton");
+  let refreshDrawBtn = document.getElementById("refreshDrawBtn")
 
-    //Remove the current class
-    uploadRecBtn.classList.remove("black-btn");
-    drawBtn.classList.remove("black-btn");
-    refreshDrawBtn.classList.remove("light-grey-btn")
+  //Remove the current class
+  uploadRecBtn.classList.remove("black-btn");
+  drawBtn.classList.remove("black-btn");
+  refreshDrawBtn.classList.remove("light-grey-btn")
 
-    // Add the new class
-    uploadRecBtn.classList.add("light-grey-btn");
-    drawBtn.classList.add("accepted-btn");
-    refreshDrawBtn.classList.add("black-btn")
-    //Change button text
-    drawBtn.innerHTML = "Drawn";
+  // Add the new class
+  uploadRecBtn.classList.add("light-grey-btn");
+  drawBtn.classList.add("accepted-btn");
+  refreshDrawBtn.classList.add("black-btn")
+  //Change button text
+  drawBtn.innerHTML = "Drawn";
 
-    //Change disabled functions
-    uploadRecBtn.disabled = true;
-    drawBtn.disabled = true;
-    refreshDrawBtn.disabled = false;
+  //Change disabled functions
+  uploadRecBtn.disabled = true;
+  drawBtn.disabled = true;
+  refreshDrawBtn.disabled = false;
 
-    drawnItems.getLayers().length =1
+  drawnItems.getLayers().length = 1
 
-    map.removeControl(drawControl)
+  map.removeControl(drawControl)
 
-// Optionally, fit the map to the rectangle bounds
-  
+  // Optionally, fit the map to the rectangle bounds
+
   //map.removeLayer(layer);
 
 
 
-const lowCCButton = document.getElementById("leastCloudCoverage");
-      const agg = document.getElementById("aggregate");
-      const select = document.getElementById("selectAvailable");
-      lowCCButton.classList.remove("black-btn");
-      lowCCButton.classList.add("accepted-btn");
+  const lowCCButton = document.getElementById("leastCloudCoverage");
+  const agg = document.getElementById("aggregate");
+  const select = document.getElementById("selectAvailable");
+  lowCCButton.classList.remove("black-btn");
+  lowCCButton.classList.add("accepted-btn");
 
 }
 
-var randomColors= generateRandomColors();
+var randomColors = generateRandomColors();
 function generateRandomColors() {
   const colors = [];
 
@@ -893,7 +893,7 @@ function generateRandomColors() {
   // Array mit 10 verschiedenen zufälligen Farben füllen
   for (let i = 0; i < 100; i++) {
     let newColor;
-    
+
     // Überprüfen, ob die generierte Farbe bereits im Array vorhanden ist
     do {
       newColor = getRandomColor();
@@ -938,218 +938,260 @@ function stopRotation() {
   wave.classList.remove('show');
 }
 
+function checkInputsForEarthSearch() {
+  var date1Value = $('#datepicker1').val();
+  var date2Value = $('#datepicker2').val();
+  var AoIgiven = false;
 
-document.addEventListener("DOMContentLoaded", async function(){
-  document.getElementById("leastCloudCoverage").addEventListener("click", async function(){
+  // Check if something is drawn
+  if (drawnItems.getLayers().length > 0) {
+    AoIgiven = true;
+  }
 
-    var date1Value = $('#datepicker1').val();
-    var date2Value = $('#datepicker2').val();  
-    var AoIgiven = false;
-  
-    // Check if something is drawn
-    if (drawnItems.getLayers().length > 0) {
-      AoIgiven = true;
-    }
-  
-    // Check if something is uploaded
-    var fileInputValue = document.getElementById('fileInput').value;
-    if (fileInputValue !== '') {
-      AoIgiven = true;
-    }
+  // Check if something is uploaded
+  var fileInputValue = document.getElementById('fileInput').value;
+  if (fileInputValue !== '') {
+    AoIgiven = true;
+  }
 
-    // Check if both Dateinputs are not empty
-    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+  // Check if both Dateinputs are not empty
+  if (date1Value !== '' && date2Value !== '' && AoIgiven) {
 
     const lowerLeftLong = west;
     const lowerLeftLat = south;
     const upperRightLong = east;
     const upperRightLat = north;
 
-    //Transform dates into earth-search compatible
-    const startDate = selectedDates[0] + "T00:00:00.000Z";
-    const endDate = selectedDates[1] + "T23:59:59.999Z";
-    
-    // Url for request with filter parameters for earth seasrch v1
+    // Url for request with filter parameters for earth search v1
+    // Transform dates into earth-search v1 compatible
+    // const startDate = selectedDates[0] + "T00:00:00.000Z";
+    // const endDate = selectedDates[1] + "T23:59:59.999Z";
     // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
     // console.log(apiUrl);
     // fetch(apiUrl)
 
-    //URL for earth-search v0 (As openeocubes uses), but dicontinued
-    const datetime= selectedDates[0] + "/" + selectedDates[1];
-    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
+    //URL for earth-search v0 (As openeocubes uses), but discontinued
+    const datetime = selectedDates[0] + "/" + selectedDates[1];
+    const bbox = [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
     const apiUrl = "https://earth-search.aws.element84.com/v0/search";
-    
-    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
-    console.log(httpRequestUrl);
-    
-    fetch(httpRequestUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json(); // Parse response body as JSON
-    })
-    .then(data => {
-      // Return formatted date, so it can be used for the openeocubes request again
-      console.log(data);
-      const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
-      const date = new Date(timestamp);
-      const formattedDate = date.toISOString().split('T')[0];
-      console.log(formattedDate);
-      selectedDates[0] = formattedDate;
-      selectedDates[1] = formattedDate;
 
-
-      const lowCCButton = document.getElementById("leastCloudCoverage");
-      const agg = document.getElementById("aggregate");
-      const select = document.getElementById("selectAvailable");
-      lowCCButton.classList.remove("black-btn");
-      lowCCButton.classList.add("accepted-btn");
-      agg.classList.remove("black-btn");
-      agg.classList.add("light-grey-btn");
-      select.classList.remove("black-btn");
-      select.classList.add("light-grey-btn");
-      
-      lowCCButton.disabled = true;
-      agg.disabled = true;
-      select.disabled = true;
-    })
-    .catch(error => {
-      // Handle fetch errors here
-      console.error('Fetch error:', error);
-    });
+    return `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
   } else {
     alert("Please fill in all the values");
   }
-  });
+}
 
-  document.getElementById("aggregate").addEventListener("click", async function(){
-    const lowCCButton = document.getElementById("leastCloudCoverage");
-    const agg = document.getElementById("aggregate");
-    const select = document.getElementById("selectAvailable");
-    lowCCButton.classList.remove("black-btn");
-    lowCCButton.classList.add("light-grey-btn");
-    agg.classList.remove("black-btn");
-    agg.classList.add("accepted-btn");
-    select.classList.remove("black-btn");
-    select.classList.add("light-grey-btn");
-    
-    lowCCButton.disabled = true;
-    agg.disabled = true;
-    select.disabled = true;
-  });
 
-  document.getElementById("selectAvailable").addEventListener("click", async function(){
-    var date1Value = $('#datepicker1').val();
-    var date2Value = $('#datepicker2').val();  
-    var AoIgiven = false;
-  
-    // Check if something is drawn
-    if (drawnItems.getLayers().length > 0) {
-      AoIgiven = true;
-    }
-  
-    // Check if something is uploaded
-    var fileInputValue = document.getElementById('fileInput').value;
-    if (fileInputValue !== '') {
-      AoIgiven = true;
-    }
+document.addEventListener("DOMContentLoaded", async function () {
 
-    // Check if both Dateinputs are not empty
-    if (date1Value !== '' && date2Value !== '' && AoIgiven) {
+  const lowCCButton = document.getElementById("leastCloudCoverage");
+  const agg = document.getElementById("aggregate");
+  const select = document.getElementById("selectAvailable");
+  const refreshButton = document.getElementById("refreshImageBtn");
+  var rememberDates = [];
 
-    const lowerLeftLong = west;
-    const lowerLeftLat = south;
-    const upperRightLong = east;
-    const upperRightLat = north;
+  document.getElementById("leastCloudCoverage").addEventListener("click", async function () {
 
-    //Transform dates into earth-search compatible
-    const startDate = selectedDates[0] + "T00:00:00.000Z";
-    const endDate = selectedDates[0] + "T23:59:59.999Z";
-    
-    // URL for earth-search v1, id eocubes switches to that one
-    // Url for request with filter parameters
-    // const apiUrl = `https://earth-search.aws.element84.com/v1/search?bbox=${lowerLeftLong},${lowerLeftLat},${upperRightLong},${upperRightLat}&datetime=${startDate}/${endDate}&collections=sentinel-2-l2a&limit=10000&sortby=properties.eo:cloud_cover`;
-    // console.log(apiUrl);
-    // fetch(apiUrl)
-
-    //URL for earth-search v0 (As openeocubes uses), but dicontinued
-    const datetime= selectedDates[0] + "/" + selectedDates[1];
-    const bbox= [lowerLeftLong, lowerLeftLat, upperRightLong, upperRightLat];
-    const apiUrl = "https://earth-search.aws.element84.com/v0/search";
-
-    const httpRequestUrl = `${apiUrl}?datetime=${datetime}&collection=sentinel-s2-l2a-cogs&bbox=[${bbox}]&sortby=properties.eo:cloud_cover&limit=1000`;
+    const httpRequestUrl = checkInputsForEarthSearch();
+    rememberDates = selectedDates;
     console.log(httpRequestUrl);
 
     fetch(httpRequestUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json(); // Parse response body as JSON
-    })
-    .then(data => {
-      // Return formatted date, so it can be used for the openeocubes request again
-      console.log(data);
-      document.getElementById("popup").style.display = "block";
-
-      const table = document.createElement("table");
-      const headerRow = table.insertRow();
-      headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
-
-
-        data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0).forEach(item => {
-        const row = table.insertRow();
-        const timeCell = row.insertCell(0);
-        const cloudCoverCell = row.insertCell(1);
-
-        const date = new Date(item.properties.datetime);
-        const formattedDate = date.toISOString().split('T')[0];
-        
-        timeCell.textContent = formattedDate;
-        cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
-
-        row.addEventListener("click", function() {
-          const previouslySelectedRow = table.querySelector(".selected");
-          if (previouslySelectedRow) {
-            previouslySelectedRow.classList.remove("selected");
-          }
-          // Add selection to the clicked row
-          row.classList.add("selected");
-
-          // Handle item selection here
-          console.log(`Selected: ${formattedDate}`);
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse response body as JSON
+      })
+      .then(data => {
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        console.log(validImages);
+        if (validImages.length === 0) {
+          alert("There are no valid images available! Select another time period or change the AOI")
+        } else {
+          // Return formatted date, so it can be used for the openeocubes request again
+          console.log(data);
+          const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
+          const date = new Date(timestamp);
+          const formattedDate = date.toISOString().split('T')[0];
+          console.log(formattedDate);
           selectedDates[0] = formattedDate;
           selectedDates[1] = formattedDate;
-        });
-        document.getElementById("dynamicTable").appendChild(table);
+
+          lowCCButton.classList.remove("black-btn");
+          lowCCButton.classList.add("accepted-btn");
+
+          agg.classList.remove("black-btn");
+          agg.classList.add("light-grey-btn");
+
+          select.classList.remove("black-btn");
+          select.classList.add("light-grey-btn");
+
+          refreshButton.classList.remove("light-grey-btn");
+          refreshButton.classList.add("black-btn");
+
+          lowCCButton.disabled = true;
+          agg.disabled = true;
+          select.disabled = true;
+          refreshButton.disabled = false;
+        }
+      })
+      .catch(error => {
+        // Handle fetch errors here
+        console.error('Fetch error:', error);
       });
 
-    })
-    .catch(error => {
-      // Handle fetch errors here
-      console.error('Fetch error:', error);
-    });
-  } else {
-    alert("Please fill in all the values");
-  }
   });
-  document.getElementById("closePopupBtn").addEventListener("click", function() {
+
+  document.getElementById("aggregate").addEventListener("click", async function () {
+
+    const httpRequestUrl = checkInputsForEarthSearch();
+    console.log(httpRequestUrl);
+
+    fetch(httpRequestUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse response body as JSON
+      })
+      .then(data => {
+        // Return formatted date, so it can be used for the openeocubes request again
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        console.log(validImages);
+        if (validImages.length === 0) {
+          alert("There are no valid images available! Select another time period or change the AOI")
+        } else {
+
+          rememberDates = selectedDates;
+
+          lowCCButton.classList.remove("black-btn");
+          lowCCButton.classList.add("light-grey-btn");
+
+          agg.classList.remove("black-btn");
+          agg.classList.add("accepted-btn");
+
+          select.classList.remove("black-btn");
+          select.classList.add("light-grey-btn");
+
+          refreshButton.classList.remove("light-grey-btn");
+          refreshButton.classList.add("black-btn");
+
+          lowCCButton.disabled = true;
+          agg.disabled = true;
+          select.disabled = true;
+          refreshButton.disabled = false;
+        }
+      });
+  });
+
+  document.getElementById("selectAvailable").addEventListener("click", async function () {
+    const httpRequestUrl = checkInputsForEarthSearch();
+    console.log(httpRequestUrl);
+
+    fetch(httpRequestUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse response body as JSON
+      })
+      .then(data => {
+        // Return formatted date, so it can be used for the openeocubes request again
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        console.log(validImages);
+
+        if (validImages.length === 0) {
+          alert("There are no valid images available! Select another time period or change the AOI")
+        } else {
+          console.log(data);
+          rememberDates = selectedDates;
+          document.getElementById("popup").style.display = "block";
+
+          const table = document.createElement("table");
+          const headerRow = table.insertRow();
+          headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
+
+
+          data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0).forEach(item => {
+            const row = table.insertRow();
+            const timeCell = row.insertCell(0);
+            const cloudCoverCell = row.insertCell(1);
+
+            const date = new Date(item.properties.datetime);
+            const formattedDate = date.toISOString().split('T')[0];
+
+            timeCell.textContent = formattedDate;
+            cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
+
+            row.addEventListener("click", function () {
+              const previouslySelectedRow = table.querySelector(".selected");
+              if (previouslySelectedRow) {
+                previouslySelectedRow.classList.remove("selected");
+              }
+              // Add selection to the clicked row
+              row.classList.add("selected");
+
+              // Handle item selection here
+              console.log(`Selected: ${formattedDate}`);
+              selectedDates[0] = formattedDate;
+              selectedDates[1] = formattedDate;
+            });
+            document.getElementById("dynamicTable").appendChild(table);
+          });
+        }
+      })
+      .catch(error => {
+        // Handle fetch errors here
+        console.error('Fetch error:', error);
+      });
+  });
+  document.getElementById("closePopupBtn").addEventListener("click", function () {
     document.getElementById("popup").style.display = "none";
-    const lowCCButton = document.getElementById("leastCloudCoverage");
-    const agg = document.getElementById("aggregate");
-    const select = document.getElementById("selectAvailable");
+
     lowCCButton.classList.remove("black-btn");
     lowCCButton.classList.add("light-grey-btn");
+
     agg.classList.remove("black-btn");
     agg.classList.add("light-grey-btn");
+
     select.classList.remove("black-btn");
     select.classList.add("accepted-btn");
-    
+
+    refreshButton.classList.remove("light-grey-btn");
+    refreshButton.classList.add("black-btn");
+
     lowCCButton.disabled = true;
     agg.disabled = true;
     select.disabled = true;
+    refreshButton.disabled = false;
   });
+
+  document.getElementById("refreshImageBtn").addEventListener("click", function () {
+
+    selectedDates = rememberDates;
+    console.log(selectedDates);
+
+    lowCCButton.classList.remove("accepted-btn");
+    lowCCButton.classList.remove("light-grey-btn");
+    lowCCButton.classList.add("black-btn");
+
+    agg.classList.remove("accepted-btn");
+    agg.classList.remove("light-grey-btn");
+    agg.classList.add("black-btn");
+
+    select.classList.remove("light-grey-btn");
+    select.classList.remove("accepted-btn");
+    select.classList.add("black-btn");
+
+    refreshButton.classList.remove("black-btn");
+    refreshButton.classList.add("light-grey-btn");
+
+    refreshButton.disabled = true;
+    lowCCButton.disabled = false;
+    agg.disabled = false;
+    select.disabled = false;
+  })
 })
 
 
@@ -1172,20 +1214,18 @@ fetch('/getModel')
   })
   .catch(error => console.error('Error:', error));
 
-  async function getSpecificModel(modelName) {
-    try {
-      let response = await fetch(`/getSpecificModel/${modelName}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      let data = await response.json();
-      return data;
-      console.log(data);
-    } catch (error) {
-      console.error('Error fetching specific model:', error.message);
+async function getSpecificModel(modelName) {
+  try {
+    let response = await fetch(`/getSpecificModel/${modelName}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-  }
 
- 
-  
+    let data = await response.json();
+    return data;
+    console.log(data);
+  } catch (error) {
+    console.error('Error fetching specific model:', error.message);
+  }
+}
+
