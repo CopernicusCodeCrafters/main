@@ -15,7 +15,7 @@ Joaquin Valdez      @jova10
 1. git clone git@github.com:CopernicusCodeCrafters/main.git
 
 2. set environment variable "AWSHOST" to your AWS-IPv4-adress in docker-compose.yml (AWSHOST = AWS-IPv4-adress)
-    if you are running the application on your local machine, set AWSHOST =127.0.0.1  .
+    if you are running the application on your local machine, set AWSHOST=ccceocubes_con  .
     On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance.
 3. docker-compose up --build
 

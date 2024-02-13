@@ -11,12 +11,15 @@ services:
         
         
         depends_on:
-            - mongodb    
+            - mongodb
+            - ccceocubes_con
             
         environment:
             WAIT_HOSTS: mongodb://mongodb:27017/
             MONGODB_URI: mongodb://mongodb:27017/
             OPENEO_URI : http://ccceocubes_con:8000
+        networks:
+            - ccc_network
             
     mongodb:
         image: mongo
@@ -29,19 +32,28 @@ services:
              - ./mongo-volume:/data/db
 
         command: mongod --noauth 
+        networks:
+            - ccc_network
         
 
     ccceocubes_con:
-        image: kwundram/ccceocubes:b12
+        image: kwundram/ccceocubes:b13
         container_name: ccceocubes_con
         environment:
-        - AWSHOST=34.209.215.214
+        - AWSHOST=ccceocubes_con
         - TZ=Etc/UTC
         - DEBIAN_FRONTEND=noninteractive
         ports:
             - "8000:8000"
               
         restart: always
+        networks:
+            - ccc_network
+
+networks:
+  ccc_network:  
+    driver: bridge
+
 volumes:
     mongo-init:
     mongo-volume:
