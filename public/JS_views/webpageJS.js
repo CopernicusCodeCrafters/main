@@ -489,7 +489,7 @@ async function checkInputsClassifications(){
    let bandsGiven = false;
  
    // Check if something is drawn
-   if (drawnItems.getLayers().length > 0) {
+   if (drawnItems.getLayers().length > 0 || demoValue == true ) {
      AoIgiven = true;
    }
  
@@ -524,17 +524,7 @@ async function createDatacube() {
     // Include converted bounds in the satelliteImage request
     let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
     let blob = await response.blob();
-    console.log("warum")
 
-    /*
-    let downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink)
-      */
     // read arraybuffer
     let reader = new FileReader();
     reader.onload = async () => {
@@ -603,16 +593,22 @@ async function createClassification() {
     console.log(model)
     const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     const blob = await response.blob();
-    console.log("warum")
+    
+    //Download Classification 
+    const downloadButton = document.getElementById('downloadButton');
+    downloadButton.removeAttribute('disabled');
+    downloadButton.classList.remove('light-grey-btn');
+    downloadButton.classList.add('black-btn');
 
-
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    document.getElementById('downloadButton').addEventListener('click', function() {
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = 'satelliteImage.tif';
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    });
 
     // read arraybuffer
     const reader = new FileReader();
@@ -683,74 +679,17 @@ async function createClassification() {
     alert(Error)
     console.log(error);
   }
-  
-  
-  /*try {
-    const localTIFPath = 'pictures/satelliteImage.tif';
-    const response = await fetch(localTIFPath);
-    const blob = await response.blob();
-
-    /*
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    
-    // read arraybuffer
-    const reader = new FileReader();
-    reader.onload = async () => {
-      let arrayBuffer = reader.result;
-
-      try {
-        const georaster = await parseGeoraster(arrayBuffer);
-        console.log(georaster);
-
-                let layer = new GeoRasterLayer({
-          georaster: georaster,
-          opacity: 1,
-          
-          pixelValuesToColorFn: function (pixelValues) {
-            // Assuming "class" is at index 0 in pixelValues array
-            var classValue = pixelValues[0];
-
-            // Define colors dynamically based on class values
-            var color = getColorForClass(classValue);
-
-            return color;
-
-
-          },
-          resolution: 512
-        });
-        
-        layer.addTo(map);
-        map.fitBounds(layer.getBounds());
-
-        stopRotation();
-      } catch (error) {
-        stopRotation();
-        console.log("Error connecting:", error);
-        alert("Error");
-      }
-    };
-
-    reader.readAsArrayBuffer(blob);
-  } catch (error) {
-    stopRotation();
-    alert("Error");
-    console.log(error);
-  }*/
 }
 
 let layer1;
+let demoValue;
 function simulateUserInput() {
+  demoValue = true;
   // Simulate date input
   $('#datepicker1').val('2021-06-01');
   $('#datepicker2').val('2021-06-15');
-  
+  document.getElementById("datepicker1").disabled = true;
+  document.getElementById("datepicker2").disabled = true;
   let saveDateBtn = document.getElementById("saveDateBtn");
 
     // Remove the current class
@@ -761,16 +700,15 @@ function simulateUserInput() {
   
     let startDate = '2021-06-01';
     let endDate = '2021-06-15';
-    console.log(startDate)
+
       // Format dates as YYYY-MM-DD
-      let formattedStartDate = startDate;
-      let formattedEndDate = endDate;
+    let formattedStartDate = startDate;
+    let formattedEndDate = endDate;
   
       // Store dates in an array
-      selectedDates = [formattedStartDate, formattedEndDate];
+    selectedDates = [formattedStartDate, formattedEndDate];
   
-      console.log(selectedDates);
-
+    
   const bandsPicker = $('#bandsPicker');
 
   // Array of indices of bands to be selected (0-indexed)
@@ -804,7 +742,7 @@ var southWest1 = L.latLng(51.937555584581446, 7.577991485595704);
 let bounds = L.latLngBounds(southWest1, northEast1);
 
 // Add a rectangle to the map
-layer1 = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+layer1 = L.rectangle(bounds, {color: "red", weight: 3, fill : false}).addTo(map);
 
     bounds = layer1.getBounds();
     console.log(bounds)
