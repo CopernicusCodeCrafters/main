@@ -32,7 +32,7 @@ services:
         
 
     ccceocubes_con:
-        image: kwundram/ccceocubes:b9
+        image: kwundram/ccceocubes:b12
         container_name: ccceocubes_con
         environment:
         - AWSHOST=34.209.215.214
