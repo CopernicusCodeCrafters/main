@@ -110,7 +110,7 @@ router.get('/satelliteImage', async function (req, res, next) {
 
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+    res.status(500).json({ error: 'Internal Server Error in get image' }); // Send error response
   }
 });
 
@@ -231,7 +231,7 @@ router.post('/buildModel', async function (req, res, next) {
 
     response.status(200)
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error in model building process' }); // Send error response
+    res.status(500).json({ error: 'Internal Server Error in model building model' }); // Send error response
   }
 });
 
