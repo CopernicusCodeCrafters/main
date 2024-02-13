@@ -1,4 +1,5 @@
-//const cons = require("consolidate");
+let startDateTraining;
+let endDateTraining;
 
 //Add Leaflet Map 
 var map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
@@ -70,9 +71,8 @@ function getTrainingDates() {
     let formattedEndDateTD = formatDate(endDateTD);
 
     // Store dates in an array
-    selectedDatesTD = [formattedStartDateTD, formattedEndDateTD];
-
-    console.log(selectedDatesTD);
+    startDateTraining = formattedStartDateTD;
+    endDateTraining = formattedEndDateTD
 
     let saveDateBtn = document.getElementById("saveDateBtn");
 
@@ -675,7 +675,7 @@ async function buildModel() {
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&trainingDates=${selectedDatesTD}`);
+    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&startDate=${startDateTraining}&endDate=${endDateTraining}`);
     if (response.ok) {
       fetch('/saveModel', {
         method: 'POST',
@@ -693,6 +693,7 @@ async function buildModel() {
     } else {
       stopRotation();
       console.error('Error in the first fetch:', response.statusText);
+      alert("Error")
     }
 
     stopRotation();
