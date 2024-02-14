@@ -32,9 +32,9 @@ With a small area the classification takes around 3 min.
 1. Enter start and ending time
 2. Draw the area of interest
 3. Select bands you would like to see
-4. "Aggregate all" will reduce the time series to the mean of the band values. By default only images with a cloudcover lower than 10 % will be used. But you can change the cloud cover value.
-5. you can also select a specific image with "select one" or get the image with the lowest Cloudcover with "lowest CC".
-If you are using "select one" chosse one of the images in the list and close with "x" in the top right corner
+4. "Aggregate all" leaves the timeframe how it is, so that the classification and model builing processes can aggregate all images in the timeframe with under 10% cloud coverage. If no images are available in the AoI and timeframe you will get a notification
+5. you can also select a specific date with "select one" or get the date with the lowest Cloudcover with "lowest CC".
+If you are using "select one" choose one of the images in the list and close with "x" in the top right corner
 It is recommended  to use "aggregate all" beacause the classification and model building processes also use aggregated images.
 6. At the end you have to use "Submit"
 

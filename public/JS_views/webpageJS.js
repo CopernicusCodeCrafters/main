@@ -481,41 +481,41 @@ function selectTrainingModel(event, model) {
   document.getElementById("trainingModelDropdown").textContent = model;
 }
 
-async function checkInputsClassifications(){
-   // Get the values of the datePickers
-   let date1Value = $('#datepicker1').val();
-   let date2Value = $('#datepicker2').val();
-   
-   // Check if an AoI is given
-   let AoIgiven = false;
-   let bandsGiven = false;
- 
-   // Check if something is drawn
-   if (drawnItems.getLayers().length > 0 || demoValue == true ) {
-     AoIgiven = true;
-   }
- 
-   // Check if something is uploaded
-   let fileInputValue = document.getElementById('fileInput').value;
-   if (fileInputValue !== '') {
-     AoIgiven = true;
-   }
-   // Check if more than 0 Bands are selected
-   let bandsInputCheck = document.getElementById("bandsPicker").value;
-   if (bandsInputCheck != ""){
-     bandsGiven = true;
-   }
-   let input = document.getElementById('trainingModelDropdown');
-   model = input.textContent;
-   console.log("Model:", model)
+async function checkInputsClassifications() {
+  // Get the values of the datePickers
+  let date1Value = $('#datepicker1').val();
+  let date2Value = $('#datepicker2').val();
 
-   // Check if both Dateinputs are not empty . bandsgiven deleted
-   if (date1Value !== '' && date2Value !== '' && AoIgiven  && model != '') {
-     // when date Inputs full call createDatacube()
-     await createClassification();
-   } else {
-     alert("Please fill in all the values")
-   }
+  // Check if an AoI is given
+  let AoIgiven = false;
+  let bandsGiven = false;
+
+  // Check if something is drawn
+  if (drawnItems.getLayers().length > 0 || demoValue == true) {
+    AoIgiven = true;
+  }
+
+  // Check if something is uploaded
+  let fileInputValue = document.getElementById('fileInput').value;
+  if (fileInputValue !== '') {
+    AoIgiven = true;
+  }
+  // Check if more than 0 Bands are selected
+  let bandsInputCheck = document.getElementById("bandsPicker").value;
+  if (bandsInputCheck != "") {
+    bandsGiven = true;
+  }
+  let input = document.getElementById('trainingModelDropdown');
+  model = input.textContent;
+  console.log("Model:", model)
+
+  // Check if both Dateinputs are not empty . bandsgiven deleted
+  if (date1Value !== '' && date2Value !== '' && AoIgiven && model != '') {
+    // when date Inputs full call createDatacube()
+    await createClassification();
+  } else {
+    alert("Please fill in all the values")
+  }
 }
 
 async function createDatacube() {
@@ -595,14 +595,14 @@ async function createClassification() {
     console.log(model)
     let response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
     let blob = await response.blob();
-    
+
     //Download Classification 
     let downloadButton = document.getElementById('downloadButton');
     downloadButton.removeAttribute('disabled');
     downloadButton.classList.remove('light-grey-btn');
     downloadButton.classList.add('black-btn');
 
-    document.getElementById('downloadButton').addEventListener('click', function() {
+    document.getElementById('downloadButton').addEventListener('click', function () {
       let downloadLink = document.createElement('a');
       downloadLink.href = URL.createObjectURL(blob);
       downloadLink.download = 'satelliteImage.tif';
@@ -630,7 +630,7 @@ async function createClassification() {
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
-          zIndex:15,
+          zIndex: 15,
 
 
           pixelValuesToColorFn: function (pixelValues) {
@@ -656,7 +656,7 @@ async function createClassification() {
     };
     reader.readAsArrayBuffer(blob);
 
-    
+
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function (map) {
       let div = L.DomUtil.create("div", "legend");
@@ -702,20 +702,20 @@ function simulateUserInput() {
   saveDateBtn.classList.remove("black-btn");
 
 
-    // Add the new class
-    saveDateBtn.classList.add("accepted-btn");
-  
-    let startDate = '2021-06-01';
-    let endDate = '2021-06-15';
+  // Add the new class
+  saveDateBtn.classList.add("accepted-btn");
 
-      // Format dates as YYYY-MM-DD
-    let formattedStartDate = startDate;
-    let formattedEndDate = endDate;
-  
-      // Store dates in an array
-    selectedDates = [formattedStartDate, formattedEndDate];
-  
-    
+  let startDate = '2021-06-01';
+  let endDate = '2021-06-15';
+
+  // Format dates as YYYY-MM-DD
+  let formattedStartDate = startDate;
+  let formattedEndDate = endDate;
+
+  // Store dates in an array
+  selectedDates = [formattedStartDate, formattedEndDate];
+
+
   let bandsPicker = $('#bandsPicker');
 
   // Array of indices of bands to be selected (0-indexed)
@@ -749,7 +749,7 @@ function simulateUserInput() {
 
 
   // Add a rectangle to the map
-  layer1 = L.rectangle(bounds, {color: "red", weight: 3, fill : false}).addTo(map);
+  layer1 = L.rectangle(bounds, { color: "red", weight: 3, fill: false }).addTo(map);
 
 
   bounds = layer1.getBounds();
@@ -963,7 +963,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         return response.json(); // Parse response body as JSON
       })
       .then(data => {
-        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 10 && item.properties['eo:cloud_cover'] != 0);
         if (validImages.length === 0) {
           alert("There are no valid images available! Select another time period or change the AOI")
         } else {
@@ -1018,7 +1018,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       })
       .then(data => {
         // Return formatted date, so it can be used for the openeocubes request again
-        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 10 && item.properties['eo:cloud_cover'] != 0);
         console.log(validImages);
         if (validImages.length === 0) {
           alert("There are no valid images available! Select another time period or change the AOI")
@@ -1061,7 +1061,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       })
       .then(data => {
         // Return formatted date, so it can be used for the openeocubes request again
-        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 10 && item.properties['eo:cloud_cover'] != 0);
         console.log(validImages);
 
         if (validImages.length === 0) {
