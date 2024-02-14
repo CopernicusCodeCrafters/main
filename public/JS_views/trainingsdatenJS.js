@@ -302,9 +302,19 @@ async function handleFile(event) {
 
 
 async function addFeaturesNames(geojson) {
-  setGeojsonToMap(geojson);
+  //setGeojsonToMap(geojson);
+  console.log(geojson.features);
+  //console.log(geojson.feat)
 
   for (let feature of geojson.features) {
+
+    const temporaryLayer = L.geoJSON(feature);
+    console.log(temporaryLayer);
+    drawnItems.addLayer(temporaryLayer);
+    map.fitBounds(temporaryLayer.getBounds(), { padding: [20, 20], maxZoom: 15 });
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     let object_id, name, classification;
     do {
       object_id = prompt("Enter object_id:");
@@ -323,7 +333,8 @@ async function addFeaturesNames(geojson) {
       name,
       classification,
     };
-    setGeojsonToMap(geojson);
+    drawnItems.removeLayer(temporaryLayer);
+    setGeojsonToMap(feature);
     await addGeoJSONtoDB(feature);
   }
 }
