@@ -480,41 +480,42 @@ function selectTrainingModel(event, model) {
   event.preventDefault();
   document.getElementById("trainingModelDropdown").textContent = model;
 }
-async function checkInputsClassifications() {
-  // Get the values of the datePickers
-  let date1Value = $('#datepicker1').val();
-  let date2Value = $('#datepicker2').val();
 
-  // Check if an AoI is given
-  let AoIgiven = false;
-  let bandsGiven = false;
+async function checkInputsClassifications(){
+   // Get the values of the datePickers
+   let date1Value = $('#datepicker1').val();
+   let date2Value = $('#datepicker2').val();
+   
+   // Check if an AoI is given
+   let AoIgiven = false;
+   let bandsGiven = false;
+ 
+   // Check if something is drawn
+   if (drawnItems.getLayers().length > 0 || demoValue == true ) {
+     AoIgiven = true;
+   }
+ 
+   // Check if something is uploaded
+   let fileInputValue = document.getElementById('fileInput').value;
+   if (fileInputValue !== '') {
+     AoIgiven = true;
+   }
+   // Check if more than 0 Bands are selected
+   let bandsInputCheck = document.getElementById("bandsPicker").value;
+   if (bandsInputCheck != ""){
+     bandsGiven = true;
+   }
+   let input = document.getElementById('trainingModelDropdown');
+   model = input.textContent;
+   console.log("Model:", model)
 
-  // Check if something is drawn
-  if (drawnItems.getLayers().length > 0) {
-    AoIgiven = true;
-  }
-
-  // Check if something is uploaded
-  let fileInputValue = document.getElementById('fileInput').value;
-  if (fileInputValue !== '') {
-    AoIgiven = true;
-  }
-  // Check if more than 0 Bands are selected
-  let bandsInputCheck = document.getElementById("bandsPicker").value;
-  if (bandsInputCheck != "") {
-    bandsGiven = true;
-  }
-  let input = document.getElementById('trainingModelDropdown');
-  model = input.textContent;
-  console.log("Model:", model)
-
-  // Check if both Dateinputs are not empty . bandsgiven deleted
-  if (date1Value !== '' && date2Value !== '' && AoIgiven && model != '') {
-    // when date Inputs full call createDatacube()
-    await createClassification();
-  } else {
-    alert("Please fill in all the values")
-  }
+   // Check if both Dateinputs are not empty . bandsgiven deleted
+   if (date1Value !== '' && date2Value !== '' && AoIgiven  && model != '') {
+     // when date Inputs full call createDatacube()
+     await createClassification();
+   } else {
+     alert("Please fill in all the values")
+   }
 }
 
 async function createDatacube() {
@@ -525,17 +526,7 @@ async function createDatacube() {
     // Include converted bounds in the satelliteImage request
     let response = await fetch(`/satelliteImage?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}`);
     let blob = await response.blob();
-    console.log("warum")
 
-    /*
-    let downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink)
-      */
     // read arraybuffer
     let reader = new FileReader();
     reader.onload = async () => {
@@ -602,29 +593,35 @@ async function createClassification() {
   startRotation();
   try {
     console.log(model)
-    const response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
-    const blob = await response.blob();
-    console.log("warum")
+    let response = await fetch(`/getClassification?date=${selectedDates}&south=${convertedSouth}&west=${convertedWest}&north=${convertedNorth}&east=${convertedEast}&bands=${selectedBands}&model=${model}`);
+    let blob = await response.blob();
+    
+    //Download Classification 
+    let downloadButton = document.getElementById('downloadButton');
+    downloadButton.removeAttribute('disabled');
+    downloadButton.classList.remove('light-grey-btn');
+    downloadButton.classList.add('black-btn');
 
-
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    document.getElementById('downloadButton').addEventListener('click', function() {
+      let downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = 'satelliteImage.tif';
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    });
 
     // read arraybuffer
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => {
-      const arrayBuffer = reader.result;
+      let arrayBuffer = reader.result;
 
       try {
         // transform arrayBuffer to georaster
-        const georaster = await parseGeoraster(arrayBuffer);
+        let georaster = await parseGeoraster(arrayBuffer);
 
-        const overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
+        let overAllMax = 5700 / 2 //Math.max(maxRed,maxGreen,maxBlue)/2
 
 
         // available color scales can be found by running console.log(chroma.brewer);
@@ -633,6 +630,8 @@ async function createClassification() {
         let layer = new GeoRasterLayer({
           georaster: georaster,
           opacity: 1,
+          zIndex:15,
+
 
           pixelValuesToColorFn: function (pixelValues) {
             // Assuming "class" is at index 0 in pixelValues array
@@ -655,7 +654,9 @@ async function createClassification() {
       }
       stopRotation();
     };
+    reader.readAsArrayBuffer(blob);
 
+    
     let legend = L.control({ position: "topleft" });
     legend.onAdd = function (map) {
       let div = L.DomUtil.create("div", "legend");
@@ -682,98 +683,43 @@ async function createClassification() {
     alert(Error)
     console.log(error);
   }
-
-
-  /*try {
-    const localTIFPath = 'pictures/satelliteImage.tif';
-    const response = await fetch(localTIFPath);
-    const blob = await response.blob();
-
-    /*
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'satelliteImage.tif';
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    
-    // read arraybuffer
-    const reader = new FileReader();
-    reader.onload = async () => {
-      let arrayBuffer = reader.result;
-
-      try {
-        const georaster = await parseGeoraster(arrayBuffer);
-        console.log(georaster);
-
-                let layer = new GeoRasterLayer({
-          georaster: georaster,
-          opacity: 1,
-          
-          pixelValuesToColorFn: function (pixelValues) {
-            // Assuming "class" is at index 0 in pixelValues array
-            var classValue = pixelValues[0];
-
-            // Define colors dynamically based on class values
-            var color = getColorForClass(classValue);
-
-            return color;
-
-
-          },
-          resolution: 512
-        });
-        
-        layer.addTo(map);
-        map.fitBounds(layer.getBounds());
-
-        stopRotation();
-      } catch (error) {
-        stopRotation();
-        console.log("Error connecting:", error);
-        alert("Error");
-      }
-    };
-
-    reader.readAsArrayBuffer(blob);
-  } catch (error) {
-    stopRotation();
-    alert("Error");
-    console.log(error);
-  }*/
 }
 
 let layer1;
+let demoValue;
 function simulateUserInput() {
+  demoValue = true;
   // Simulate date input
   $('#datepicker1').val('2021-06-01');
   $('#datepicker2').val('2021-06-15');
+
+  document.getElementById("datepicker1").disabled = true;
+  document.getElementById("datepicker2").disabled = true;
 
   let saveDateBtn = document.getElementById("saveDateBtn");
 
   // Remove the current class
   saveDateBtn.classList.remove("black-btn");
 
-  // Add the new class
-  saveDateBtn.classList.add("accepted-btn");
 
-  let startDate = '2021-06-01';
-  let endDate = '2021-06-15';
-  console.log(startDate)
-  // Format dates as YYYY-MM-DD
-  let formattedStartDate = startDate;
-  let formattedEndDate = endDate;
+    // Add the new class
+    saveDateBtn.classList.add("accepted-btn");
+  
+    let startDate = '2021-06-01';
+    let endDate = '2021-06-15';
 
-  // Store dates in an array
-  selectedDates = [formattedStartDate, formattedEndDate];
-
-  console.log(selectedDates);
-
-  const bandsPicker = $('#bandsPicker');
+      // Format dates as YYYY-MM-DD
+    let formattedStartDate = startDate;
+    let formattedEndDate = endDate;
+  
+      // Store dates in an array
+    selectedDates = [formattedStartDate, formattedEndDate];
+  
+    
+  let bandsPicker = $('#bandsPicker');
 
   // Array of indices of bands to be selected (0-indexed)
-  const selectedBandsIndices = [1, 2, 3]; // Bands 2, 3, and 4
+  let selectedBandsIndices = [1, 2, 3]; // Bands 2, 3, and 4
 
   // Loop through the indices and set the selected property for each option
   selectedBandsIndices.forEach(index => {
@@ -786,13 +732,12 @@ function simulateUserInput() {
   // Assign selected bands to your variable if needed
   selectedBands = ['B02', 'B03', 'B04']
 
-  const modelName = 'Test';  // Replace with the desired model name
+  let modelName = 'Test';  // Replace with the desired model name
+
 
   // Trigger a click event on the corresponding dropdown item
-  const dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
+  let dropdownItem = $(`#trainingModelOptions a:contains(${modelName})`);
   dropdownItem.trigger('click');
-
-
 
 
   // Coordinates for the corners of the rectangle
@@ -802,8 +747,10 @@ function simulateUserInput() {
   // Create a LatLngBounds object
   let bounds = L.latLngBounds(southWest1, northEast1);
 
+
   // Add a rectangle to the map
-  layer1 = L.rectangle(bounds, { color: "#ff7800", weight: 1 }).addTo(map);
+  layer1 = L.rectangle(bounds, {color: "red", weight: 3, fill : false}).addTo(map);
+
 
   bounds = layer1.getBounds();
   console.log(bounds)
@@ -869,21 +816,25 @@ function simulateUserInput() {
 
 
 
+
   const lowCCButton = document.getElementById("leastCloudCoverage");
   const agg = document.getElementById("aggregate");
   const select = document.getElementById("selectAvailable");
   lowCCButton.classList.remove("black-btn");
   lowCCButton.classList.add("accepted-btn");
-
+  agg.classList.remove("black-btn");
+  agg.classList.remove("light-grey-btn");
+  select.classList.remove("black-btn");
+  select.classList.remove("light-grey-btn");
 }
 
 var randomColors = generateRandomColors();
 function generateRandomColors() {
-  const colors = [];
+  let colors = [];
 
   // Funktion, um eine zufällige Farbe zu generieren
   function getRandomColor() {
-    const letters = '0123456789ABCDEF';
+    let letters = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
@@ -914,6 +865,10 @@ function getColorForClass(classValue) {
     2: randomColors[1],
     3: randomColors[2],
     4: randomColors[3],
+    5: randomColors[4],
+    6: randomColors[5],
+    7: randomColors[6],
+    8: randomColors[7],
     // Add more class-color mappings as needed
   };
 
@@ -958,10 +913,10 @@ function checkInputsForEarthSearch() {
   // Check if both Dateinputs are not empty
   if (date1Value !== '' && date2Value !== '' && AoIgiven) {
 
-    const lowerLeftLong = west;
-    const lowerLeftLat = south;
-    const upperRightLong = east;
-    const upperRightLat = north;
+    let lowerLeftLong = west;
+    let lowerLeftLat = south;
+    let upperRightLong = east;
+    let upperRightLat = north;
 
     // Url for request with filter parameters for earth search v1
     // Transform dates into earth-search v1 compatible
@@ -1051,6 +1006,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     endTime = selectedDates[1];
 
     const httpRequestUrl = checkInputsForEarthSearch();
+
     console.log(httpRequestUrl);
 
     fetch(httpRequestUrl)

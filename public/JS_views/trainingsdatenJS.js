@@ -1,4 +1,4 @@
-//const cons = require("consolidate");
+//let cons = require("consolidate");
 
 //Add Leaflet Map 
 var map = L.map('map').setView([51.96269732749698, 7.625025563711631], 13);
@@ -137,14 +137,14 @@ async function startingPolygonmanager() {
           },
           onEachFeature: function (feature, layer) {
 
-            const div = document.createElement("div");
+            let div = document.createElement("div");
             div.innerHTML = `
             <strong>Name:</strong> ${feature.properties.name || 'N/A'}<br>
             <strong>Object ID:</strong> ${feature.properties.object_id || 'N/A'}<br> 
             <strong>Classification:</strong> ${feature.properties.classification || 'N/A'}<br>
           `;
             //Delete Function
-            const deleteButton = document.createElement("button");
+            let deleteButton = document.createElement("button");
             deleteButton.innerHTML = "Delete";
             deleteButton.onclick = function () {
               console.log("start deleting");
@@ -155,13 +155,13 @@ async function startingPolygonmanager() {
             div.appendChild(document.createElement("br"));
 
             // Save edit button
-            const submitEditButton = document.createElement("button");
+            let submitEditButton = document.createElement("button");
             submitEditButton.innerHTML = "Submit Edit";
             div.appendChild(submitEditButton);
             div.appendChild(document.createElement("br"));
 
             // End edit button
-            const stopEditButton = document.createElement("button");
+            let stopEditButton = document.createElement("button");
             stopEditButton.innerHTML = "Dismiss Edit";
             div.appendChild(stopEditButton);
 
@@ -497,14 +497,14 @@ let addGeoJSONtoDB = async (geojson) => {
 // Function to Delete a Polygon
 async function deleteFeaturefromMapAndDB(feature) {
   try {
-    const objectId = feature._id; // Replace with the actual property name of your objectId
+    let objectId = feature._id; // Replace with the actual property name of your objectId
 
     // Make a request to the server to delete the feature
-    const response = await fetch(`/delete-feature?_id=${objectId}`, {
+    let response = await fetch(`/delete-feature?_id=${objectId}`, {
       method: 'GET', // Since the server route is defined as app.get
     });
 
-    const result = await response.text();
+    let result = await response.text();
     console.log(result);
 
   } catch (error) {
@@ -692,8 +692,29 @@ async function buildModel() {
   try {
     // Call the /buildModel endpoint with the needed data
     let encodedGeoJSONDataString = encodeURIComponent(geoJSONDataString);
-    let response = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&trainingDates=${selectedDatesTD}`);
-    if (response.ok) {
+    //let RDSresponse = await fetch(`/buildModel?nt=${nt}&mt=${mt}&name=${name}&geoJSONData=${encodedGeoJSONDataString}&convertedSouth=${convertedSouth}&convertedWest=${convertedWest}&convertedNorth=${convertedNorth}&convertedEast=${convertedEast}&trainingDates=${selectedDatesTD}`);
+    let requestBody = {
+      nt: nt,
+      mt: mt,
+      name: name,
+      geoJSONData: geoJSONDataString,
+      convertedSouth: convertedSouth,
+      convertedWest: convertedWest,
+      convertedNorth: convertedNorth,
+      convertedEast: convertedEast,
+      trainingDates: selectedDatesTD,
+    };
+    console.log(geoJSONData)
+    
+    let RDSresponse = await fetch('/buildModel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+    
+    if (RDSresponse.ok) {
       fetch('/saveModel', {
         method: 'POST',
         headers: {
@@ -707,6 +728,8 @@ async function buildModel() {
           alert("Done");
         })
         .catch(error => console.error('Error saving data:', error));
+
+
     } else {
       stopRotation();
       console.error('Error in the first fetch:', response.statusText);

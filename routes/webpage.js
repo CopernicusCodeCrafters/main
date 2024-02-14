@@ -4,14 +4,14 @@ var mongodb = require("mongodb");
 let { MongoClient } = require("mongodb");
 let { OpenEO, FileTypes, Capabilities } = require('@openeo/js-client'); 
 let { format } = require("morgan");
-const bodyParser = require('body-parser');
+let bodyParser = require('body-parser');
 
 
 
 
 //let url = "mongodb://127.0.0.1:27017";
 //let url = "mongodb://mongo:27017"; // connection URL
-const url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
+let url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
 //let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
 let openeo_url = "http://34.209.215.214:8000/"
 console.log("OPENEO URL : ",openeo_url)
@@ -110,7 +110,7 @@ router.get('/satelliteImage', async function (req, res, next) {
 
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+    res.status(500).json({ error: 'Internal Server Error in get image' }); // Send error response
   }
 });
 
@@ -177,58 +177,66 @@ router.get('/getClassification', async function (req, res, next) {
 
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' }); // Send error response
+    alert("")
+    res.status(500).json({ error: 'Internal Server Error in get Classification' }); // Send error response
   }
 });
 
 let rdsModels = [];
 // Method to build a Model 
-router.get('/buildModel', async function (req, res, next) {
+router.post('/buildModel', async function (req, res, next) {
   try {
-    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast} = req.query;
-    console.log(geoJSONData)
-    let TDDates = req.query.trainingDates.split(',');
-
+    let { nt, mt, name, geoJSONData, convertedSouth, convertedWest, convertedNorth, convertedEast, trainingDates } = req.body;
+    console.log(name)
+    //let geoJSON = JSON.parse(geoJSONData);
+    //let TDDates = trainingDates.split(',');
     console.log('Processing model...'); // Indicate the code is running up to this point
     // Connect to the OpenEO server
     let connection = await OpenEO.connect(openeo_url);
     await connection.authenticateBasic('user', 'password');
-    var builder = await connection.buildProcess();
-    console.log(convertedWest)
+    let builder = await connection.buildProcess();
+    console.log(convertedWest);
 
     // datacube init
-    var datacube = builder.load_collection(
+    let datacube = builder.load_collection(
       "sentinel-s2-l2a-cogs",
-      {west: convertedWest, south: convertedSouth,
+      {
+        west: convertedWest,
+        south: convertedSouth,
         east: convertedEast,
-        north: convertedNorth},
+        north: convertedNorth
+      },
       3857,
-      TDDates
+      trainingDates
     );
-        // filter bands to bands with 10 or 20 resolution
-    let datacube_filtered = builder.filter_bands(datacube,["B02","B03","B04","B05","B06","B07","B08","B11","B12"])
-      // NDVI and Fill NAs
-    //let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
+      
+    // filter bands to bands with 10 or 20 resolution
+    let datacube_filtered = builder.filter_bands(datacube, ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B11", "B12"]);
+    
+    // NDVI and Fill NAs
+    // let datacube_ndvi = builder.ndvi(datacube,nir ="B08",red="B04",keepBands=true)
     let datacube_filled = builder.fill_NAs_cube(datacube_filtered);
 
-    var mean = function(data) {
+    let mean = function (data) {
       return this.mean(data);
     };
 
     // reduce data cube - time dimension
-    let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");  
-    
+    let datacube_reduced = builder.reduce_dimension(datacube_filled, mean, dimension = "t");
+
     // data, nt, mt und name müssen übergeben werden
     let model = builder.train_model_ml(data = datacube_reduced, samples = geoJSONData, parseInt(nt), parseInt(mt), String(name), save = true);
-
-    let result = builder.save_result(model,'RDS'); 
+    let result = builder.save_result(model, 'RDS');
     let response = await connection.computeResult(result);
-    res.status(200).send("Model build");
+
+    res.status(200).json({message: 'Model built successfully.' });
+
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error in model building process' }); // Send error response
+    res.status(500).json({ error: 'Internal Server Error in model building model' }); // Send error response
   }
-  
 });
+
+
 classNames = [];
 // POST endpoint saveModel
 router.post('/saveModel', async (req, res) => {
@@ -249,7 +257,7 @@ router.post('/saveModel', async (req, res) => {
   res.json({ message: 'Data saved successfully on the server.' });
 } catch (error) {
   console.error('Error:', error);
-  res.status(500).json({ error: 'Internal Server Error' });
+  res.status(500).json({ error: 'Internal Server Error in save Model' });
 }
 });
 
@@ -263,17 +271,17 @@ router.get('/getModel', async (req, res) => {
     let collection = db.collection(collectionName);
 
     // Fetch all documents from the collection
-    const cursor = collection.find({});
+    let cursor = collection.find({});
     
     // Convert the cursor to an array
-    const documentsArray = await cursor.toArray();
+    let documentsArray = await cursor.toArray();
 
     await client.close();
 
     res.json(documentsArray);
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error in get Model' });
   }
 });
 
@@ -285,7 +293,7 @@ router.get('/getSpecificModel/:modelName', async (req, res) => {
     let collection = client.db(dbName).collection('class');
 
     // Extract the model name from the request parameters
-    const modelName = req.params.modelName;
+    let modelName = req.params.modelName;
 
     // Find the GeoJSON model by name
     let geojson = await collection.findOne({ name: modelName });
