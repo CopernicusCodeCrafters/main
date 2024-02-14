@@ -337,6 +337,7 @@ async function addFeaturesNames(geojson) {
     setGeojsonToMap(feature);
     await addGeoJSONtoDB(feature);
   }
+  location.reload();
 }
 
 
