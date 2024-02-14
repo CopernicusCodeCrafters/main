@@ -747,100 +747,9 @@ async function buildModel() {
 
 document.addEventListener("DOMContentLoaded", async function () {
 
-  const lowCCButton = document.getElementById("leastCloudCoverage");
   const agg = document.getElementById("aggregate");
-  const select = document.getElementById("selectAvailable");
-  const refreshButton = document.getElementById("refreshImageBtn");
   var startingTime;
   var endTime;
-
-  document.getElementById("leastCloudCoverage").addEventListener("click", async function () {
-
-    let response = await fetch("/getAllPolygons");
-    let featureCollections;
-    let geoJSONData;
-    try {
-      geoJSONData = await response.json();
-    } catch (error) {
-      console.log(error)
-    }
-
-    try {
-      if (geoJSONData[0].type === "FeatureCollection") {
-        featureCollections = geoJSONData[0];
-
-      } else {
-        featureCollections = {
-          type: "FeatureCollection",
-          features: geoJSONData
-        }
-      }
-    } catch (error) {
-      console.log(error)
-    }
-
-    let bbox;
-    try {
-      bbox = turf.bbox(featureCollections);
-    } catch (error) {
-      console.log(error)
-    }
-
-    south = bbox[0];
-    west = bbox[1];
-    north = bbox[2];
-    east = bbox[3];
-
-    startingTime = selectedDatesTD[0];
-    endTime = selectedDatesTD[1];
-
-    const httpRequestUrl = checkInputsForEarthSearch();
-    console.log(httpRequestUrl);
-
-    fetch(httpRequestUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json(); // Parse response body as JSON
-      })
-      .then(data => {
-        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
-        if (validImages.length === 0) {
-          alert("There are no valid images available! Select another time period or change the AOI")
-        } else {
-          // Return formatted date, so it can be used for the openeocubes request again
-          console.log(data);
-          const timestamp = data.features[0].properties.datetime; //rigth now returns the image in the timeframe with the least cloud cover
-          const date = new Date(timestamp);
-          const formattedDate = date.toISOString().split('T')[0];
-          console.log(formattedDate);
-          selectedDatesTD[0] = formattedDate;
-          selectedDatesTD[1] = formattedDate;
-
-          lowCCButton.classList.remove("black-btn");
-          lowCCButton.classList.add("accepted-btn");
-
-          agg.classList.remove("black-btn");
-          agg.classList.add("light-grey-btn");
-
-          select.classList.remove("black-btn");
-          select.classList.add("light-grey-btn");
-
-          refreshButton.classList.remove("light-grey-btn");
-          refreshButton.classList.add("black-btn");
-
-          lowCCButton.disabled = true;
-          agg.disabled = true;
-          select.disabled = true;
-          refreshButton.disabled = false;
-        }
-      })
-      .catch(error => {
-        // Handle fetch errors here
-        console.error('Fetch error:', error);
-      });
-  });
 
   document.getElementById("aggregate").addEventListener("click", async function () {
 
@@ -893,199 +802,27 @@ document.addEventListener("DOMContentLoaded", async function () {
       })
       .then(data => {
         // Return formatted date, so it can be used for the openeocubes request again
-        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 10 && item.properties['eo:cloud_cover'] != 0);
         console.log(validImages);
         if (validImages.length === 0) {
-          alert("There are no valid images available! Select another time period or change the AOI")
+          alert("There are no valid images available! Select another time period or change the AOI");
+          agg.innerHTML = "No imagery Available. Click to try again";
         } else {
-
-          lowCCButton.classList.remove("black-btn");
-          lowCCButton.classList.add("light-grey-btn");
 
           agg.classList.remove("black-btn");
           agg.classList.add("accepted-btn");
-
-          select.classList.remove("black-btn");
-          select.classList.add("light-grey-btn");
-
-          refreshButton.classList.remove("light-grey-btn");
-          refreshButton.classList.add("black-btn");
-
-          lowCCButton.disabled = true;
+          agg.innerHTML = "Imagery Available";
           agg.disabled = true;
-          select.disabled = true;
-          refreshButton.disabled = false;
         }
       });
   });
-
-  document.getElementById("selectAvailable").addEventListener("click", async function () {
-
-    let response = await fetch("/getAllPolygons");
-    let featureCollections;
-    let geoJSONData;
-
-    try {
-      geoJSONData = await response.json();
-    } catch (error) {
-      console.log(error)
-    }
-
-    try {
-      if (geoJSONData[0].type === "FeatureCollection") {
-        featureCollections = geoJSONData[0];
-
-      } else {
-        featureCollections = {
-          type: "FeatureCollection",
-          features: geoJSONData
-        }
-      }
-    } catch (error) {
-      console.log(error)
-    }
-
-    let bbox;
-    try {
-      bbox = turf.bbox(featureCollections);
-    } catch (error) {
-      console.log(error)
-    }
-
-    south = bbox[0];
-    west = bbox[1];
-    north = bbox[2];
-    east = bbox[3];
-
-    startingTime = selectedDatesTD[0];
-    endTime = selectedDatesTD[1];
-
-    const httpRequestUrl = checkInputsForEarthSearch();
-    console.log(httpRequestUrl);
-
-    fetch(httpRequestUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json(); // Parse response body as JSON
-      })
-      .then(data => {
-        // Return formatted date, so it can be used for the openeocubes request again
-        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
-        console.log(validImages);
-
-        if (validImages.length === 0) {
-          alert("There are no valid images available! Select another time period or change the AOI")
-        } else {
-          console.log(data);
-          document.getElementById("popup").style.display = "block";
-
-          const table = document.createElement("table");
-          const headerRow = table.insertRow();
-          headerRow.innerHTML = "<th>Time</th><th>Cloud Cover (%)</th>";
-
-
-          data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0).forEach(item => {
-            const row = table.insertRow();
-            const timeCell = row.insertCell(0);
-            const cloudCoverCell = row.insertCell(1);
-
-            const date = new Date(item.properties.datetime);
-            const formattedDate = date.toISOString().split('T')[0];
-
-            timeCell.textContent = formattedDate;
-            cloudCoverCell.textContent = item.properties['eo:cloud_cover'] + "%";
-
-            row.addEventListener("click", function () {
-              const previouslySelectedRow = table.querySelector(".selected");
-              if (previouslySelectedRow) {
-                previouslySelectedRow.classList.remove("selected");
-              }
-              // Add selection to the clicked row
-              row.classList.add("selected");
-
-              // Handle item selection here
-              console.log(`Selected: ${formattedDate}`);
-              selectedDatesTD[0] = formattedDate;
-              selectedDatesTD[1] = formattedDate;
-            });
-            document.getElementById("dynamicTable").appendChild(table);
-          });
-        }
-      })
-      .catch(error => {
-        // Handle fetch errors here
-        console.error('Fetch error:', error);
-      });
-  });
-  document.getElementById("closePopupBtn").addEventListener("click", function () {
-    document.getElementById("popup").style.display = "none";
-
-    lowCCButton.classList.remove("black-btn");
-    lowCCButton.classList.add("light-grey-btn");
-
-    agg.classList.remove("black-btn");
-    agg.classList.add("light-grey-btn");
-
-    select.classList.remove("black-btn");
-    select.classList.add("accepted-btn");
-
-    refreshButton.classList.remove("light-grey-btn");
-    refreshButton.classList.add("black-btn");
-
-    lowCCButton.disabled = true;
-    agg.disabled = true;
-    select.disabled = true;
-    refreshButton.disabled = false;
-  });
-
-  document.getElementById("refreshImageBtn").addEventListener("click", function () {
-
-    selectedDatesTD[0] = startingTime;
-    selectedDatesTD[1] = endTime;
-    console.log(selectedDatesTD);
-
-    lowCCButton.classList.remove("accepted-btn");
-    lowCCButton.classList.remove("light-grey-btn");
-    lowCCButton.classList.add("black-btn");
-
-    agg.classList.remove("accepted-btn");
-    agg.classList.remove("light-grey-btn");
-    agg.classList.add("black-btn");
-
-    select.classList.remove("light-grey-btn");
-    select.classList.remove("accepted-btn");
-    select.classList.add("black-btn");
-
-    refreshButton.classList.remove("black-btn");
-    refreshButton.classList.add("light-grey-btn");
-
-    refreshButton.disabled = true;
-    lowCCButton.disabled = false;
-    agg.disabled = false;
-    select.disabled = false;
-  })
 })
 
 
 function checkInputsForEarthSearch() {
   var date1Value = $('#datepicker1').val();
   var date2Value = $('#datepicker2').val();
-  // var AoIgiven = false;
 
-  // // Check if something is drawn
-  // if (drawnItems.getLayers().length > 0) {
-  //   AoIgiven = true;
-  // }
-
-  // // Check if something is uploaded
-  // var fileInputValue = document.getElementById('fileInput').value;
-  // if (fileInputValue !== '') {
-  //   AoIgiven = true;
-  // }
-
-  // Check if both Dateinputs are not empty
   if (date1Value !== '' && date2Value !== '') {
 
     const lowerLeftLong = west;
