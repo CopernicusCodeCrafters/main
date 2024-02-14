@@ -14,7 +14,7 @@ Joaquin Valdez      @jova10
 
 1. git clone git@github.com:CopernicusCodeCrafters/main.git
 
-2. set environment variable "AWSHOST" of  the "ccceocubes_con"  service to your AWS-IPv4-adress in docker-compose.yml (AWSHOST = AWS-IPv4-adress).
+2. set environment variable "AWSHOST" of  the "ccceocubes_con"  service to your AWS-IPv4-adress in docker-compose.yml (AWSHOST = AWS-IPv4-adress / AWSHOST=34.209.215.214).
 if you are running the application on your local machine, set AWSHOST=ccceocubes_con  .
 On the other hand an AWS-IPv4 adress is necessary if you deploy it on an AWS instance and it is highly recommended.
 3. docker-compose up --build
@@ -29,13 +29,13 @@ With a small area the classification takes around 3 min.
 ### Exploration with "Viewer"
 
  Before you classify a scene, you can take a look with the viewer if there are images with a cloudcover that is low enough
-1. Enter starting and ending time
+1. Enter start and ending time
 2. Draw the area of interest
 3. Select bands you would like to see
 4. "Aggregate all" will reduce the time series to the mean of the band values. By default only images with a cloudcover lower than 10 % will be used. But you can change the cloud cover value.
 5. you can also select a specific image with "select one" or get the image with the lowest Cloudcover with "lowest CC".
 If you are using "select one" chosse one of the images in the list and close with "x" in the top right corner
-
+It is recommended  to use "aggregate all" beacause the classification and model building processes also use aggregated images.
 6. At the end you have to use "Submit"
 
 ### Model Creation
@@ -59,7 +59,7 @@ In the folder "DemoDaten" you will find training polygons.
 ### Classification
 
 1. Select area of interest (in the Imagery page).
-2. Enter Start and end date
+2. Enter Start and end date (also in imagery page)
 3. Select Model , either demo model or your own.
 4. Classify
 

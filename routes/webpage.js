@@ -12,8 +12,8 @@ let bodyParser = require('body-parser');
 //let url = "mongodb://127.0.0.1:27017";
 //let url = "mongodb://mongo:27017"; // connection URL
 let url = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017"
-//let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
-let openeo_url = "http://34.209.215.214:8000/"
+let openeo_url = process.env.OPENEO_URI ?? "http://localhost:8000"
+//let openeo_url = "http://34.209.215.214:8000/"
 console.log("OPENEO URL : ",openeo_url)
 
 /* GET home page. */
