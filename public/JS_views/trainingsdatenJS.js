@@ -311,7 +311,7 @@ async function addFeaturesNames(geojson) {
     const temporaryLayer = L.geoJSON(feature);
     console.log(temporaryLayer);
     drawnItems.addLayer(temporaryLayer);
-    map.fitBounds(temporaryLayer.getBounds(), { padding: [20, 20], maxZoom: 15 });
+    map.fitBounds(temporaryLayer.getBounds());
 
     await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -705,7 +705,7 @@ async function buildModel() {
       trainingDates: selectedDatesTD,
     };
     console.log(geoJSONData)
-    
+
     let RDSresponse = await fetch('/buildModel', {
       method: 'POST',
       headers: {
@@ -713,7 +713,7 @@ async function buildModel() {
       },
       body: JSON.stringify(requestBody),
     });
-    
+
     if (RDSresponse.ok) {
       fetch('/saveModel', {
         method: 'POST',
