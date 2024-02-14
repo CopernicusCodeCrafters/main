@@ -802,7 +802,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       })
       .then(data => {
         // Return formatted date, so it can be used for the openeocubes request again
-        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 30 && item.properties['eo:cloud_cover'] != 0);
+        const validImages = data.features.filter(item => item.properties['eo:cloud_cover'] < 10 && item.properties['eo:cloud_cover'] != 0);
         console.log(validImages);
         if (validImages.length === 0) {
           alert("There are no valid images available! Select another time period or change the AOI");
