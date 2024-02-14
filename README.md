@@ -50,6 +50,8 @@ It is recommended  to use "aggregate all" beacause the classification and model 
 
 5. After a while a message will be displayed ("DONE"). If not, an error has occured. In that case try it with less polygons.
 
+If you are trying to change attributes of a poylgon and it does not work, change the shape of the polygon a little bit and click "submit edit". Afterwards you can edit the values.
+
 #### Upload of training polygons
 
 It its important that training polygons which are uploaded have a column/attribute "classification" and a column/attribute "object_id".
